@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { difficulty, labels, select, tr, type GameDefinition, type GameViewProps } from '../../core/types';
 import { canRaise, cardLabel, createPoker, evaluate, pokerBot, pokerReducer, suit, type PokerState } from './engine';
+import PokerWorker from './bot.worker?worker&inline';
 import './poker.css';
 
 const categoryNames=[labels('Carta alta','High card'),labels('Pareja','Pair'),labels('Doble pareja','Two pair'),labels('Trío','Three of a kind'),labels('Escalera','Straight'),labels('Color','Flush'),labels('Full','Full house'),labels('Póker','Four of a kind'),labels('Escalera de color','Straight flush')];
@@ -19,7 +20,12 @@ function PokerView({state:s,dispatch,locale:l,paused}:GameViewProps<PokerState>)
 export const poker:GameDefinition<PokerState>={
   id:'poker',name:labels('Póker','Poker'),description:labels('Texas Hold’em sin límite. Fichas ficticias y decisiones reales.','No-limit Texas Hold’em. Play chips, real decisions.'),category:'cards',icon:'♠',version:1,
   defaults:{players:2,humans:1,difficulty:'medium'},options:[select('players','Jugadores','Players',[[2,'2','2'],[3,'3','3'],[4,'4','4'],[5,'5','5'],[6,'6','6']],2),select('humans','Humanos','Humans',[[1,'1','1'],[2,'2','2'],[3,'3','3'],[4,'4','4'],[5,'5','5'],[6,'6','6']],1),difficulty],
-  create:createPoker,reducer:pokerReducer,View:PokerView,bot:pokerBot,getTurn:s=>s.street==='showdown'?null:{player:s.turn,bot:false,hidden:true},
+  create:createPoker,reducer:pokerReducer,View:PokerView,bot:async(s,c)=>{
+    // Send only the acting player's hand and public information to the worker.
+    const publicState=structuredClone(s);publicState.deck=[];publicState.players.forEach((p,i)=>{if(i!==s.turn)p.hole=[];});
+    if(typeof Worker==='undefined')return pokerBot(publicState,c);
+    return new Promise((resolve)=>{let worker:Worker;try{worker=new PokerWorker();}catch{resolve(pokerBot(publicState,c));return;}const timer=setTimeout(()=>{worker.terminate();resolve({type:'CALL'});},5000);worker.onmessage=e=>{clearTimeout(timer);worker.terminate();resolve(e.data.action??{type:'CALL'});};worker.onerror=()=>{clearTimeout(timer);worker.terminate();resolve(pokerBot(publicState,c));};worker.postMessage({state:publicState,config:c});});
+  },getTurn:s=>s.street==='showdown'?null:{player:s.turn,bot:false,hidden:true},
   guide:[{title:labels('Dos cartas, una mesa','Two cards, one board'),text:labels('Recibes dos cartas privadas. La mejor combinación de cinco entre tus dos cartas y las cinco de la mesa gana. Los otros jugadores solo ven las suyas.','Receive two private cards. Your best five-card combination from your hand and the five community cards wins. Other players only see their own cards.'),diagram:'[A♠ K♠] + [Q♠ J♠ 10♠ 2♦ 3♣] → A♠ K♠ Q♠ J♠ 10♠'},
     {title:labels('Cuatro rondas de apuestas','Four betting rounds'),text:labels('Las ciegas son 10 y 20. Puedes pasar si no debes fichas, igualar, subir o retirarte. En dos jugadores el repartidor pone la ciega pequeña y actúa primero antes del flop. Prueba pasar o igualar.','Blinds are 10 and 20. Check when nothing is owed, call, raise or fold. Heads-up, the dealer posts the small blind and acts first before the flop. Try a check or call.'),diagram:'2 privadas → FLOP (3) → TURN (+1) → RIVER (+1)',action:{type:'CALL'}},
     {title:labels('Subidas y all-in','Raises and all-in'),text:labels('La subida mínima iguala el tamaño de la última subida completa. Un all-in menor es válido, pero no permite volver a subir a quien ya actuó, salvo que las subidas acumuladas alcancen una subida completa.','A minimum raise matches the last full raise size. A smaller all-in is legal, but does not reopen raising for a player who already acted unless cumulative raises reach a full raise.')},

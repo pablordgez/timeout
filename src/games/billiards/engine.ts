@@ -72,7 +72,7 @@ export function poolReducer(state:PoolState,a:Action,c:Config):PoolState {
     else return state;s.breakChoice=null;s.calledBall=1;return s;
   }
   if(a.type==='PLACE'||(a.type==='POINTER'&&state.inHand)){
-    const x=Number(a.x),y=Number(a.y);if(!validPlacement(state,x,y))return state;const s=structuredClone(state);const cue=s.balls.find(b=>b.id===0)!;cue.x=x;cue.y=y;cue.pocketed=false;s.inHand=false;s.event={es:'Blanca colocada. Apunta y dispara.',en:'Cue ball placed. Aim and shoot.'};return s;
+    const x=Number(a.x),y=Number(a.y);if(!validPlacement(state,x,y))return {...state,event:{es:'Elige un espacio libre dentro de la mesa y de la zona permitida.',en:'Choose empty cloth within the table and permitted area.'}};const s=structuredClone(state);const cue=s.balls.find(b=>b.id===0)!;cue.x=x;cue.y=y;cue.pocketed=false;s.inHand=false;s.event={es:'Blanca colocada. Apunta y dispara.',en:'Cue ball placed. Aim and shoot.'};return s;
   }
   if(a.type==='POINTER'||a.type==='POINTER_MOVE'||a.type==='AIM'){
     if(a.type==='POINTER_MOVE'&&!a.down)return state;const s=structuredClone(state),cue=s.balls.find(b=>b.id===0)!;s.angle=a.type==='AIM'?Number(a.angle):Math.atan2(a.y-cue.y,a.x-cue.x);if(!Number.isFinite(s.angle))return state;return s;

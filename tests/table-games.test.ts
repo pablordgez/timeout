@@ -43,7 +43,7 @@ describe('Hold’em evaluator and pot accounting',()=>{
     }}
   });
   it('bot decisions cannot depend on hidden cards or the future deck',()=>{
-    const s=createPoker({players:3},61);const altered=structuredClone(s);altered.deck.reverse();altered.players.forEach((p,i)=>{if(i!==s.turn)p.hole.reverse();});
+    const s=createPoker({players:3},61);const altered=structuredClone(s);altered.deck=[];altered.players.forEach((p,i)=>{if(i!==s.turn)p.hole=[card(14),card(14,1)];});
     expect(pokerBot(s,{difficulty:'hard'})).toEqual(pokerBot(altered,{difficulty:'hard'}));expect(cardLabel(51)).toBe('A♠');
   });
 });
@@ -101,5 +101,12 @@ describe('eight-ball adjudication and deterministic physics',()=>{
   it('a full-power bot break resolves and leaves all balls finite',()=>{
     const c={mode:'eight',difficulty:'hard'};let s=createPool(c,72);s=poolReducer(s,poolBot(s,c)!,c);s=poolReducer(s,poolBot(s,c)!,c);for(let i=0;i<1500&&s.phase==='moving';i++)s=poolReducer(s,{type:'TICK',dt:1/60},c);
     expect(s.phase).not.toBe('moving');expect(s.balls.every(b=>Number.isFinite(b.x)&&Number.isFinite(b.y))).toBe(true);expect(s.shots[0]).toBe(1);
+  });
+  it('the geometric aiming bot can actually pocket balls, not just choose legal actions',()=>{
+    const c={mode:'practice',difficulty:'hard'};let s=createPool(c,72);
+    for(let i=0;i<20000&&s.status==='playing'&&s.shots[0]<20;i++){
+      const action=s.phase==='moving'?{type:'TICK',dt:.05}:poolBot(s,c);expect(action).not.toBeNull();const next=poolReducer(s,action!,c);expect(next).not.toBe(s);s=next;
+    }
+    expect(s.balls.filter(b=>b.id&&b.pocketed).length).toBeGreaterThan(4);
   });
 });
