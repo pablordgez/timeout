@@ -1,0 +1,60 @@
+.solitaire { --sol-width: 68px; --sol-height: 94px; --sol-overlap: 27px; --sol-card-paper: var(--card-face, #f7f5f0); --sol-card-ink: var(--card-black, #222); --sol-card-red: var(--card-red, #bd2635); width: 100%; }
+.sol-meta { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin: 0 0 12px; }
+.sol-meta strong { font-size: 1.1rem; }
+.sol-meta span, .sol-label, .sol-instruction { color: var(--muted, #888); font-size: .82rem; }
+.sol-instruction { margin: 0 0 20px; line-height: 1.7; }
+.sol-scroll { overflow-x: auto; padding: 5px 6px 24px; overscroll-behavior-x: contain; }
+.sol-top { display: flex; gap: 14px; margin-bottom: 30px; min-width: 595px; }
+.sol-top-spider { min-width: 755px; }
+.sol-top-freecell { min-width: 635px; justify-content: space-between; }
+.sol-top-pyramid { min-width: 555px; }
+.sol-pile { position: relative; flex-shrink: 0; min-width: var(--sol-width); }
+.sol-label { display: block; margin-bottom: 8px; text-align: center; min-height: 18px; font-size: .7rem; }
+.sol-foundation-group, .sol-cell-group { display: flex; gap: 12px; }
+.sol-foundation-group { margin-left: auto; }
+.sol-card, .sol-slot { width: var(--sol-width); height: var(--sol-height); position: relative; flex-shrink: 0; padding: 0; border-radius: var(--card-radius, 8px); border: 1px solid var(--card-border, #c7c5c0); box-shadow: 0 2px 5px #0002; background: var(--sol-card-paper); color: var(--sol-card-ink); cursor: pointer; font-family: var(--font-mono, monospace); font-size: 1.15rem; touch-action: manipulation; text-align: left; transition: box-shadow .12s, outline-color .12s; }
+.sol-card:disabled { opacity: 1; cursor: default; }
+.sol-slot { background: transparent; color: var(--muted, #888); box-shadow: none; border: 1px dashed var(--border, #8886); display: flex; justify-content: center; align-items: center; font-size: .7rem; }
+.sol-corner { position: absolute; top: 4px; left: 5px; font-size: 1rem; font-weight: 600; line-height: 1; }
+.sol-corner small { display: block; font-size: .85rem; margin-top: 3px; }
+.sol-bottom { top: auto; left: auto; bottom: 4px; right: 5px; transform: rotate(180deg); }
+.sol-center { position: absolute; top: 32%; left: 36%; font-size: 1.45rem; }
+.sol-red { color: var(--sol-card-red); }
+.sol-back { background: repeating-radial-gradient(circle at 4px 4px, #ffffff28 0 1px, transparent 1px 6px), var(--card-back, #374953); color: #f5f5f5; border-color: var(--card-back, #374953); display: grid; place-items: center; }
+.sol-stock { display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--card-back, #374953); color: #fff; }
+.sol-stock small { font-size: .8rem; padding-top: 8px; }
+.sol-selected { outline: 3px solid var(--accent, #d6383e); outline-offset: -2px; box-shadow: 0 0 0 2px var(--accent, #d6383e); }
+.sol-suggested { outline: 3px dashed var(--accent, #d6383e); outline-offset: 2px; }
+.sol-target { box-shadow: 0 0 0 3px var(--accent, #d6383e); }
+.sol-card:focus-visible, .sol-slot:focus-visible { outline: 3px solid var(--accent, #d6383e); outline-offset: 3px; z-index: 150 !important; }
+.sol-covered::after { content: ''; position: absolute; inset: 0; background: #2223; border-radius: inherit; }
+.sol-waste { width: calc(var(--sol-width) + 34px); height: var(--sol-height); position: relative; }
+.sol-waste .sol-card { position: absolute; top: 0; }
+.sol-tableau { display: grid; gap: 12px; grid-template-columns: repeat(7, var(--sol-width)); width: max-content; min-width: 100%; }
+.sol-columns-8 { grid-template-columns: repeat(8, var(--sol-width)); }
+.sol-columns-10 { grid-template-columns: repeat(10, var(--sol-width)); }
+.sol-column-cards { position: relative; }
+.sol-column-cards .sol-card { position: absolute; left: 0; }
+.sol-column-cards .sol-slot { position: absolute; inset: 0; }
+.sol-progress { display: flex; flex-direction: column; justify-content: center; gap: 10px; margin-left: 20px; }
+.sol-progress strong { font-size: 1.7rem; }
+.sol-progress span { font-size: .8rem; color: var(--muted, #888); }
+.sol-sequence-icons { letter-spacing: 4px; }
+.sol-pyramid { min-width: 555px; display: flex; flex-direction: column; align-items: center; padding-bottom: var(--sol-height); }
+.sol-pyramid-row { display: flex; gap: 8px; height: 42px; }
+.sol-pyramid-cell { width: var(--sol-width); height: var(--sol-height); position: relative; }
+.sol-cleared { display: flex; height: 42px; align-items: center; justify-content: center; color: var(--muted, #888); }
+.sol-tools { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 4px 0; }
+.sol-tools button, .sol-guide > button, .sol-demo > button { padding: 9px 14px; font: inherit; border: 1px solid var(--border, #8886); border-radius: var(--radius, 8px); background: var(--surface, transparent); color: inherit; cursor: pointer; }
+.sol-tools button:disabled { opacity: .45; cursor: default; }
+.sol-tools span { margin-left: auto; color: var(--muted, #888); font-size: .8rem; }
+.sol-message { min-height: 24px; font-size: .85rem; color: var(--muted, #888); line-height: 1.6; }
+.sol-guide { border: 1px solid var(--border, #8886); border-radius: var(--radius, 8px); padding: 16px; margin: 16px 0; }
+.sol-guide summary { cursor: pointer; font-weight: 600; }
+.sol-guide li, .sol-guide p { font-size: .88rem; line-height: 1.8; margin: 12px 0; }
+.sol-rule-diagram { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-family: var(--font-mono, monospace); border: 1px dashed var(--border, #8886); padding: 16px; }
+.sol-rule-diagram small { font-family: inherit; font-size: .73rem; color: var(--muted, #888); }
+.sol-demo { border-top: 1px solid var(--border, #8886); margin-top: 16px; padding-top: 12px; }
+.sol-paused { color: var(--accent, #d6383e); }
+@media (max-width: 680px) { .solitaire { --sol-width: 55px; --sol-height: 80px; --sol-overlap: 25px; } .sol-tableau { gap: 8px; } .sol-top { gap: 8px; min-width: 455px; } .sol-top-freecell { min-width: 496px; } .sol-top-spider { min-width: 622px; } .sol-top-pyramid, .sol-pyramid { min-width: 449px; } .sol-foundation-group, .sol-cell-group { gap: 8px; } .sol-pyramid-row { height: 35px; } .sol-tools span { width: 100%; margin: 8px 0; } .sol-label { font-size: .64rem; } .sol-corner { font-size: .9rem; } .sol-center { font-size: 1.2rem; } }
+@media (prefers-reduced-motion: reduce) { .sol-card { transition: none; } }
