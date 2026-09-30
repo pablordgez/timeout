@@ -24,6 +24,7 @@ type Draw = (
   ctx: CanvasRenderingContext2D,
   s: PoolState,
   colors: Record<string, string>,
+  practice: boolean,
 ) => void;
 /** Drag state belongs to the UI. A cancelled or saved drag is never a pending shot. */
 export function PoolSurface({
@@ -33,11 +34,12 @@ export function PoolSurface({
   locale: l,
   paused,
   draw,
-}: GameViewProps<PoolState> & { draw: Draw }) {
+  locked = true,
+}: GameViewProps<PoolState> & { draw: Draw; locked?: boolean }) {
   const wrapper = useRef<HTMLDivElement>(null),
     gesture = useRef<Gesture | null>(null),
+    hover = useRef<number | null>(null),
     [power, setPower] = useState<number | null>(null);
-  const [locked, setLocked] = useState(true);
   const ready =
     !paused &&
     s.phase === "aim" &&
@@ -46,6 +48,7 @@ export function PoolSurface({
   const cancel = useCallback(() => {
     const g = gesture.current;
     gesture.current = null;
+    hover.current = null;
     setPower(null);
     if (g && wrapper.current?.hasPointerCapture(g.pointer))
       wrapper.current.releasePointerCapture(g.pointer);
@@ -53,6 +56,9 @@ export function PoolSurface({
   useEffect(() => {
     if (!ready) cancel();
   }, [ready, cancel]);
+  useEffect(() => {
+    hover.current = null;
+  }, [s.angle, s.turn, s.inHand, s.phase]);
   useEffect(() => {
     window.addEventListener("blur", cancel);
     const hidden = () => {
@@ -80,11 +86,14 @@ export function PoolSurface({
         ctx,
         g
           ? { ...state, angle: g.angle, power: g.power, pull: g.distance }
-          : state,
+          : hover.current !== null
+            ? { ...state, angle: hover.current }
+            : state,
         colors,
+        c.mode === "practice",
       );
     },
-    [draw],
+    [draw, c.mode],
   );
   const filteredDispatch = useCallback(
     (a: Action) => {
@@ -113,16 +122,18 @@ export function PoolSurface({
     const pocket = pockets.findIndex(
       ([x, y]) => Math.hypot(x - p.x, y - p.y) < 27,
     );
-    if (pocket >= 0 && !s.breakShot) {
+    if (pocket >= 0 && !s.breakShot && c.mode !== "practice") {
       dispatch({ type: "CALL_POCKET", pocket });
       return;
     }
     const cue = s.balls.find((b) => b.id === 0)!;
     const angle =
-      Math.hypot(p.x - cue.x, p.y - cue.y) > 28
+      Math.hypot(p.x - cue.x, p.y - cue.y) > 42
         ? Math.atan2(p.y - cue.y, p.x - cue.x)
-        : s.angle;
-    const aiming = Math.hypot(p.x - cue.x, p.y - cue.y) > 42;
+        : (hover.current ?? s.angle);
+    // Mouse: point, pull anywhere, release. Touch: aim first, pull near the cue ball.
+    const aiming =
+      e.pointerType === "touch" && Math.hypot(p.x - cue.x, p.y - cue.y) > 42;
     gesture.current = {
       pointer: e.pointerId,
       start: p,
@@ -139,7 +150,16 @@ export function PoolSurface({
   };
   const move = (e: PointerEvent<HTMLDivElement>) => {
     const g = gesture.current;
-    if (!ready || !g || g.pointer !== e.pointerId) return;
+    if (!ready || s.inHand) return;
+    if (!g) {
+      if (e.pointerType === "touch" || e.buttons) return;
+      const p = point(e),
+        cue = s.balls.find((b) => b.id === 0)!;
+      if (Math.hypot(p.x - cue.x, p.y - cue.y) > 42)
+        hover.current = Math.atan2(p.y - cue.y, p.x - cue.x);
+      return;
+    }
+    if (g.pointer !== e.pointerId) return;
     e.preventDefault();
     const current = point(e);
     if (g.aiming) {
@@ -178,7 +198,7 @@ export function PoolSurface({
     const pocket = pockets.findIndex(
       ([x, y]) => Math.hypot(x - p.x, y - p.y) < 27,
     );
-    if (pocket >= 0 && !s.breakShot) {
+    if (pocket >= 0 && !s.breakShot && c.mode !== "practice") {
       dispatch({ type: "CALL_POCKET", pocket });
       return;
     }
@@ -189,7 +209,8 @@ export function PoolSurface({
         Math.hypot(b.x - p.x, b.y - p.y) < 20 &&
         permittedTargets(s, c).includes(b.id),
     );
-    if (target && !s.breakShot) dispatch({ type: "CALL_BALL", id: target.id });
+    if (target && !s.breakShot && c.mode !== "practice")
+      dispatch({ type: "CALL_BALL", id: target.id });
   };
   return (
     <>
@@ -208,6 +229,7 @@ export function PoolSurface({
           if (!ready || s.inHand) return;
           if (["ArrowLeft", "ArrowRight"].includes(e.key)) {
             e.preventDefault();
+            cancel();
             dispatch({
               type: "AIM",
               angle:
@@ -220,7 +242,9 @@ export function PoolSurface({
           }
           if (e.key === " " && !e.repeat) {
             e.preventDefault();
-            dispatch({ type: "SHOOT" });
+            const angle = hover.current ?? s.angle;
+            cancel();
+            dispatch({ type: "SHOOT", angle });
           }
           if (e.key === "Escape") {
             cancel();
@@ -232,6 +256,9 @@ export function PoolSurface({
         onPointerUp={end}
         onPointerCancel={cancel}
         onLostPointerCapture={cancel}
+        onPointerLeave={() => {
+          if (!gesture.current) hover.current = null;
+        }}
       >
         <CanvasBoard
           state={s}
@@ -249,27 +276,24 @@ export function PoolSurface({
         )}
       </div>
       <p className="pool-drag-help" aria-live="polite">
-        {power === null
+        {s.inHand
           ? tr(
               l,
-              "Arrastra hacia atrás desde la blanca y suelta para tirar. Toca o arrastra el resto de la mesa para apuntar.",
-              "Pull back from the cue ball and release to shoot. Tap or drag elsewhere on the cloth to aim.",
+              s.behindHead
+                ? "Coloca la blanca a la izquierda de la línea."
+                : "Coloca la blanca en un espacio libre.",
+              s.behindHead
+                ? "Place the cue ball to the left of the line."
+                : "Place the cue ball on empty cloth.",
             )
-          : `${tr(l, "Potencia del tirón", "Drag power")}: ${power}% · ${tr(l, "Suelta para tirar · Escape cancela", "Release to shoot · Escape cancels")}`}
+          : power === null
+            ? tr(
+                l,
+                "Apunta con el ratón, arrastra hacia atrás y suelta para tirar. En pantalla táctil, apunta y tira desde la blanca.",
+                "Aim with the mouse, pull back and release to shoot. On touchscreens, aim first, then pull from the cue ball.",
+              )
+            : `${tr(l, "Potencia del tirón", "Drag power")}: ${power}% · ${tr(l, "Suelta para tirar · Escape cancela", "Release to shoot · Escape cancels")}`}
       </p>
-      <label className="pool-aim-lock">
-        <input
-          type="checkbox"
-          checked={locked}
-          disabled={!ready}
-          onChange={(e) => setLocked(e.target.checked)}
-        />
-        {tr(
-          l,
-          "Mantener la dirección al cargar el tiro",
-          "Keep the chosen direction while charging",
-        )}
-      </label>
     </>
   );
 }

@@ -130,4 +130,15 @@ describe('eight-ball adjudication and deterministic physics',()=>{
     }
     expect(s.balls.filter(b=>b.id&&b.pocketed).length).toBeGreaterThan(4);
   });
+  it('practice can shoot again after the previously called ball has been pocketed, while eight-ball still requires a valid call',()=>{
+    const c={mode:'practice'};let state=createPool(c,42);
+    state=poolReducer(state,{type:'PLACE',x:170,y:200},c);
+    state.breakShot=false;
+    state.balls.find(b=>b.id===state.calledBall)!.pocketed=true;
+    const action={type:'SHOOT',angle:0,power:600};
+    const practice=poolReducer(state,action,c);
+    expect(practice.phase).toBe('moving');
+    expect(practice.balls.find(b=>b.id===0)!.vx).toBe(600);
+    expect(poolReducer(state,action,{mode:'eight'}).phase).toBe('aim');
+  });
 });

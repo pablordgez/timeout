@@ -119,8 +119,8 @@ export function nextStep(id: string, s: GameState, l: Locale, config: Config = {
               )
             : s.breakShot || config.mode === "practice"
               ? t(
-                  "Apunta en la mesa; tira hacia atrás desde la blanca y suelta.",
-                  "Aim on the table; pull back from the cue ball and release.",
+                  "Apunta en la mesa, arrastra hacia atrás y suelta para tirar.",
+                  "Aim on the table, pull back and release to shoot.",
                 )
               : t(
                 "Anuncia bola y tronera. Arrastra hacia atrás y suelta para tirar.",

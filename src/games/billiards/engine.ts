@@ -78,13 +78,13 @@ export function poolReducer(state:PoolState,a:Action,c:Config):PoolState {
     if(a.type==='POINTER_MOVE'&&!a.down)return state;const s=structuredClone(state),cue=s.balls.find(b=>b.id===0)!;s.angle=a.type==='AIM'?Number(a.angle):Math.atan2(a.y-cue.y,a.x-cue.x);if(!Number.isFinite(s.angle))return state;return s;
   }
   if(a.type==='POWER'){const n=Number(a.power);return Number.isFinite(n)?{...state,power:Math.max(80,Math.min(1100,n))}:state;}
-  if(a.type==='CALL_BALL'){const id=Number(a.id);return permittedTargets(state,c).includes(id)?{...state,calledBall:id}:state;}
-  if(a.type==='CALL_POCKET'){const p=Number(a.pocket);return Number.isInteger(p)&&p>=0&&p<6?{...state,calledPocket:p}:state;}
+  if(a.type==='CALL_BALL'){const id=Number(a.id);return permittedTargets(state,c).includes(id)?{...state,calledBall:id,event:{es:`Bola ${id} anunciada para la tronera ${state.calledPocket+1}.`,en:`Ball ${id} called for pocket ${state.calledPocket+1}.`}}:state;}
+  if(a.type==='CALL_POCKET'){const p=Number(a.pocket);return Number.isInteger(p)&&p>=0&&p<6?{...state,calledPocket:p,event:{es:`Bola ${state.calledBall} anunciada para la tronera ${p+1}.`,en:`Ball ${state.calledBall} called for pocket ${p+1}.`}}:state;}
   if(a.type==='SHOOT'){
     if(state.inHand)return state;const s=structuredClone(state);const angle=Number(a.angle??s.angle),power=Number(a.power??s.power),ball=Number(a.calledBall??s.calledBall),pocket=Number(a.calledPocket??s.calledPocket);
     if(!Number.isFinite(angle)||!Number.isFinite(power)||power<80||power>1100||!Number.isInteger(pocket)||pocket<0||pocket>5)return state;
-    if(!s.breakShot&&!permittedTargets(s,c).includes(ball))return {...state,event:{es:'Anuncia una bola disponible y la tronera antes de tirar.',en:'Call an available ball and pocket before shooting.'}};
-    const cue=s.balls.find(b=>b.id===0)!;if(cue.pocketed)return state;cue.vx=Math.cos(angle)*power;cue.vy=Math.sin(angle)*power;s.angle=angle;s.power=power;s.calledBall=ball;s.calledPocket=pocket;s.phase='moving';s.shot={shooter:s.turn,first:null,pocketed:[],railAfter:false,railBalls:[],calledBall:ball,calledPocket:pocket,wasBreak:s.breakShot,onEight:!!s.groups[s.turn]&&leftInGroup(s,s.groups[s.turn]).length===0,age:0,crossedHead:cue.x>=HEAD,behindHead:s.behindHead};s.behindHead=false;s.accumulator=0;return s;
+    if(c.mode!=='practice'&&!s.breakShot&&!permittedTargets(s,c).includes(ball))return {...state,event:{es:'Anuncia una bola disponible y la tronera antes de tirar.',en:'Call an available ball and pocket before shooting.'}};
+    const cue=s.balls.find(b=>b.id===0)!;if(cue.pocketed)return state;cue.vx=Math.cos(angle)*power;cue.vy=Math.sin(angle)*power;s.angle=angle;s.power=power;s.calledBall=ball;s.calledPocket=pocket;s.phase='moving';s.event={es:'Tiro en curso.',en:'Shot in progress.'};s.shot={shooter:s.turn,first:null,pocketed:[],railAfter:false,railBalls:[],calledBall:ball,calledPocket:pocket,wasBreak:s.breakShot,onEight:!!s.groups[s.turn]&&leftInGroup(s,s.groups[s.turn]).length===0,age:0,crossedHead:cue.x>=HEAD,behindHead:s.behindHead};s.behindHead=false;s.accumulator=0;return s;
   }
   return state;
 }

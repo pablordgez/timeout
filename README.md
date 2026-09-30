@@ -29,7 +29,7 @@ Los guardados se quedan en tu navegador. Para trasladarlos o conservar una copia
 | Póker                  | Texas Hold’em con fichas ficticias; 2–6 jugadores.           |
 | Dominó                 | Doble seis, individual o por parejas.                        |
 | Billar                 | Bola 8 y práctica individual.                                |
-| Preguntas y respuestas | Un tablero con seis categorías de preguntas.                 |
+| Preguntas y respuestas | Seis categorías; 500 preguntas en español y 500 en inglés.   |
 | Serpiente              | Recoge comida y evita chocar.                                |
 | Salto de dinosaurio    | Salta los cactus mientras aumenta la velocidad.              |
 | Vuelo entre tubos      | Da impulsos al pájaro para atravesar los huecos.             |
@@ -42,7 +42,7 @@ Los juegos de palabras y preguntas permiten elegir español o inglés al iniciar
 
 ![Colección de juegos](screenshots/collection.png)
 
-![Partida de billar](screenshots/billiards.png)
+![Partida de billar](screenshots/billiards.jpg)
 
 ## Construir
 
@@ -66,4 +66,4 @@ La web incluye una política de seguridad en el HTML y un archivo `_headers` par
 
 El código se distribuye bajo [GPL-3.0-only](LICENSE). Las distribuciones deben incluir el código fuente correspondiente y los avisos de [licenses/](licenses/).
 
-Las palabras proceden de Wikcionario/Wiktionary, vía Kaikki/Wiktextract, y las preguntas inglesas de Open Trivia DB; sus paquetes conservan CC BY-SA 4.0. Stockfish usa GPLv3 y las tipografías IBM Plex, SIL OFL. Los créditos y textos de licencia también están disponibles dentro del juego.
+Las palabras proceden de Wikcionario/Wiktionary, vía Kaikki/Wiktextract, y las preguntas inglesas de Open Trivia DB; sus paquetes conservan CC BY-SA 4.0. Las preguntas españolas combinan contenido original con una selección de [Spanish general knowledge database](https://doi.org/10.6084/m9.figshare.13041803.v2), bajo CC BY 4.0. Stockfish usa GPLv3 y las tipografías IBM Plex, SIL OFL. Los créditos y textos de licencia también están disponibles dentro del juego.
