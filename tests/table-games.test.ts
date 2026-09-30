@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { canRaise, cardLabel, compareHands, createPoker, evaluate, pokerBot, pokerReducer, sidePots, type Player, type PokerState } from '../src/games/poker/engine';
 import { createDomino, dominoBot, dominoReducer, legalEnds, legalTiles, pipSum, roundWinners, tiles } from '../src/games/domino/engine';
 import { adjudicate, createPool, poolBot, poolReducer, validPlacement, type PoolState, type Shot } from '../src/games/billiards/engine';
+import {dragShot,previewShot} from '../src/games/billiards/preview';
 
 const card=(rank:number,suit=0)=>suit*13+rank-2;
 const player=(total:number,hole:number[],folded=false):Player=>({stack:0,hole,folded,allIn:true,bet:total,total,actedAt:-1});
@@ -82,6 +83,16 @@ describe('double-six domino rules',()=>{
 function shot(overrides:Partial<Shot>={}):Shot{return {shooter:0,first:1,pocketed:[],railAfter:true,railBalls:[1],calledBall:1,calledPocket:2,wasBreak:false,onEight:false,age:2,crossedHead:true,behindHead:false,...overrides};}
 function shotState(overrides:Partial<Shot>={}):PoolState {const s=createPool({},10);s.breakShot=false;s.inHand=false;s.groups=['solid','stripe'];s.shot=shot(overrides);return s;}
 describe('eight-ball adjudication and deterministic physics',()=>{
+  it('maps a backwards pull to forward aim and proportional capped power',()=>{
+    expect(dragShot({x:170,y:200},{x:70,y:200})).toEqual({angle:0,power:600,distance:100});expect(dragShot({x:170,y:200},{x:120,y:200}).power).toBe(300);expect(dragShot({x:170,y:200},{x:-500,y:200}).power).toBe(1100);expect(dragShot({x:170,y:200},{x:170,y:100}).angle).toBeCloseTo(Math.PI/2);
+  });
+  it('previews the first ball impact and transfers a straight shot to the object',()=>{
+    const s=createPool({},1);const p=previewShot(s,0,800)!;expect(p.kind).toBe('ball');expect(p.ball).toBe(s.balls.find(b=>b.x===495)!.id);expect(p.contact.x).toBeCloseTo(479);expect(p.contact.y).toBeCloseTo(200);expect(p.lines.filter(l=>l.kind==='object')).toHaveLength(1);expect(p.lines[1].to.x).toBeGreaterThan(p.lines[1].from.x);
+  });
+  it('previews a cushion reflection and a pocket before the cushion',()=>{
+    const s=createPool({},1);s.balls.filter(b=>b.id).forEach(b=>b.pocketed=true);let p=previewShot(s,0,600)!;expect(p.kind).toBe('rail');expect(p.contact.x).toBe(682);expect(p.lines[1].kind).toBe('bounce');expect(p.lines[1].to.x).toBeLessThan(p.contact.x);
+    s.balls[0].x=360;p=previewShot(s,-Math.PI/2,600)!;expect(p.kind).toBe('pocket');expect(p.contact.y).toBeCloseTo(48);expect(p.lines).toHaveLength(1);
+  });
   it('assigns groups only on a legal called shot, never on the break',()=>{
     const s=shotState({pocketed:[{id:1,pocket:2}]});s.groups=[null,null];adjudicate(s,{mode:'eight'});expect(s.groups).toEqual(['solid','stripe']);expect(s.turn).toBe(0);
     const b=shotState({wasBreak:true,pocketed:[{id:1,pocket:2}]});b.groups=[null,null];adjudicate(b,{mode:'eight'});expect(b.groups).toEqual([null,null]);expect(b.turn).toBe(0);
