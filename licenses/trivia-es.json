@@ -1,0 +1,1784 @@
+{
+  "title": "The thousand-question Spanish general knowledge database",
+  "authors": [
+    "Francisco Buades-Sitjar",
+    "Roger Boada",
+    "Marc Guasch",
+    "Pilar Ferré",
+    "José Antonio Hinojosa",
+    "Marc Brysbaert",
+    "Jon Andoni Duñabeitia"
+  ],
+  "source": "https://figshare.com/articles/dataset/The_thousand-question_Spanish_general_knowledge_database/13041803/2",
+  "doi": "10.6084/m9.figshare.13041803.v2",
+  "download": "https://ndownloader.figshare.com/files/24952217",
+  "license": "CC-BY-4.0",
+  "sourcePublishedAt": "2020-10-02",
+  "sourceMd5": "5d8a6617222bc60738c4366e438795f1",
+  "sourceSha256": "cf5b5f9659f15bf24e007c9d2f121d5930842bda8f9c93fa909650bd4020c506",
+  "questions": 440,
+  "changes": "Selected standalone short-answer questions; removed distractors and research statistics; mapped categories; normalized whitespace; corrected selected wording and answers. Selection and edits: scripts/trivia-es-selection.json.",
+  "provenance": "Published by Jon Andoni Duñabeitia on Figshare under CC BY 4.0. The accompanying paper describes questions adapted from academic question banks, FunTrivia and TriviaChamp. The paper itself is not included and has a separate license.",
+  "verification": [
+    {
+      "id": "es-sgk-367",
+      "url": "https://es.wikipedia.org/wiki/Londres"
+    },
+    {
+      "id": "es-sgk-368",
+      "url": "https://es.wikipedia.org/wiki/Groenlandia"
+    },
+    {
+      "id": "es-sgk-369",
+      "url": "https://es.wikipedia.org/wiki/Venecia"
+    },
+    {
+      "id": "es-sgk-371",
+      "url": "https://es.wikipedia.org/wiki/Golfo_de_Botnia"
+    },
+    {
+      "id": "es-sgk-378",
+      "url": "https://es.wikipedia.org/wiki/Tirana"
+    },
+    {
+      "id": "es-sgk-379",
+      "url": "https://es.wikipedia.org/wiki/Minsk"
+    },
+    {
+      "id": "es-sgk-380",
+      "url": "https://es.wikipedia.org/wiki/Copenhague"
+    },
+    {
+      "id": "es-sgk-381",
+      "url": "https://es.wikipedia.org/wiki/Helsinki"
+    },
+    {
+      "id": "es-sgk-384",
+      "url": "https://es.wikipedia.org/wiki/Suiza"
+    },
+    {
+      "id": "es-sgk-386",
+      "url": "https://es.wikipedia.org/wiki/Grecia"
+    },
+    {
+      "id": "es-sgk-387",
+      "url": "https://es.wikipedia.org/wiki/Budapest"
+    },
+    {
+      "id": "es-sgk-388",
+      "url": "https://es.wikipedia.org/wiki/Hellas_(desambiguación)"
+    },
+    {
+      "id": "es-sgk-390",
+      "url": "https://es.wikipedia.org/wiki/Formentera"
+    },
+    {
+      "id": "es-sgk-391",
+      "url": "https://es.wikipedia.org/wiki/Ródano"
+    },
+    {
+      "id": "es-sgk-392",
+      "url": "https://es.wikipedia.org/wiki/Pirineos"
+    },
+    {
+      "id": "es-sgk-393",
+      "url": "https://es.wikipedia.org/wiki/Reikiavik"
+    },
+    {
+      "id": "es-sgk-395",
+      "url": "https://es.wikipedia.org/wiki/Liechtenstein"
+    },
+    {
+      "id": "es-sgk-396",
+      "url": "https://es.wikipedia.org/wiki/Hibernia"
+    },
+    {
+      "id": "es-sgk-398",
+      "url": "https://es.wikipedia.org/wiki/Chipre"
+    },
+    {
+      "id": "es-sgk-399",
+      "url": "https://es.wikipedia.org/wiki/Tallin"
+    },
+    {
+      "id": "es-sgk-400",
+      "url": "https://es.wikipedia.org/wiki/Danubio"
+    },
+    {
+      "id": "es-sgk-478",
+      "url": "https://es.wikipedia.org/wiki/Tierra"
+    },
+    {
+      "id": "es-sgk-479",
+      "url": "https://es.wikipedia.org/wiki/Duna"
+    },
+    {
+      "id": "es-sgk-480",
+      "url": "https://es.wikipedia.org/wiki/Meridiano_de_Greenwich"
+    },
+    {
+      "id": "es-sgk-481",
+      "url": "https://es.wikipedia.org/wiki/Oc%C3%A9ano_%C3%8Dndico"
+    },
+    {
+      "id": "es-sgk-483",
+      "url": "https://es.wikipedia.org/wiki/Pangea"
+    },
+    {
+      "id": "es-sgk-486",
+      "url": "https://es.wikipedia.org/wiki/Cabo_de_las_Agujas"
+    },
+    {
+      "id": "es-sgk-495",
+      "url": "https://es.wikipedia.org/wiki/Equinoccio"
+    },
+    {
+      "id": "es-sgk-496",
+      "url": "https://es.wikipedia.org/wiki/Corriente_del_Golfo"
+    },
+    {
+      "id": "es-sgk-497",
+      "url": "https://es.wikipedia.org/wiki/Triángulo_de_las_Bermudas"
+    },
+    {
+      "id": "es-sgk-498",
+      "url": "https://es.wikipedia.org/wiki/Litosfera"
+    },
+    {
+      "id": "es-sgk-499",
+      "url": "https://es.wikipedia.org/wiki/Nuevo_Mundo"
+    },
+    {
+      "id": "es-sgk-500",
+      "url": "https://es.wikipedia.org/wiki/Viejo_Mundo"
+    },
+    {
+      "id": "es-sgk-501",
+      "url": "https://es.wikipedia.org/wiki/Marea"
+    },
+    {
+      "id": "es-sgk-503",
+      "url": "https://es.wikipedia.org/wiki/Cordillera_de_los_Andes"
+    },
+    {
+      "id": "es-sgk-508",
+      "url": "https://es.wikipedia.org/wiki/Tectónica_de_placas"
+    },
+    {
+      "id": "es-sgk-510",
+      "url": "https://es.wikipedia.org/wiki/Biogeograf%C3%ADa"
+    },
+    {
+      "id": "es-sgk-513",
+      "url": "https://es.wikipedia.org/wiki/Isolínea#Tipos_de_isolíneas"
+    },
+    {
+      "id": "es-sgk-514",
+      "url": "https://es.wikipedia.org/wiki/Siroco"
+    },
+    {
+      "id": "es-sgk-859",
+      "url": "https://es.wikipedia.org/wiki/Río_Bravo"
+    },
+    {
+      "id": "es-sgk-861",
+      "url": "https://es.wikipedia.org/wiki/Sri_Lanka"
+    },
+    {
+      "id": "es-sgk-868",
+      "url": "https://es.wikipedia.org/wiki/Santiago_de_Chile"
+    },
+    {
+      "id": "es-sgk-869",
+      "url": "https://es.wikipedia.org/wiki/Ad%C3%ADs_Abeba"
+    },
+    {
+      "id": "es-sgk-870",
+      "url": "https://es.wikipedia.org/wiki/Acra"
+    },
+    {
+      "id": "es-sgk-872",
+      "url": "https://es.wikipedia.org/wiki/Kingston"
+    },
+    {
+      "id": "es-sgk-874",
+      "url": "https://es.wikipedia.org/wiki/Wellington"
+    },
+    {
+      "id": "es-sgk-877",
+      "url": "https://es.wikipedia.org/wiki/Geografía_de_África"
+    },
+    {
+      "id": "es-sgk-878",
+      "url": "https://es.wikipedia.org/wiki/Parque_nacional_de_Yellowstone"
+    },
+    {
+      "id": "es-sgk-880",
+      "url": "https://es.wikipedia.org/wiki/Bagdad"
+    },
+    {
+      "id": "es-sgk-881",
+      "url": "https://es.wikipedia.org/wiki/Nairobi"
+    },
+    {
+      "id": "es-sgk-882",
+      "url": "https://es.wikipedia.org/wiki/Sucre"
+    },
+    {
+      "id": "es-sgk-883",
+      "url": "https://es.wikipedia.org/wiki/Copacabana_(R%C3%ADo_de_Janeiro)"
+    },
+    {
+      "id": "es-sgk-884",
+      "url": "https://es.wikipedia.org/wiki/Eritrea"
+    },
+    {
+      "id": "es-sgk-885",
+      "url": "https://es.wikipedia.org/wiki/Guyana"
+    },
+    {
+      "id": "es-sgk-886",
+      "url": "https://es.wikipedia.org/wiki/Himalaya"
+    },
+    {
+      "id": "es-sgk-888",
+      "url": "https://es.wikipedia.org/wiki/Seychelles"
+    },
+    {
+      "id": "es-sgk-889",
+      "url": "https://es.wikipedia.org/wiki/Brisbane"
+    },
+    {
+      "id": "es-sgk-891",
+      "url": "https://es.wikipedia.org/wiki/Tanzania"
+    },
+    {
+      "id": "es-sgk-893",
+      "url": "https://es.wikipedia.org/wiki/Kalahari"
+    },
+    {
+      "id": "es-sgk-895",
+      "url": "https://es.wikipedia.org/wiki/República_Popular_China#Etimología"
+    },
+    {
+      "id": "es-sgk-896",
+      "url": "https://es.wikipedia.org/wiki/Puerto_Príncipe"
+    },
+    {
+      "id": "es-sgk-897",
+      "url": "https://es.wikipedia.org/wiki/Imperio_portugués"
+    },
+    {
+      "id": "es-sgk-1319",
+      "url": "https://es.wikipedia.org/wiki/Distintivo_automovilístico_de_identificación_internacional"
+    },
+    {
+      "id": "es-sgk-1320",
+      "url": "https://es.wikipedia.org/wiki/Distintivo_automovilístico_de_identificación_internacional"
+    },
+    {
+      "id": "es-sgk-31",
+      "url": "https://es.wikipedia.org/wiki/Muro_de_Berl%C3%ADn"
+    },
+    {
+      "id": "es-sgk-515",
+      "url": "https://es.wikipedia.org/wiki/Luis_XIV_de_Francia"
+    },
+    {
+      "id": "es-sgk-516",
+      "url": "https://es.wikipedia.org/wiki/Tierra_de_nadie_(guerra)"
+    },
+    {
+      "id": "es-sgk-519",
+      "url": "https://es.wikipedia.org/wiki/Proyecto_Manhattan"
+    },
+    {
+      "id": "es-sgk-522",
+      "url": "https://es.wikipedia.org/wiki/Blitzkrieg"
+    },
+    {
+      "id": "es-sgk-525",
+      "url": "https://es.wikipedia.org/wiki/Fundaci%C3%B3n_de_Roma"
+    },
+    {
+      "id": "es-sgk-528",
+      "url": "https://es.wikipedia.org/wiki/Guerra_de_los_Cien_A%C3%B1os"
+    },
+    {
+      "id": "es-sgk-534",
+      "url": "https://es.wikipedia.org/wiki/Tratado_de_Versalles_(1919)"
+    },
+    {
+      "id": "es-sgk-537",
+      "url": "https://es.wikipedia.org/wiki/Accidente_de_Chern%C3%B3bil"
+    },
+    {
+      "id": "es-sgk-541",
+      "url": "https://es.wikipedia.org/wiki/Napole%C3%B3n_Bonaparte"
+    },
+    {
+      "id": "es-sgk-544",
+      "url": "https://es.wikipedia.org/wiki/Guerra_de_trincheras"
+    },
+    {
+      "id": "es-sgk-549",
+      "url": "https://es.wikipedia.org/wiki/Batalla_de_Accio"
+    },
+    {
+      "id": "es-sgk-554",
+      "url": "https://es.wikipedia.org/wiki/Alejandro_Magno#India"
+    },
+    {
+      "id": "es-sgk-556",
+      "url": "https://es.wikipedia.org/wiki/Crist%C3%B3bal_Col%C3%B3n#Primer_viaje_(3_de_agosto_de_1492-15_de_marzo_de_1493)"
+    },
+    {
+      "id": "es-sgk-557",
+      "url": "https://es.wikipedia.org/wiki/Guerra_de_los_Cien_A%C3%B1os"
+    },
+    {
+      "id": "es-sgk-572",
+      "url": "https://es.wikipedia.org/wiki/Howard_Carter"
+    },
+    {
+      "id": "es-sgk-978",
+      "url": "https://es.wikipedia.org/wiki/FBI"
+    },
+    {
+      "id": "es-sgk-979",
+      "url": "https://es.wikipedia.org/wiki/Cruz_Roja"
+    },
+    {
+      "id": "es-sgk-980",
+      "url": "https://es.wikipedia.org/wiki/Ku_Klux_Klan"
+    },
+    {
+      "id": "es-sgk-982",
+      "url": "https://es.wikipedia.org/wiki/Unesco"
+    },
+    {
+      "id": "es-sgk-986",
+      "url": "https://es.wikipedia.org/wiki/Organización_de_las_Naciones_Unidas"
+    },
+    {
+      "id": "es-sgk-989",
+      "url": "https://es.wikipedia.org/wiki/Organizaci%C3%B3n_de_las_Naciones_Unidas"
+    },
+    {
+      "id": "es-sgk-991",
+      "url": "https://es.wikipedia.org/wiki/Ignacio_de_Loyola"
+    },
+    {
+      "id": "es-sgk-994",
+      "url": "https://es.wikipedia.org/wiki/Unicef"
+    },
+    {
+      "id": "es-sgk-1002",
+      "url": "https://es.wikipedia.org/wiki/Mensa_(organizaci%C3%B3n)"
+    },
+    {
+      "id": "es-sgk-1003",
+      "url": "https://es.wikipedia.org/wiki/Henri_Dunant"
+    },
+    {
+      "id": "es-sgk-1004",
+      "url": "https://es.wikipedia.org/wiki/Osama_bin_Laden"
+    },
+    {
+      "id": "es-sgk-1005",
+      "url": "https://es.wikipedia.org/wiki/Benelux"
+    },
+    {
+      "id": "es-sgk-1042",
+      "url": "https://es.wikipedia.org/wiki/Partido_Nacionalsocialista_Obrero_Alem%C3%A1n"
+    },
+    {
+      "id": "es-sgk-1044",
+      "url": "https://es.wikipedia.org/wiki/Guerra_inform%C3%A1tica"
+    },
+    {
+      "id": "es-sgk-1046",
+      "url": "https://es.wikipedia.org/wiki/Armisticio"
+    },
+    {
+      "id": "es-sgk-1047",
+      "url": "https://es.wikipedia.org/wiki/Confederaci%C3%B3n"
+    },
+    {
+      "id": "es-sgk-1050",
+      "url": "https://es.wikipedia.org/wiki/Gobernanza_multipartes"
+    },
+    {
+      "id": "es-sgk-1051",
+      "url": "https://es.wikipedia.org/wiki/Palacio_de_Buckingham"
+    },
+    {
+      "id": "es-sgk-1052",
+      "url": "https://es.wikipedia.org/wiki/Apartheid"
+    },
+    {
+      "id": "es-sgk-1053",
+      "url": "https://es.wikipedia.org/wiki/Pol%C3%ADtica_exterior"
+    },
+    {
+      "id": "es-sgk-1054",
+      "url": "https://es.wikipedia.org/wiki/Campa%C3%B1a_presidencial_de_Barack_Obama_de_2008"
+    },
+    {
+      "id": "es-sgk-1055",
+      "url": "https://es.wikipedia.org/wiki/Golpe_de_Estado"
+    },
+    {
+      "id": "es-sgk-1057",
+      "url": "https://es.wikipedia.org/wiki/Propaganda"
+    },
+    {
+      "id": "es-sgk-1058",
+      "url": "https://es.wikipedia.org/wiki/Perestroika"
+    },
+    {
+      "id": "es-sgk-1063",
+      "url": "https://es.wikipedia.org/wiki/Atentados_del_11_de_septiembre_de_2001"
+    },
+    {
+      "id": "es-sgk-1064",
+      "url": "https://es.wikipedia.org/wiki/Dictadura"
+    },
+    {
+      "id": "es-sgk-1070",
+      "url": "https://es.wikipedia.org/wiki/Feminismo"
+    },
+    {
+      "id": "es-sgk-1075",
+      "url": "https://es.wikipedia.org/wiki/República_romana"
+    },
+    {
+      "id": "es-sgk-1077",
+      "url": "https://es.wikipedia.org/wiki/Anexo:Primeros_ministros_del_Reino_Unido"
+    },
+    {
+      "id": "es-sgk-1081",
+      "url": "https://es.wikipedia.org/wiki/Nelson_Mandela"
+    },
+    {
+      "id": "es-sgk-1188",
+      "url": "https://es.wikipedia.org/wiki/Lourdes_(Altos_Pirineos)"
+    },
+    {
+      "id": "es-sgk-1189",
+      "url": "https://es.wikipedia.org/wiki/Monte_Sinaí"
+    },
+    {
+      "id": "es-sgk-1191",
+      "url": "https://es.wikipedia.org/wiki/Panteón_(mitología)"
+    },
+    {
+      "id": "es-sgk-1192",
+      "url": "https://es.wikipedia.org/wiki/Rabino"
+    },
+    {
+      "id": "es-sgk-1196",
+      "url": "https://es.wikipedia.org/wiki/Sinagoga"
+    },
+    {
+      "id": "es-sgk-1199",
+      "url": "https://es.wikipedia.org/wiki/Papa"
+    },
+    {
+      "id": "es-sgk-1200",
+      "url": "https://es.wikipedia.org/wiki/Shinigami"
+    },
+    {
+      "id": "es-sgk-1204",
+      "url": "https://es.wikipedia.org/wiki/Francisco_(papa)"
+    },
+    {
+      "id": "es-sgk-1208",
+      "url": "https://es.wikipedia.org/wiki/Politeísmo"
+    },
+    {
+      "id": "es-sgk-1209",
+      "url": "https://es.wikipedia.org/wiki/Budismo"
+    },
+    {
+      "id": "es-sgk-1210",
+      "url": "https://es.wikipedia.org/wiki/Ramadán"
+    },
+    {
+      "id": "es-sgk-1213",
+      "url": "https://es.wikipedia.org/wiki/Potala"
+    },
+    {
+      "id": "es-sgk-1218",
+      "url": "https://es.wikipedia.org/wiki/Divinidades_hindúes"
+    },
+    {
+      "id": "es-sgk-1221",
+      "url": "https://es.wikipedia.org/wiki/INRI"
+    },
+    {
+      "id": "es-sgk-1225",
+      "url": "https://es.wikipedia.org/wiki/Anexo:Papas#Primer_milenio"
+    },
+    {
+      "id": "es-sgk-1227",
+      "url": "https://es.wikipedia.org/wiki/Judas_Iscariote"
+    },
+    {
+      "id": "es-sgk-1302",
+      "url": "https://es.wikipedia.org/wiki/RMS_Titanic"
+    },
+    {
+      "id": "es-sgk-80",
+      "url": "https://es.wikipedia.org/wiki/Espacio_exterior#Límite_de_la_Tierra"
+    },
+    {
+      "id": "es-sgk-92",
+      "url": "https://es.wikipedia.org/wiki/Voyager_2#Urano"
+    },
+    {
+      "id": "es-sgk-93",
+      "url": "https://es.wikipedia.org/wiki/Astronauta#Taikonautas"
+    },
+    {
+      "id": "es-sgk-94",
+      "url": "https://es.wikipedia.org/wiki/Estaci%C3%B3n_Espacial_Internacional"
+    },
+    {
+      "id": "es-sgk-106",
+      "url": "https://es.wikipedia.org/wiki/Valentina_Tereshkova"
+    },
+    {
+      "id": "es-sgk-108",
+      "url": "https://es.wikipedia.org/wiki/Laika"
+    },
+    {
+      "id": "es-sgk-109",
+      "url": "https://es.wikipedia.org/wiki/Plutón_(planeta_enano)"
+    },
+    {
+      "id": "es-sgk-112",
+      "url": "https://es.wikipedia.org/wiki/Aurora_polar"
+    },
+    {
+      "id": "es-sgk-132",
+      "url": "https://es.wikipedia.org/wiki/V%C3%ADa_L%C3%A1ctea"
+    },
+    {
+      "id": "es-sgk-136",
+      "url": "https://es.wikipedia.org/wiki/Cygnus_(constelaci%C3%B3n)"
+    },
+    {
+      "id": "es-sgk-137",
+      "url": "https://es.wikipedia.org/wiki/Cometa_Halley"
+    },
+    {
+      "id": "es-sgk-140",
+      "url": "https://es.wikipedia.org/wiki/Supernova"
+    },
+    {
+      "id": "es-sgk-144",
+      "url": "https://es.wikipedia.org/wiki/Galaxia"
+    },
+    {
+      "id": "es-sgk-149",
+      "url": "https://es.wikipedia.org/wiki/Hermafroditismo"
+    },
+    {
+      "id": "es-sgk-154",
+      "url": "https://es.wikipedia.org/wiki/Mitosis"
+    },
+    {
+      "id": "es-sgk-158",
+      "url": "https://es.wikipedia.org/wiki/Extinci%C3%B3n"
+    },
+    {
+      "id": "es-sgk-169",
+      "url": "https://es.wikipedia.org/wiki/Ácido_desoxirribonucleico"
+    },
+    {
+      "id": "es-sgk-170",
+      "url": "https://es.wikipedia.org/wiki/Caloría"
+    },
+    {
+      "id": "es-sgk-174",
+      "url": "https://es.wikipedia.org/wiki/Biodiversidad"
+    },
+    {
+      "id": "es-sgk-176",
+      "url": "https://es.wikipedia.org/wiki/Mutación"
+    },
+    {
+      "id": "es-sgk-180",
+      "url": "https://es.wikipedia.org/wiki/Gene_Roddenberry"
+    },
+    {
+      "id": "es-sgk-194",
+      "url": "https://es.wikipedia.org/wiki/Flor#Androceo"
+    },
+    {
+      "id": "es-sgk-200",
+      "url": "https://es.wikipedia.org/wiki/Perennifolio"
+    },
+    {
+      "id": "es-sgk-204",
+      "url": "https://es.wikipedia.org/wiki/Caducifolio"
+    },
+    {
+      "id": "es-sgk-205",
+      "url": "https://es.wikipedia.org/wiki/Plantación"
+    },
+    {
+      "id": "es-sgk-219",
+      "url": "https://es.wikipedia.org/wiki/Sakura_(cerezo)"
+    },
+    {
+      "id": "es-sgk-224",
+      "url": "https://es.wikipedia.org/wiki/Tubérculo"
+    },
+    {
+      "id": "es-sgk-263",
+      "url": "https://es.wikipedia.org/wiki/Insomnio"
+    },
+    {
+      "id": "es-sgk-265",
+      "url": "https://es.wikipedia.org/wiki/Dermatolog%C3%ADa"
+    },
+    {
+      "id": "es-sgk-266",
+      "url": "https://es.wikipedia.org/wiki/Diafragma_(anatomía)"
+    },
+    {
+      "id": "es-sgk-267",
+      "url": "https://es.wikipedia.org/wiki/Melanina"
+    },
+    {
+      "id": "es-sgk-269",
+      "url": "https://es.wikipedia.org/wiki/Tend%C3%B3n_de_Aquiles"
+    },
+    {
+      "id": "es-sgk-281",
+      "url": "https://es.wikipedia.org/wiki/R%C3%B3tula"
+    },
+    {
+      "id": "es-sgk-287",
+      "url": "https://es.wikipedia.org/wiki/Queratina"
+    },
+    {
+      "id": "es-sgk-333",
+      "url": "https://es.wikipedia.org/wiki/Recesión"
+    },
+    {
+      "id": "es-sgk-334",
+      "url": "https://es.wikipedia.org/wiki/Monopolio"
+    },
+    {
+      "id": "es-sgk-339",
+      "url": "https://es.wikipedia.org/wiki/Interés"
+    },
+    {
+      "id": "es-sgk-342",
+      "url": "https://es.wikipedia.org/wiki/Ánimo_de_lucro"
+    },
+    {
+      "id": "es-sgk-345",
+      "url": "https://es.wikipedia.org/wiki/Impuesto"
+    },
+    {
+      "id": "es-sgk-362",
+      "url": "https://es.wikipedia.org/wiki/Macroeconom%C3%ADa"
+    },
+    {
+      "id": "es-sgk-438",
+      "url": "https://es.wikipedia.org/wiki/Número_Mach"
+    },
+    {
+      "id": "es-sgk-439",
+      "url": "https://es.wikipedia.org/wiki/Infrasonido"
+    },
+    {
+      "id": "es-sgk-440",
+      "url": "https://es.wikipedia.org/wiki/Fotón"
+    },
+    {
+      "id": "es-sgk-442",
+      "url": "https://es.wikipedia.org/wiki/Teoría_de_la_relatividad"
+    },
+    {
+      "id": "es-sgk-458",
+      "url": "https://es.wikipedia.org/wiki/Isaac_Newton"
+    },
+    {
+      "id": "es-sgk-464",
+      "url": "https://es.wikipedia.org/wiki/Leyes_de_Newton"
+    },
+    {
+      "id": "es-sgk-482",
+      "url": "https://es.wikipedia.org/wiki/Biósfera"
+    },
+    {
+      "id": "es-sgk-505",
+      "url": "https://es.wikipedia.org/wiki/Dinosauria#Colisión_de_un_asteroide"
+    },
+    {
+      "id": "es-sgk-509",
+      "url": "https://es.wikipedia.org/wiki/Geolog%C3%ADa"
+    },
+    {
+      "id": "es-sgk-561",
+      "url": "https://es.wikipedia.org/wiki/P%C3%B3lvora#China"
+    },
+    {
+      "id": "es-sgk-581",
+      "url": "https://es.wikipedia.org/wiki/Hermanos_Wright"
+    },
+    {
+      "id": "es-sgk-582",
+      "url": "https://es.wikipedia.org/wiki/Pantal%C3%B3n_vaquero"
+    },
+    {
+      "id": "es-sgk-588",
+      "url": "https://es.wikipedia.org/wiki/Clyde_Tombaugh"
+    },
+    {
+      "id": "es-sgk-594",
+      "url": "https://es.wikipedia.org/wiki/King_Camp_Gillette#Biograf%C3%ADa"
+    },
+    {
+      "id": "es-sgk-706",
+      "url": "https://es.wikipedia.org/wiki/Eneágono"
+    },
+    {
+      "id": "es-sgk-708",
+      "url": "https://es.wikipedia.org/wiki/Fracción"
+    },
+    {
+      "id": "es-sgk-709",
+      "url": "https://es.wikipedia.org/wiki/Fracción"
+    },
+    {
+      "id": "es-sgk-717",
+      "url": "https://es.wikipedia.org/wiki/Cuadrado_perfecto"
+    },
+    {
+      "id": "es-sgk-719",
+      "url": "https://es.wikipedia.org/wiki/Cuadrado_perfecto"
+    },
+    {
+      "id": "es-sgk-728",
+      "url": "https://es.wikipedia.org/wiki/Numeraci%C3%B3n_romana"
+    },
+    {
+      "id": "es-sgk-734",
+      "url": "https://es.wikipedia.org/wiki/Mamografía"
+    },
+    {
+      "id": "es-sgk-740",
+      "url": "https://es.wikipedia.org/wiki/Hipoglucemia"
+    },
+    {
+      "id": "es-sgk-746",
+      "url": "https://es.wikipedia.org/wiki/Punci%C3%B3n_lumbar"
+    },
+    {
+      "id": "es-sgk-754",
+      "url": "https://es.wikipedia.org/wiki/Oncología"
+    },
+    {
+      "id": "es-sgk-757",
+      "url": "https://es.wikipedia.org/wiki/Halitosis"
+    },
+    {
+      "id": "es-sgk-762",
+      "url": "https://es.wikipedia.org/wiki/Encefalitis"
+    },
+    {
+      "id": "es-sgk-768",
+      "url": "https://es.wikipedia.org/wiki/Alopecia"
+    },
+    {
+      "id": "es-sgk-774",
+      "url": "https://es.wikipedia.org/wiki/Decibelio#Aplicaciones_en_acústica"
+    },
+    {
+      "id": "es-sgk-784",
+      "url": "https://es.wikipedia.org/wiki/Pipeta"
+    },
+    {
+      "id": "es-sgk-786",
+      "url": "https://es.wikipedia.org/wiki/Br%C3%BAjula"
+    },
+    {
+      "id": "es-sgk-789",
+      "url": "https://es.wikipedia.org/wiki/Bar_(unidad_de_presión)"
+    },
+    {
+      "id": "es-sgk-794",
+      "url": "https://es.wikipedia.org/wiki/Pluviómetro"
+    },
+    {
+      "id": "es-sgk-803",
+      "url": "https://es.wikipedia.org/wiki/Sistema_m%C3%A9trico_decimal"
+    },
+    {
+      "id": "es-sgk-1085",
+      "url": "https://es.wikipedia.org/wiki/Claustrofobia"
+    },
+    {
+      "id": "es-sgk-1092",
+      "url": "https://es.wikipedia.org/wiki/Bisexualidad"
+    },
+    {
+      "id": "es-sgk-1093",
+      "url": "https://es.wikipedia.org/wiki/Negación_(psicología)"
+    },
+    {
+      "id": "es-sgk-1099",
+      "url": "https://es.wikipedia.org/wiki/Dislexia"
+    },
+    {
+      "id": "es-sgk-1123",
+      "url": "https://es.wikipedia.org/wiki/Sal_común"
+    },
+    {
+      "id": "es-sgk-1130",
+      "url": "https://es.wikipedia.org/wiki/Cafeína"
+    },
+    {
+      "id": "es-sgk-1132",
+      "url": "https://es.wikipedia.org/wiki/Potasio"
+    },
+    {
+      "id": "es-sgk-1138",
+      "url": "https://es.wikipedia.org/wiki/%C3%81tomo"
+    },
+    {
+      "id": "es-sgk-1141",
+      "url": "https://es.wikipedia.org/wiki/Saponificación"
+    },
+    {
+      "id": "es-sgk-1155",
+      "url": "https://es.wikipedia.org/wiki/Rubí"
+    },
+    {
+      "id": "es-sgk-1230",
+      "url": "https://es.wikipedia.org/wiki/Diodo#Polarizaci%C3%B3n_directa_de_un_diodo"
+    },
+    {
+      "id": "es-sgk-1234",
+      "url": "https://es.wikipedia.org/wiki/Microsoft_Windows"
+    },
+    {
+      "id": "es-sgk-1238",
+      "url": "https://es.wikipedia.org/wiki/Sistema_operativo"
+    },
+    {
+      "id": "es-sgk-1251",
+      "url": "https://es.wikipedia.org/wiki/Amazon_Kindle"
+    },
+    {
+      "id": "es-sgk-1253",
+      "url": "https://es.wikipedia.org/wiki/Spam"
+    },
+    {
+      "id": "es-sgk-1256",
+      "url": "https://es.wikipedia.org/wiki/Disco_compacto"
+    },
+    {
+      "id": "es-sgk-1261",
+      "url": "https://es.wikipedia.org/wiki/Malware"
+    },
+    {
+      "id": "es-sgk-1296",
+      "url": "https://es.wikipedia.org/wiki/Olympic_Airlines"
+    },
+    {
+      "id": "es-sgk-1301",
+      "url": "https://es.wikipedia.org/wiki/RMS_Titanic"
+    },
+    {
+      "id": "es-sgk-1307",
+      "url": "https://es.wikipedia.org/wiki/TAP_Air_Portugal"
+    },
+    {
+      "id": "es-sgk-1315",
+      "url": "https://es.wikipedia.org/wiki/Carl_Benz"
+    },
+    {
+      "id": "es-sgk-1327",
+      "url": "https://es.wikipedia.org/wiki/Hibernaci%C3%B3n"
+    },
+    {
+      "id": "es-sgk-1328",
+      "url": "https://es.wikipedia.org/wiki/Chamaeleonidae"
+    },
+    {
+      "id": "es-sgk-1337",
+      "url": "https://es.wikipedia.org/wiki/Omn%C3%ADvoro"
+    },
+    {
+      "id": "es-sgk-1356",
+      "url": "https://es.wikipedia.org/wiki/Ornitolog%C3%ADa"
+    },
+    {
+      "id": "es-sgk-1359",
+      "url": "https://es.wikipedia.org/wiki/Hippocampus"
+    },
+    {
+      "id": "es-sgk-5",
+      "url": "https://es.wikipedia.org/wiki/Igl%C3%BA"
+    },
+    {
+      "id": "es-sgk-10",
+      "url": "https://es.wikipedia.org/wiki/Wonders_of_the_World"
+    },
+    {
+      "id": "es-sgk-11",
+      "url": "https://es.wikipedia.org/wiki/Gran_Muralla_China"
+    },
+    {
+      "id": "es-sgk-14",
+      "url": "https://es.wikipedia.org/wiki/Burj_Al_Arab"
+    },
+    {
+      "id": "es-sgk-16",
+      "url": "https://es.wikipedia.org/wiki/Taj_Mahal"
+    },
+    {
+      "id": "es-sgk-19",
+      "url": "https://es.wikipedia.org/wiki/Parten%C3%B3n"
+    },
+    {
+      "id": "es-sgk-23",
+      "url": "https://es.wikipedia.org/wiki/Ópera_de_Sídney"
+    },
+    {
+      "id": "es-sgk-26",
+      "url": "https://es.wikipedia.org/wiki/King_Kong_(pel%C3%ADcula_de_1933)"
+    },
+    {
+      "id": "es-sgk-29",
+      "url": "https://es.wikipedia.org/wiki/Deconstructivismo"
+    },
+    {
+      "id": "es-sgk-30",
+      "url": "https://es.wikipedia.org/wiki/Catedral_de_Notre_Dame_(París)"
+    },
+    {
+      "id": "es-sgk-34",
+      "url": "https://es.wikipedia.org/wiki/Monte_Rushmore"
+    },
+    {
+      "id": "es-sgk-36",
+      "url": "https://es.wikipedia.org/wiki/Palacio_de_Versalles#Luis_XIV"
+    },
+    {
+      "id": "es-sgk-37",
+      "url": "https://es.wikipedia.org/wiki/Basílica_de_San_Pedro#Proyecto_de_Miguel_Ángel"
+    },
+    {
+      "id": "es-sgk-43",
+      "url": "https://es.wikipedia.org/wiki/La_Gioconda"
+    },
+    {
+      "id": "es-sgk-44",
+      "url": "https://es.wikipedia.org/wiki/Venus_de_Milo"
+    },
+    {
+      "id": "es-sgk-45",
+      "url": "https://es.wikipedia.org/wiki/Bóveda_de_la_Capilla_Sixtina"
+    },
+    {
+      "id": "es-sgk-47",
+      "url": "https://es.wikipedia.org/wiki/Renacimiento"
+    },
+    {
+      "id": "es-sgk-48",
+      "url": "https://es.wikipedia.org/wiki/Latas_de_sopa_Campbell"
+    },
+    {
+      "id": "es-sgk-50",
+      "url": "https://es.wikipedia.org/wiki/Pierre-Auguste_Renoir"
+    },
+    {
+      "id": "es-sgk-51",
+      "url": "https://es.wikipedia.org/wiki/Sandro_Botticelli"
+    },
+    {
+      "id": "es-sgk-57",
+      "url": "https://es.wikipedia.org/wiki/Donatello"
+    },
+    {
+      "id": "es-sgk-58",
+      "url": "https://es.wikipedia.org/wiki/Hombre_de_Vitruvio"
+    },
+    {
+      "id": "es-sgk-66",
+      "url": "https://es.wikipedia.org/wiki/Tríptico"
+    },
+    {
+      "id": "es-sgk-70",
+      "url": "https://es.wikipedia.org/wiki/Fresco"
+    },
+    {
+      "id": "es-sgk-75",
+      "url": "https://es.wikipedia.org/wiki/El_grito"
+    },
+    {
+      "id": "es-sgk-76",
+      "url": "https://es.wikipedia.org/wiki/El_jardín_de_las_delicias"
+    },
+    {
+      "id": "es-sgk-404",
+      "url": "https://es.wikipedia.org/wiki/Hedonismo"
+    },
+    {
+      "id": "es-sgk-405",
+      "url": "https://es.wikipedia.org/wiki/Pseudociencia"
+    },
+    {
+      "id": "es-sgk-408",
+      "url": "https://es.wikipedia.org/wiki/Sócrates"
+    },
+    {
+      "id": "es-sgk-412",
+      "url": "https://es.wikipedia.org/wiki/Comunismo#Desarrollo_doctrinal"
+    },
+    {
+      "id": "es-sgk-413",
+      "url": "https://es.wikipedia.org/wiki/Nihilismo"
+    },
+    {
+      "id": "es-sgk-414",
+      "url": "https://es.wikipedia.org/wiki/Igualitarismo"
+    },
+    {
+      "id": "es-sgk-415",
+      "url": "https://es.wikipedia.org/wiki/Karl_Marx"
+    },
+    {
+      "id": "es-sgk-419",
+      "url": "https://es.wikipedia.org/wiki/República_(Platón)#Alegoría_de_la_caverna"
+    },
+    {
+      "id": "es-sgk-421",
+      "url": "https://es.wikipedia.org/wiki/Racionalismo"
+    },
+    {
+      "id": "es-sgk-425",
+      "url": "https://es.wikipedia.org/wiki/René_Descartes"
+    },
+    {
+      "id": "es-sgk-429",
+      "url": "https://es.wikipedia.org/wiki/El_príncipe"
+    },
+    {
+      "id": "es-sgk-433",
+      "url": "https://es.wikipedia.org/wiki/Metaf%C3%ADsica"
+    },
+    {
+      "id": "es-sgk-434",
+      "url": "https://es.wikipedia.org/wiki/Categoría:Filósofos"
+    },
+    {
+      "id": "es-sgk-437",
+      "url": "https://es.wikipedia.org/wiki/Proletariado"
+    },
+    {
+      "id": "es-sgk-601",
+      "url": "https://es.wikipedia.org/wiki/Harakiri"
+    },
+    {
+      "id": "es-sgk-602",
+      "url": "https://es.wikipedia.org/wiki/Andorra"
+    },
+    {
+      "id": "es-sgk-604",
+      "url": "https://es.wikipedia.org/wiki/Jordania"
+    },
+    {
+      "id": "es-sgk-605",
+      "url": "https://es.wikipedia.org/wiki/Idioma_español"
+    },
+    {
+      "id": "es-sgk-613",
+      "url": "https://es.wikipedia.org/wiki/Idioma_hebreo#Escritura"
+    },
+    {
+      "id": "es-sgk-614",
+      "url": "https://es.wikipedia.org/wiki/Antiguo_eslavo_eclesi%C3%A1stico"
+    },
+    {
+      "id": "es-sgk-618",
+      "url": "https://es.wikipedia.org/wiki/Esperanto"
+    },
+    {
+      "id": "es-sgk-619",
+      "url": "https://es.wikipedia.org/wiki/Acto_fallido"
+    },
+    {
+      "id": "es-sgk-620",
+      "url": "https://es.wikipedia.org/wiki/Crocodilia#En_la_literatura"
+    },
+    {
+      "id": "es-sgk-630",
+      "url": "https://es.wikipedia.org/wiki/Sóviet"
+    },
+    {
+      "id": "es-sgk-632",
+      "url": "https://es.wikipedia.org/wiki/Yoga"
+    },
+    {
+      "id": "es-sgk-638",
+      "url": "https://es.wikipedia.org/wiki/John_H._Watson"
+    },
+    {
+      "id": "es-sgk-639",
+      "url": "https://es.wikipedia.org/wiki/La_bella_durmiente"
+    },
+    {
+      "id": "es-sgk-642",
+      "url": "https://es.wikipedia.org/wiki/Jorge_Luis_Borges"
+    },
+    {
+      "id": "es-sgk-645",
+      "url": "https://es.wikipedia.org/wiki/Romeo_y_Julieta"
+    },
+    {
+      "id": "es-sgk-649",
+      "url": "https://es.wikipedia.org/wiki/Tres_leyes_de_la_robótica"
+    },
+    {
+      "id": "es-sgk-650",
+      "url": "https://es.wikipedia.org/wiki/Carlo_Collodi"
+    },
+    {
+      "id": "es-sgk-651",
+      "url": "https://es.wikipedia.org/wiki/Breve_historia_del_tiempo"
+    },
+    {
+      "id": "es-sgk-652",
+      "url": "https://es.wikipedia.org/wiki/Mi_lucha"
+    },
+    {
+      "id": "es-sgk-656",
+      "url": "https://es.wikipedia.org/wiki/Antonio_y_Cleopatra"
+    },
+    {
+      "id": "es-sgk-660",
+      "url": "https://es.wikipedia.org/wiki/Los_miserables"
+    },
+    {
+      "id": "es-sgk-662",
+      "url": "https://es.wikipedia.org/wiki/Ana_Karenina"
+    },
+    {
+      "id": "es-sgk-665",
+      "url": "https://es.wikipedia.org/wiki/El_retrato_de_Dorian_Gray"
+    },
+    {
+      "id": "es-sgk-666",
+      "url": "https://es.wikipedia.org/wiki/Las_aventuras_de_Huckleberry_Finn"
+    },
+    {
+      "id": "es-sgk-667",
+      "url": "https://es.wikipedia.org/wiki/Las_aventuras_de_Tom_Sawyer"
+    },
+    {
+      "id": "es-sgk-671",
+      "url": "https://es.wikipedia.org/wiki/J._K._Rowling"
+    },
+    {
+      "id": "es-sgk-807",
+      "url": "https://es.wikipedia.org/wiki/Aracne"
+    },
+    {
+      "id": "es-sgk-812",
+      "url": "https://es.wikipedia.org/wiki/Atl%C3%A1ntida"
+    },
+    {
+      "id": "es-sgk-814",
+      "url": "https://es.wikipedia.org/wiki/Valquiria"
+    },
+    {
+      "id": "es-sgk-815",
+      "url": "https://es.wikipedia.org/wiki/Asgard"
+    },
+    {
+      "id": "es-sgk-816",
+      "url": "https://es.wikipedia.org/wiki/Olimpo"
+    },
+    {
+      "id": "es-sgk-818",
+      "url": "https://es.wikipedia.org/wiki/Afrodita"
+    },
+    {
+      "id": "es-sgk-819",
+      "url": "https://es.wikipedia.org/wiki/Freyja"
+    },
+    {
+      "id": "es-sgk-832",
+      "url": "https://es.wikipedia.org/wiki/Centauro"
+    },
+    {
+      "id": "es-sgk-833",
+      "url": "https://es.wikipedia.org/wiki/Zeus"
+    },
+    {
+      "id": "es-sgk-841",
+      "url": "https://es.wikipedia.org/wiki/Polifemo"
+    },
+    {
+      "id": "es-sgk-844",
+      "url": "https://es.wikipedia.org/wiki/Mitología_nórdica"
+    },
+    {
+      "id": "es-sgk-849",
+      "url": "https://es.wikipedia.org/wiki/Odín"
+    },
+    {
+      "id": "es-sgk-850",
+      "url": "https://es.wikipedia.org/wiki/Iris_(mitolog%C3%ADa)"
+    },
+    {
+      "id": "es-sgk-851",
+      "url": "https://es.wikipedia.org/wiki/Némesis"
+    },
+    {
+      "id": "es-sgk-858",
+      "url": "https://es.wikipedia.org/wiki/Narciso_(mitolog%C3%ADa)"
+    },
+    {
+      "id": "es-sgk-941",
+      "url": "https://es.wikipedia.org/wiki/Don_Giovanni"
+    },
+    {
+      "id": "es-sgk-943",
+      "url": "https://es.wikipedia.org/wiki/Libreto"
+    },
+    {
+      "id": "es-sgk-945",
+      "url": "https://es.wikipedia.org/wiki/Franz_Liszt"
+    },
+    {
+      "id": "es-sgk-946",
+      "url": "https://es.wikipedia.org/wiki/El_barbero_de_Sevilla_(Rossini)"
+    },
+    {
+      "id": "es-sgk-958",
+      "url": "https://es.wikipedia.org/wiki/Ludwig_van_Beethoven"
+    },
+    {
+      "id": "es-sgk-960",
+      "url": "https://es.wikipedia.org/wiki/Ludwig_van_Beethoven"
+    },
+    {
+      "id": "es-sgk-965",
+      "url": "https://es.wikipedia.org/wiki/R%C3%A9quiem_(Mozart)"
+    },
+    {
+      "id": "es-sgk-967",
+      "url": "https://es.wikipedia.org/wiki/Teatro_Bolshói_(Moscú)"
+    },
+    {
+      "id": "es-sgk-972",
+      "url": "https://es.wikipedia.org/wiki/Aida"
+    },
+    {
+      "id": "es-sgk-973",
+      "url": "https://es.wikipedia.org/wiki/Bolero_(Ravel)"
+    },
+    {
+      "id": "es-sgk-974",
+      "url": "https://es.wikipedia.org/wiki/Piotr_Ilich_Chaikovski"
+    },
+    {
+      "id": "es-sgk-977",
+      "url": "https://es.wikipedia.org/wiki/Las_cuatro_estaciones"
+    },
+    {
+      "id": "es-sgk-898",
+      "url": "https://es.wikipedia.org/wiki/Elvis_Presley"
+    },
+    {
+      "id": "es-sgk-899",
+      "url": "https://es.wikipedia.org/wiki/Snoop_Dogg#2012-2013:_Snoop_Lion_y_el_reggae"
+    },
+    {
+      "id": "es-sgk-902",
+      "url": "https://es.wikipedia.org/wiki/Dave_Grohl"
+    },
+    {
+      "id": "es-sgk-903",
+      "url": "https://es.wikipedia.org/wiki/Victoria_Beckham"
+    },
+    {
+      "id": "es-sgk-904",
+      "url": "https://es.wikipedia.org/wiki/Eminem"
+    },
+    {
+      "id": "es-sgk-905",
+      "url": "https://es.wikipedia.org/wiki/What_a_Wonderful_World"
+    },
+    {
+      "id": "es-sgk-906",
+      "url": "https://es.wikipedia.org/wiki/Wannabe_(canción)"
+    },
+    {
+      "id": "es-sgk-907",
+      "url": "https://es.wikipedia.org/wiki/Like_a_Virgin_(canci%C3%B3n)"
+    },
+    {
+      "id": "es-sgk-909",
+      "url": "https://es.wikipedia.org/wiki/The_Dark_Side_of_the_Moon"
+    },
+    {
+      "id": "es-sgk-910",
+      "url": "https://es.wikipedia.org/wiki/Elvis_Presley"
+    },
+    {
+      "id": "es-sgk-915",
+      "url": "https://es.wikipedia.org/wiki/Highway_to_Hell"
+    },
+    {
+      "id": "es-sgk-917",
+      "url": "https://es.wikipedia.org/wiki/The_Smiths"
+    },
+    {
+      "id": "es-sgk-922",
+      "url": "https://es.wikipedia.org/wiki/My_Heart_Will_Go_On"
+    },
+    {
+      "id": "es-sgk-923",
+      "url": "https://es.wikipedia.org/wiki/K-pop"
+    },
+    {
+      "id": "es-sgk-924",
+      "url": "https://es.wikipedia.org/wiki/David_Bowie"
+    },
+    {
+      "id": "es-sgk-925",
+      "url": "https://es.wikipedia.org/wiki/Freddie_Mercury"
+    },
+    {
+      "id": "es-sgk-927",
+      "url": "https://es.wikipedia.org/wiki/John_Lennon"
+    },
+    {
+      "id": "es-sgk-928",
+      "url": "https://es.wikipedia.org/wiki/David_Bowie"
+    },
+    {
+      "id": "es-sgk-929",
+      "url": "https://es.wikipedia.org/wiki/ABBA"
+    },
+    {
+      "id": "es-sgk-930",
+      "url": "https://es.wikipedia.org/wiki/Disc-jockey"
+    },
+    {
+      "id": "es-sgk-932",
+      "url": "https://es.wikipedia.org/wiki/The_Final_Countdown_(canci%C3%B3n)"
+    },
+    {
+      "id": "es-sgk-933",
+      "url": "https://es.wikipedia.org/wiki/Barbie_Girl"
+    },
+    {
+      "id": "es-sgk-934",
+      "url": "https://es.wikipedia.org/wiki/Imagine_(canci%C3%B3n)"
+    },
+    {
+      "id": "es-sgk-938",
+      "url": "https://es.wikipedia.org/wiki/Mark_David_Chapman"
+    },
+    {
+      "id": "es-sgk-939",
+      "url": "https://es.wikipedia.org/wiki/ABBA"
+    },
+    {
+      "id": "es-sgk-1008",
+      "url": "https://es.wikipedia.org/wiki/Superman"
+    },
+    {
+      "id": "es-sgk-1009",
+      "url": "https://es.wikipedia.org/wiki/Batman"
+    },
+    {
+      "id": "es-sgk-1010",
+      "url": "https://es.wikipedia.org/wiki/West_Side_Story_(musical)"
+    },
+    {
+      "id": "es-sgk-1011",
+      "url": "https://es.wikipedia.org/wiki/Tarzán"
+    },
+    {
+      "id": "es-sgk-1013",
+      "url": "https://es.wikipedia.org/wiki/El_último_emperador"
+    },
+    {
+      "id": "es-sgk-1014",
+      "url": "https://es.wikipedia.org/wiki/Darth_Vader"
+    },
+    {
+      "id": "es-sgk-1017",
+      "url": "https://es.wikipedia.org/wiki/Snow_White_and_the_Seven_Dwarfs"
+    },
+    {
+      "id": "es-sgk-1020",
+      "url": "https://es.wikipedia.org/wiki/Premios_%C3%93scar"
+    },
+    {
+      "id": "es-sgk-1021",
+      "url": "https://es.wikipedia.org/wiki/Anexo:Filmografía_de_Charles_Chaplin"
+    },
+    {
+      "id": "es-sgk-1022",
+      "url": "https://es.wikipedia.org/wiki/Will_Smith"
+    },
+    {
+      "id": "es-sgk-1024",
+      "url": "https://es.wikipedia.org/wiki/El_diario_de_Bridget_Jones"
+    },
+    {
+      "id": "es-sgk-1025",
+      "url": "https://es.wikipedia.org/wiki/Mrs._Doubtfire"
+    },
+    {
+      "id": "es-sgk-1026",
+      "url": "https://es.wikipedia.org/wiki/Mulan"
+    },
+    {
+      "id": "es-sgk-1027",
+      "url": "https://es.wikipedia.org/wiki/The_Princess_Bride_(pel%C3%ADcula)"
+    },
+    {
+      "id": "es-sgk-1028",
+      "url": "https://es.wikipedia.org/wiki/Rocky_Balboa"
+    },
+    {
+      "id": "es-sgk-1029",
+      "url": "https://es.wikipedia.org/wiki/Julie_Andrews"
+    },
+    {
+      "id": "es-sgk-1030",
+      "url": "https://es.wikipedia.org/wiki/Grace_Kelly"
+    },
+    {
+      "id": "es-sgk-1031",
+      "url": "https://es.wikipedia.org/wiki/Casablanca_(pel%C3%ADcula)"
+    },
+    {
+      "id": "es-sgk-1033",
+      "url": "https://es.wikipedia.org/wiki/Buscando_a_Nemo"
+    },
+    {
+      "id": "es-sgk-1034",
+      "url": "https://es.wikipedia.org/wiki/Stanley_Kubrick"
+    },
+    {
+      "id": "es-sgk-1035",
+      "url": "https://es.wikipedia.org/wiki/James_Cameron"
+    },
+    {
+      "id": "es-sgk-1036",
+      "url": "https://es.wikipedia.org/wiki/George_Lucas"
+    },
+    {
+      "id": "es-sgk-1037",
+      "url": "https://es.wikipedia.org/wiki/Peter_Jackson"
+    },
+    {
+      "id": "es-sgk-1038",
+      "url": "https://es.wikipedia.org/wiki/Tootsie"
+    },
+    {
+      "id": "es-sgk-1039",
+      "url": "https://es.wikipedia.org/wiki/Man_on_the_Moon_(pel%C3%ADcula)"
+    },
+    {
+      "id": "es-sgk-1267",
+      "url": "https://es.wikipedia.org/wiki/Friends"
+    },
+    {
+      "id": "es-sgk-1268",
+      "url": "https://es.wikipedia.org/wiki/Rachel_Green"
+    },
+    {
+      "id": "es-sgk-1269",
+      "url": "https://es.wikipedia.org/wiki/Enterprise"
+    },
+    {
+      "id": "es-sgk-1270",
+      "url": "https://es.wikipedia.org/wiki/Frasier"
+    },
+    {
+      "id": "es-sgk-1271",
+      "url": "https://es.wikipedia.org/wiki/Marge_Simpson"
+    },
+    {
+      "id": "es-sgk-1272",
+      "url": "https://es.wikipedia.org/wiki/Casa_Stark"
+    },
+    {
+      "id": "es-sgk-1273",
+      "url": "https://es.wikipedia.org/wiki/Eric_Cartman"
+    },
+    {
+      "id": "es-sgk-1274",
+      "url": "https://es.wikipedia.org/wiki/Garfield#Otros_personajes_principales"
+    },
+    {
+      "id": "es-sgk-1275",
+      "url": "https://es.wikipedia.org/wiki/Gus_Fring"
+    },
+    {
+      "id": "es-sgk-1278",
+      "url": "https://es.wikipedia.org/wiki/El_cocinero_sueco"
+    },
+    {
+      "id": "es-sgk-1279",
+      "url": "https://es.wikipedia.org/wiki/Grey%27s_Anatomy"
+    },
+    {
+      "id": "es-sgk-1280",
+      "url": "https://es.wikipedia.org/wiki/Dexter"
+    },
+    {
+      "id": "es-sgk-1282",
+      "url": "https://es.wikipedia.org/wiki/Rick_Grimes"
+    },
+    {
+      "id": "es-sgk-1283",
+      "url": "https://es.wikipedia.org/wiki/Futurama"
+    },
+    {
+      "id": "es-sgk-1284",
+      "url": "https://es.wikipedia.org/wiki/Flipper_(pel%C3%ADcula_de_1996)"
+    },
+    {
+      "id": "es-sgk-1285",
+      "url": "https://es.wikipedia.org/wiki/Walter_White"
+    },
+    {
+      "id": "es-sgk-1287",
+      "url": "https://es.wikipedia.org/wiki/Padre_de_familia"
+    },
+    {
+      "id": "es-sgk-1288",
+      "url": "https://es.wikipedia.org/wiki/Don_Draper"
+    },
+    {
+      "id": "es-sgk-1289",
+      "url": "https://es.wikipedia.org/wiki/Lost"
+    },
+    {
+      "id": "es-sgk-1290",
+      "url": "https://es.wikipedia.org/wiki/Prison_Break"
+    },
+    {
+      "id": "es-sgk-1291",
+      "url": "https://es.wikipedia.org/wiki/Scooby-Doo"
+    },
+    {
+      "id": "es-sgk-1294",
+      "url": "https://es.wikipedia.org/wiki/Matt_Groening"
+    },
+    {
+      "id": "es-sgk-225",
+      "url": "https://es.wikipedia.org/wiki/Pasa"
+    },
+    {
+      "id": "es-sgk-226",
+      "url": "https://es.wikipedia.org/wiki/Muesli"
+    },
+    {
+      "id": "es-sgk-228",
+      "url": "https://es.wikipedia.org/wiki/Vino"
+    },
+    {
+      "id": "es-sgk-229",
+      "url": "https://es.wikipedia.org/wiki/Foie_gras"
+    },
+    {
+      "id": "es-sgk-230",
+      "url": "https://es.wikipedia.org/wiki/Cuscús"
+    },
+    {
+      "id": "es-sgk-231",
+      "url": "https://es.wikipedia.org/wiki/Feta"
+    },
+    {
+      "id": "es-sgk-232",
+      "url": "https://es.wikipedia.org/wiki/Destornillador_(cóctel)"
+    },
+    {
+      "id": "es-sgk-235",
+      "url": "https://es.wikipedia.org/wiki/Borsch"
+    },
+    {
+      "id": "es-sgk-238",
+      "url": "https://es.wikipedia.org/wiki/Buey_de_Kobe"
+    },
+    {
+      "id": "es-sgk-239",
+      "url": "https://es.wikipedia.org/wiki/Sake"
+    },
+    {
+      "id": "es-sgk-240",
+      "url": "https://es.wikipedia.org/wiki/Tequila"
+    },
+    {
+      "id": "es-sgk-241",
+      "url": "https://es.wikipedia.org/wiki/Tofu"
+    },
+    {
+      "id": "es-sgk-243",
+      "url": "https://es.wikipedia.org/wiki/Whisky"
+    },
+    {
+      "id": "es-sgk-244",
+      "url": "https://es.wikipedia.org/wiki/Sushi"
+    },
+    {
+      "id": "es-sgk-245",
+      "url": "https://es.wikipedia.org/wiki/Cinnamomum_verum"
+    },
+    {
+      "id": "es-sgk-249",
+      "url": "https://es.wikipedia.org/wiki/Guacamole"
+    },
+    {
+      "id": "es-sgk-250",
+      "url": "https://es.wikipedia.org/wiki/Al_dente"
+    },
+    {
+      "id": "es-sgk-251",
+      "url": "https://es.wikipedia.org/wiki/Basmati"
+    },
+    {
+      "id": "es-sgk-252",
+      "url": "https://es.wikipedia.org/wiki/Veganismo"
+    },
+    {
+      "id": "es-sgk-253",
+      "url": "https://es.wikipedia.org/wiki/Tokaji"
+    },
+    {
+      "id": "es-sgk-257",
+      "url": "https://es.wikipedia.org/wiki/Champán"
+    },
+    {
+      "id": "es-sgk-258",
+      "url": "https://es.wikipedia.org/wiki/Tuber_melanosporum"
+    },
+    {
+      "id": "es-sgk-259",
+      "url": "https://es.wikipedia.org/wiki/Seta"
+    },
+    {
+      "id": "es-sgk-297",
+      "url": "https://es.wikipedia.org/wiki/Ronaldinho"
+    },
+    {
+      "id": "es-sgk-298",
+      "url": "https://es.wikipedia.org/wiki/Tiger_Woods"
+    },
+    {
+      "id": "es-sgk-299",
+      "url": "https://es.wikipedia.org/wiki/Estilo_mariposa"
+    },
+    {
+      "id": "es-sgk-300",
+      "url": "https://es.wikipedia.org/wiki/Muhammad_Ali"
+    },
+    {
+      "id": "es-sgk-302",
+      "url": "https://es.wikipedia.org/wiki/Marat%C3%B3n"
+    },
+    {
+      "id": "es-sgk-303",
+      "url": "https://es.wikipedia.org/wiki/Rugby_league"
+    },
+    {
+      "id": "es-sgk-304",
+      "url": "https://es.wikipedia.org/wiki/Baloncesto#La_cancha"
+    },
+    {
+      "id": "es-sgk-305",
+      "url": "https://es.wikipedia.org/wiki/Voleibol#Campo_de_juego"
+    },
+    {
+      "id": "es-sgk-306",
+      "url": "https://es.wikipedia.org/wiki/Juegos_Ol%C3%ADmpicos_en_la_Antig%C3%BCedad"
+    },
+    {
+      "id": "es-sgk-307",
+      "url": "https://es.wikipedia.org/wiki/Atletismo"
+    },
+    {
+      "id": "es-sgk-311",
+      "url": "https://es.wikipedia.org/wiki/Clasificación_por_puntos_en_el_Tour_de_Francia"
+    },
+    {
+      "id": "es-sgk-312",
+      "url": "https://es.wikipedia.org/wiki/Anexo:Elecci%C3%B3n_de_la_sede_de_los_Juegos_Ol%C3%ADmpicos#2010-2020"
+    },
+    {
+      "id": "es-sgk-313",
+      "url": "https://es.wikipedia.org/wiki/Juegos_Olímpicos_de_Invierno"
+    },
+    {
+      "id": "es-sgk-315",
+      "url": "https://es.wikipedia.org/wiki/Carrera_con_obstáculos"
+    },
+    {
+      "id": "es-sgk-317",
+      "url": "https://es.wikipedia.org/wiki/Copa_Stanley"
+    },
+    {
+      "id": "es-sgk-318",
+      "url": "https://es.wikipedia.org/wiki/Polo_(deporte)"
+    },
+    {
+      "id": "es-sgk-319",
+      "url": "https://es.wikipedia.org/wiki/Polo_(deporte)"
+    },
+    {
+      "id": "es-sgk-320",
+      "url": "https://es.wikipedia.org/wiki/Juegos_Olímpicos_de_Verano#Sedes_de_Juegos_Olímpicos_de_Verano"
+    },
+    {
+      "id": "es-sgk-321",
+      "url": "https://es.wikipedia.org/wiki/Estación_de_esquí"
+    },
+    {
+      "id": "es-sgk-322",
+      "url": "https://es.wikipedia.org/wiki/Squash"
+    },
+    {
+      "id": "es-sgk-323",
+      "url": "https://es.wikipedia.org/wiki/Sóftbol"
+    },
+    {
+      "id": "es-sgk-324",
+      "url": "https://es.wikipedia.org/wiki/Campeonato_de_Wimbledon"
+    },
+    {
+      "id": "es-sgk-325",
+      "url": "https://es.wikipedia.org/wiki/Argentina_vs._Inglaterra_(1986)#La_mano_de_Dios"
+    },
+    {
+      "id": "es-sgk-326",
+      "url": "https://es.wikipedia.org/wiki/Juegos_Olímpicos"
+    },
+    {
+      "id": "es-sgk-327",
+      "url": "https://es.wikipedia.org/wiki/Jugador_Más_Valioso"
+    },
+    {
+      "id": "es-sgk-328",
+      "url": "https://es.wikipedia.org/wiki/Copa_Mundial_de_F%C3%BAtbol#Resultados_y_estad%C3%ADsticas"
+    }
+  ]
+}

@@ -39,6 +39,7 @@ import { loadLexicon } from "../core/lexicon";
 import gpl from "../../LICENSE?raw";
 import thirdPartyNotices from "../../licenses/THIRD-PARTY-NOTICES.txt?raw";
 import dataLicense from "../../licenses/CC-BY-SA-4.0.txt?raw";
+import spanishDataLicense from "../../licenses/CC-BY-4.0.txt?raw";
 import stockfishAuthors from "../../licenses/STOCKFISH-AUTHORS.txt?raw";
 import { validateGameSession } from "../core/save-validation";
 import {
@@ -741,8 +742,8 @@ export function App() {
             <p>
               {tr(
                 locale,
-                "Preguntas: Open Trivia DB (inglés, adaptadas a respuesta abierta) y Timeout (español). CC BY-SA 4.0. Tipografías: IBM Plex, SIL OFL.",
-                "Questions: Open Trivia DB (English, adapted to open answers) and Timeout (Spanish). CC BY-SA 4.0. Typefaces: IBM Plex, SIL OFL.",
+                "Preguntas: Open Trivia DB y Timeout, CC BY-SA 4.0; selección adaptada de Spanish general knowledge database (2020), de Buades-Sitjar, Boada, Guasch, Ferré, Hinojosa, Brysbaert y Duñabeitia, CC BY 4.0. Tipografías: IBM Plex, SIL OFL.",
+                "Questions: Open Trivia DB and Timeout, CC BY-SA 4.0; adapted selection from Spanish general knowledge database (2020), by Buades-Sitjar, Boada, Guasch, Ferré, Hinojosa, Brysbaert and Duñabeitia, CC BY 4.0. Typefaces: IBM Plex, SIL OFL.",
               )}
             </p>
             <div className="controls">
@@ -765,6 +766,20 @@ export function App() {
               </a>
               <a href="https://opentdb.com/" target="_blank" rel="noreferrer">
                 Open Trivia DB
+              </a>
+              <a
+                href="https://doi.org/10.6084/m9.figshare.13041803.v2"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Spanish general knowledge database
+              </a>
+              <a
+                href="https://creativecommons.org/licenses/by/4.0/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                CC BY 4.0
               </a>
               <a
                 href="https://github.com/nmrugg/stockfish.js"
@@ -798,6 +813,10 @@ export function App() {
             <details>
               <summary>Creative Commons BY-SA 4.0</summary>
               <pre>{dataLicense}</pre>
+            </details>
+            <details>
+              <summary>Creative Commons BY 4.0</summary>
+              <pre>{spanishDataLicense}</pre>
             </details>
             <details>
               <summary>

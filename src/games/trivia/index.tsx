@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { normalize } from '../../core/lexicon';
+import { normalize } from "../../core/lexicon";
 import corpus from "../../data/trivia.json";
+import spanishCorpus from "../../data/trivia-es.json";
 import { spanishQuestions } from "./spanish";
 import {
   baseState,
@@ -20,6 +21,29 @@ export interface TriviaQuestion {
   q: string;
   a: string;
   lang: string;
+}
+export function migrateTrivia(s: State): State {
+  const state = {
+    ...s,
+    players: s.players.map((p, i) => ({ ...botProfile(s.rng, i), ...p })),
+  };
+  if (!s.pool.every((q) => q.lang === "es")) return state;
+  const existing = new Set(s.pool.map((q) => q.id));
+  const additions = spanishCorpus.filter((q) => !existing.has(q.id));
+  if (!additions.length) return state;
+  let rng = s.rng;
+  const decks = s.decks.map((deck, category) => {
+    const shuffled = shuffle(
+      [
+        ...deck,
+        ...additions.filter((q) => q.category === category).map((q) => q.id),
+      ],
+      rng,
+    );
+    rng = shuffled.seed;
+    return shuffled.items;
+  });
+  return { ...state, pool: [...s.pool, ...additions], decks, rng };
 }
 export const categoryNames = [
   labels("Geografía", "Geography"),
@@ -79,18 +103,46 @@ interface State extends GameState {
 const nodeCategory = (node: number) =>
   node === 0 ? 0 : node <= 42 ? (node - 1) % 6 : Math.floor((node - 43) / 5);
 export function exactAnswer(answer: string, solution: string) {
-  const clean = (v:string) => normalize(v.trim()).replace(/\s+/g,' ').replace(/^["“«]+|["”».!?]+$/g,'').trim();
+  const clean = (v: string) =>
+    normalize(v.trim())
+      .replace(/\s+/g, " ")
+      .replace(/^["“«]+|["”».!?]+$/g, "")
+      .trim();
   return !!clean(answer) && clean(answer) === clean(solution);
 }
 export function botAccuracy(s: State, cfg: Config) {
-  const levels:Record<string,number> = {easy:.38,medium:.6,hard:.78,expert:.86};
-  const base = levels[String(cfg.difficulty)] ?? (Number.isFinite(Number(cfg.probability)) ? Number(cfg.probability)/100 : .6);
+  const levels: Record<string, number> = {
+    easy: 0.38,
+    medium: 0.6,
+    hard: 0.78,
+    expert: 0.86,
+  };
+  const base =
+    levels[String(cfg.difficulty)] ??
+    (Number.isFinite(Number(cfg.probability))
+      ? Number(cfg.probability) / 100
+      : 0.6);
   const player = s.players[s.turn];
   // Mild, secret category strengths persist with the match. Legacy saves use a seeded profile too.
-  const skills = player.skills ?? shuffle([-.06,-.04,-.02,.02,.04,.06],s.rng ^ (s.turn+1)*0x9e3779b9).items;
-  const fatigue = Math.min(.12,(player.streak || 0)*.02);
-  const weakness = ['easy','medium'].includes(String(cfg.difficulty || 'medium')) && player.weakness === s.question?.category ? .15 : 0;
-  return Math.max(.15,Math.min(.92,base + skills[s.question?.category ?? 0] - fatigue - weakness));
+  const skills =
+    player.skills ??
+    shuffle(
+      [-0.06, -0.04, -0.02, 0.02, 0.04, 0.06],
+      s.rng ^ ((s.turn + 1) * 0x9e3779b9),
+    ).items;
+  const fatigue = Math.min(0.12, (player.streak || 0) * 0.02);
+  const weakness =
+    ["easy", "medium"].includes(String(cfg.difficulty || "medium")) &&
+    player.weakness === s.question?.category
+      ? 0.15
+      : 0;
+  return Math.max(
+    0.15,
+    Math.min(
+      0.92,
+      base + skills[s.question?.category ?? 0] - fatigue - weakness,
+    ),
+  );
 }
 function pickQuestion(s: State, cat: number): State {
   let deck = s.decks[cat],
@@ -108,10 +160,17 @@ function pickQuestion(s: State, cat: number): State {
   const decks = s.decks.map((d, i) => (i === cat ? deck.slice(1) : d));
   return { ...s, rng, decks, question, phase: "question", answer: "" };
 }
-export function botProfile(seed:number,index:number) {
-  const profile=shuffle([-.06,-.04,-.02,.02,.04,.06],mixSeed(seed,(index+1)*0x9e3779b9));
-  const [weak,next]=random(profile.seed);
-  return {skills:profile.items,weakness:weak<.5?Math.floor(random(next)[0]*6):-1,streak:0};
+export function botProfile(seed: number, index: number) {
+  const profile = shuffle(
+    [-0.06, -0.04, -0.02, 0.02, 0.04, 0.06],
+    mixSeed(seed, (index + 1) * 0x9e3779b9),
+  );
+  const [weak, next] = random(profile.seed);
+  return {
+    skills: profile.items,
+    weakness: weak < 0.5 ? Math.floor(random(next)[0] * 6) : -1,
+    streak: 0,
+  };
 }
 export function triviaReducer(s: State, a: Action, cfg: Config): State {
   if (s.status !== "playing") return s;
@@ -148,14 +207,17 @@ export function triviaReducer(s: State, a: Action, cfg: Config): State {
     return pickQuestion(next, nodeCategory(a.node));
   }
   if (a.type === "ANSWER" && s.phase === "question") {
-    const revealed:State = {
+    const revealed: State = {
       ...s,
       answer: String(a.answer),
       rng: random(s.rng)[1],
       phase: "reveal",
     };
-    if (s.turn < Number(cfg.humans || 1) && exactAnswer(String(a.answer),s.question!.a))
-      return triviaReducer(revealed,{type:'GRADE',correct:true},cfg);
+    if (
+      s.turn < Number(cfg.humans || 1) &&
+      exactAnswer(String(a.answer), s.question!.a)
+    )
+      return triviaReducer(revealed, { type: "GRADE", correct: true }, cfg);
     return revealed;
   }
   if (a.type === "GRADE" && s.phase === "reveal") {
@@ -182,7 +244,10 @@ export function triviaReducer(s: State, a: Action, cfg: Config): State {
       phase: "roll",
       question: null,
       final: false,
-      lastAnswer: labels(`${s.players[s.turn].name}: ${correct ? '✓' : '×'} ${s.question!.a}${correct && p.tokens.filter(Boolean).length > s.players[s.turn].tokens.filter(Boolean).length ? ' · Categoría conseguida ◆' : ''}`, `${s.players[s.turn].name}: ${correct ? '✓' : '×'} ${s.question!.a}${correct && p.tokens.filter(Boolean).length > s.players[s.turn].tokens.filter(Boolean).length ? ' · Category earned ◆' : ''}`),
+      lastAnswer: labels(
+        `${s.players[s.turn].name}: ${correct ? "✓" : "×"} ${s.question!.a}${correct && p.tokens.filter(Boolean).length > s.players[s.turn].tokens.filter(Boolean).length ? " · Categoría conseguida ◆" : ""}`,
+        `${s.players[s.turn].name}: ${correct ? "✓" : "×"} ${s.question!.a}${correct && p.tokens.filter(Boolean).length > s.players[s.turn].tokens.filter(Boolean).length ? " · Category earned ◆" : ""}`,
+      ),
     };
   }
   return s;
@@ -206,13 +271,19 @@ function View({
   config,
 }: GameViewProps<State>) {
   const [answer, setAnswer] = useState("");
-  useEffect(() => setAnswer(''), [s.question?.id, s.turn]);
+  useEffect(() => setAnswer(""), [s.question?.id, s.turn]);
   const p = s.players[s.turn],
     bot = s.turn >= Number(config.humans);
   return (
     <div className="trivia-layout">
       <div className="trivia-board">
-        <svg className="trivia-paths" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44"/>{Array.from({length:6},(_,i)=>{const [x,y]=position(1+i*7);return <line key={i} x1="50" y1="50" x2={x} y2={y}/>;})}</svg>
+        <svg className="trivia-paths" viewBox="0 0 100 100" aria-hidden="true">
+          <circle cx="50" cy="50" r="44" />
+          {Array.from({ length: 6 }, (_, i) => {
+            const [x, y] = position(1 + i * 7);
+            return <line key={i} x1="50" y1="50" x2={x} y2={y} />;
+          })}
+        </svg>
         {Array.from({ length: 73 }, (_, node) => {
           const [x, y] = position(node);
           const objective = node > 0 && node <= 42 && (node - 1) % 7 === 0;
@@ -225,7 +296,10 @@ function View({
                 background: `var(--category-${nodeCategory(node)})`,
               }}
               disabled={
-                paused || bot || s.phase !== "move" || !s.destinations.includes(node)
+                paused ||
+                bot ||
+                s.phase !== "move" ||
+                !s.destinations.includes(node)
               }
               onClick={() => {
                 dispatch({ type: "MOVE", node });
@@ -244,9 +318,30 @@ function View({
             </button>
           );
         })}
-        {s.players.map((player,i)=>{const [x,y]=position(player.position),same=s.players.slice(0,i).filter(p=>p.position===player.position).length;return <span key={i} className={`trivia-pawn ${i===s.turn?'current':''}`} style={{left:`${x}%`,top:`${y}%`,marginLeft:same*9,marginTop:same*6}} role="img" aria-label={`${player.name} · ${categoryNames[nodeCategory(player.position)][locale]}`}>{i+1}</span>;})}
+        {s.players.map((player, i) => {
+          const [x, y] = position(player.position),
+            same = s.players
+              .slice(0, i)
+              .filter((p) => p.position === player.position).length;
+          return (
+            <span
+              key={i}
+              className={`trivia-pawn ${i === s.turn ? "current" : ""}`}
+              style={{
+                left: `${x}%`,
+                top: `${y}%`,
+                marginLeft: same * 9,
+                marginTop: same * 6,
+              }}
+              role="img"
+              aria-label={`${player.name} · ${categoryNames[nodeCategory(player.position)][locale]}`}
+            >
+              {i + 1}
+            </span>
+          );
+        })}
       </div>
-      <div className="question-card" key={`${s.phase}:${s.question?.id || ''}`}>
+      <div className="question-card" key={`${s.phase}:${s.question?.id || ""}`}>
         <p className="eyebrow">
           {p.name} · {tr(locale, "Dado", "Die")}: {s.dice || "—"}
         </p>
@@ -297,37 +392,50 @@ function View({
             ) : (
               <>
                 <p>
-                  {bot ? tr(locale, "Respuesta del bot", "Bot answer") : tr(locale, "Tu respuesta", "Your answer")}: {s.answer || "—"}
+                  {bot
+                    ? tr(locale, "Respuesta del bot", "Bot answer")
+                    : tr(locale, "Tu respuesta", "Your answer")}
+                  : {s.answer || "—"}
                 </p>
                 <p className="solution">{s.question!.a}</p>
                 <p className="muted">
-                  {bot ? tr(locale, "Solución · El resultado aparecerá en la siguiente acción.", "Solution · The result will appear on the next action.") : tr(
-                    locale,
-                    "Acepta sinónimos y respuestas equivalentes. Tú decides.",
-                    "Accept synonyms and equivalent answers. You decide.",
-                  )}
+                  {bot
+                    ? tr(
+                        locale,
+                        "Solución · El resultado aparecerá en la siguiente acción.",
+                        "Solution · The result will appear on the next action.",
+                      )
+                    : tr(
+                        locale,
+                        "Acepta sinónimos y respuestas equivalentes. Tú decides.",
+                        "Accept synonyms and equivalent answers. You decide.",
+                      )}
                 </p>
-                {!bot && <div className="controls">
-                  <button
-                    disabled={bot || paused}
-                    onClick={() => dispatch({ type: "GRADE", correct: true })}
-                  >
-                    {tr(locale, "He acertado", "Correct")}
-                  </button>
-                  <button
-                    disabled={bot || paused}
-                    onClick={() => dispatch({ type: "GRADE", correct: false })}
-                  >
-                    {tr(locale, "He fallado", "Incorrect")}
-                  </button>
-                </div>}
+                {!bot && (
+                  <div className="controls">
+                    <button
+                      disabled={bot || paused}
+                      onClick={() => dispatch({ type: "GRADE", correct: true })}
+                    >
+                      {tr(locale, "He acertado", "Correct")}
+                    </button>
+                    <button
+                      disabled={bot || paused}
+                      onClick={() =>
+                        dispatch({ type: "GRADE", correct: false })
+                      }
+                    >
+                      {tr(locale, "He fallado", "Incorrect")}
+                    </button>
+                  </div>
+                )}
               </>
             )}
           </>
         )}
         <div className="trivia-scores">
           {s.players.map((p, i) => (
-            <div key={i} className={i===s.turn ? 'active' : ''}>
+            <div key={i} className={i === s.turn ? "active" : ""}>
               <b>
                 {i + 1}. {p.name}
               </b>
@@ -342,7 +450,12 @@ function View({
                   </span>
                 ))}
               </div>
-              <small>{p.correct}/{p.attempts} ✓{(p.streak || 0)>1 ? ` · ${tr(locale,'Racha','Streak')} ${p.streak}` : ''}</small>
+              <small>
+                {p.correct}/{p.attempts} ✓
+                {(p.streak || 0) > 1
+                  ? ` · ${tr(locale, "Racha", "Streak")} ${p.streak}`
+                  : ""}
+              </small>
             </div>
           ))}
         </div>
@@ -359,9 +472,9 @@ export const trivia: GameDefinition<State> = {
   ),
   category: "board",
   icon: "✳",
-  version: 2,
-  migrate: (s:State) => ({...s,players:s.players.map((p,i)=>({...botProfile(s.rng,i),...p}))}),
-  defaults: { players: 2, humans: 1, difficulty: 'medium' },
+  version: 3,
+  migrate: migrateTrivia,
+  defaults: { players: 2, humans: 1, difficulty: "medium" },
   options: [
     select(
       "players",
@@ -395,12 +508,12 @@ export const trivia: GameDefinition<State> = {
       "Dificultad del bot",
       "Bot difficulty",
       [
-        ['easy', 'Fácil', 'Easy'],
-        ['medium', 'Media', 'Medium'],
-        ['hard', 'Difícil', 'Hard'],
-        ['expert', 'Experto', 'Expert'],
+        ["easy", "Fácil", "Easy"],
+        ["medium", "Media", "Medium"],
+        ["hard", "Difícil", "Hard"],
+        ["expert", "Experto", "Expert"],
       ],
-      'medium',
+      "medium",
       (c) => Number(c.humans) < Number(c.players),
     ),
   ],
@@ -408,13 +521,16 @@ export const trivia: GameDefinition<State> = {
     const pool: TriviaQuestion[] =
       cfg.language === "en"
         ? corpus
-        : spanishQuestions.map(([category, q, a], i) => ({
-            id: "es-" + i,
-            category,
-            q,
-            a,
-            lang: "es",
-          }));
+        : [
+            ...spanishQuestions.map(([category, q, a], i) => ({
+              id: "es-" + i,
+              category,
+              q,
+              a,
+              lang: "es",
+            })),
+            ...spanishCorpus,
+          ];
     let rng = seed;
     const decks = Array.from({ length: 6 }, (_, cat) => {
       const out = shuffle(
@@ -428,14 +544,15 @@ export const trivia: GameDefinition<State> = {
       ...baseState(rng),
       turn: 0,
       players: Array.from({ length: Number(cfg.players) }, (_, i) => {
-        return ({
-        name: (i < Number(cfg.humans) ? "P" : "Bot ") + (i + 1),
-        position: 0,
-        tokens: Array(6).fill(false),
-        correct: 0,
-        attempts: 0,
-        ...botProfile(seed,i),
-      });}),
+        return {
+          name: (i < Number(cfg.humans) ? "P" : "Bot ") + (i + 1),
+          position: 0,
+          tokens: Array(6).fill(false),
+          correct: 0,
+          attempts: 0,
+          ...botProfile(seed, i),
+        };
+      }),
       phase: "roll",
       dice: 0,
       destinations: [],
@@ -449,11 +566,14 @@ export const trivia: GameDefinition<State> = {
   },
   reducer: triviaReducer,
   View,
-  getTurn: (s, cfg) => s.status !== 'playing' ? null : ({
-    player: s.turn,
-    bot: s.turn >= Number(cfg.humans),
-    hidden: false,
-  }),
+  getTurn: (s, cfg) =>
+    s.status !== "playing"
+      ? null
+      : {
+          player: s.turn,
+          bot: s.turn >= Number(cfg.humans),
+          hidden: false,
+        },
   bot: (s, cfg) => {
     if (s.phase === "roll") return { type: "ROLL" };
     if (s.phase === "move") {
@@ -479,9 +599,13 @@ export const trivia: GameDefinition<State> = {
       return {
         type: "ANSWER",
         answer:
-          r < botAccuracy(s,cfg)
+          r < botAccuracy(s, cfg)
             ? s.question!.a
-            : tr(cfg.language==='en'?'en':'es','No lo sé','I do not know'),
+            : tr(
+                cfg.language === "en" ? "en" : "es",
+                "No lo sé",
+                "I do not know",
+              ),
       };
     }
     return { type: "GRADE", correct: s.answer === s.question?.a };

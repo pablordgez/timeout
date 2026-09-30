@@ -45,6 +45,10 @@ for (const [url, path] of [
     "https://creativecommons.org/licenses/by-sa/4.0/legalcode.txt",
     "licenses/CC-BY-SA-4.0.txt",
   ],
+  [
+    "https://creativecommons.org/licenses/by/4.0/legalcode.txt",
+    "licenses/CC-BY-4.0.txt",
+  ],
 ]) {
   const r = await fetch(url);
   if (!r.ok) throw Error(r.status + " " + url);
