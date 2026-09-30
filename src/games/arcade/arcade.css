@@ -1,1 +1,2 @@
 .arcade-game{min-width:0;max-width:100%}.arcade-game .touch-controls{flex-wrap:wrap;max-width:100%}.arcade-game .touch-controls button{min-width:44px}.arcade-game .game-canvas{touch-action:none}
+.arcade-game .snake-pad .touch-controls{display:grid;grid-template-columns:repeat(3,58px);grid-template-rows:repeat(2,48px);justify-content:center}.snake-pad button:nth-child(1){grid-area:2/1}.snake-pad button:nth-child(2){grid-area:1/2}.snake-pad button:nth-child(3){grid-area:2/2}.snake-pad button:nth-child(4){grid-area:2/3}.arcade-game[inert] .touch-controls{opacity:.45}
