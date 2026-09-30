@@ -979,6 +979,15 @@ button.primary:hover {
   overflow: auto;
   font: 0.8rem/2 var(--font-mono);
 }
+.ring-answer-feedback {
+  margin: 20px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.ring-solution strong,
+.ring-answer-feedback strong {
+  color: var(--accent);
+}
 .solution {
   font-size: 1.3rem;
   color: var(--accent);

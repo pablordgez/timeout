@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { vocabularyOrder, wordBand } from '../../core/vocabulary';
+import { vocabularyOrder, wordBand } from "../../core/vocabulary";
 import {
   baseState,
   difficulty,
@@ -26,11 +26,15 @@ interface State extends GameState {
   duration: number;
   language: "es" | "en";
   answers: string[];
+  lastMiss?: number;
 }
 function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
   const [answer, setAnswer] = useState("");
-  const q = s.questions[s.index];
-  useEffect(() => setAnswer(''), [s.index]);
+  const [reviewIndex, setReviewIndex] = useState<number | null>(null);
+  const q = s.questions[reviewIndex ?? s.index];
+  const lastMiss =
+    s.lastMiss === undefined ? undefined : s.questions[s.lastMiss];
+  useEffect(() => setAnswer(""), [s.index]);
   return (
     <div className="ring-layout">
       <div className="word-ring">
@@ -39,7 +43,7 @@ function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
           return (
             <button
               key={q.letter}
-              disabled={paused || s.status !== 'playing'}
+              disabled={paused && s.status === "playing"}
               style={{
                 left: `${50 + 43 * Math.cos(angle)}%`,
                 top: `${50 + 43 * Math.sin(angle)}%`,
@@ -47,8 +51,19 @@ function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
               className={
                 "ring-letter " + q.result + (i === s.index ? " current" : "")
               }
-              onClick={() => dispatch({ type: "SELECT", index: i })}
-              aria-label={`${q.letter}: ${q.result}`}
+              onClick={() => {
+                if (
+                  s.status === "playing" &&
+                  ["pending", "passed"].includes(q.result)
+                ) {
+                  setReviewIndex(null);
+                  dispatch({ type: "SELECT", index: i });
+                } else {
+                  setReviewIndex(i);
+                }
+              }}
+              aria-pressed={reviewIndex === i}
+              aria-label={`${q.letter.toUpperCase()}: ${q.result === "correct" ? tr(locale, "Acierto", "Correct") : q.result === "wrong" ? tr(locale, "Fallo", "Wrong") : tr(locale, "Pendiente", "Pending")}`}
             >
               {q.letter.toUpperCase()}
               <small>
@@ -71,8 +86,22 @@ function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
           <small>{s.duration ? s.remaining + "s" : "∞"}</small>
         </div>
       </div>
-      <div className="question-card" key={s.index}>
-        {s.status === "playing" ? (
+      <div className="question-card">
+        {reviewIndex !== null ? (
+          <>
+            <p className="eyebrow">{q.letter.toUpperCase()}</p>
+            <h2>{q.g}</h2>
+            <p className="ring-solution">
+              {tr(locale, "Respuesta correcta", "Correct answer")}:{" "}
+              <strong>{q.w}</strong>
+            </p>
+            <button onClick={() => setReviewIndex(null)}>
+              {s.status === "playing"
+                ? tr(locale, "Seguir jugando", "Keep playing")
+                : tr(locale, "Ver todas las respuestas", "See all answers")}
+            </button>
+          </>
+        ) : s.status === "playing" ? (
           <>
             <p className="eyebrow">
               {tr(
@@ -111,10 +140,20 @@ function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
               >
                 {tr(locale, "Pasar palabra", "Pass")}
               </button>
-              <button disabled={paused} onClick={() => dispatch({ type: "REVEAL" })}>
+              <button
+                disabled={paused}
+                onClick={() => dispatch({ type: "REVEAL" })}
+              >
                 {tr(locale, "Revelar (fallo)", "Reveal (miss)")}
               </button>
             </div>
+            {lastMiss?.result === "wrong" ? (
+              <p className="ring-answer-feedback" role="status">
+                {lastMiss.letter.toUpperCase()} ·{" "}
+                {tr(locale, "Respuesta correcta", "Correct answer")}:{" "}
+                <strong>{lastMiss.w}</strong>
+              </p>
+            ) : null}
           </>
         ) : (
           <>
@@ -143,7 +182,7 @@ export const ring: GameDefinition<State> = {
   category: "words",
   icon: "◎",
   version: 1,
-  defaults: { duration: 180, difficulty:'medium' },
+  defaults: { duration: 180, difficulty: "medium" },
   options: [
     difficulty,
     select(
@@ -161,7 +200,9 @@ export const ring: GameDefinition<State> = {
   create: async (cfg, seed) => {
     const language = cfg.language === "en" ? "en" : "es";
     await loadLexicon(language);
-    const pool = clueWords(language).filter(w=>cfg.difficulty !== 'easy' || wordBand(w,language)<2),
+    const pool = clueWords(language).filter(
+        (w) => cfg.difficulty !== "easy" || wordBand(w, language) < 2,
+      ),
       alphabet =
         language === "es"
           ? "abcdefghijklmnñopqrstuvwxyz"
@@ -175,8 +216,14 @@ export const ring: GameDefinition<State> = {
         contains = true;
       }
       if (!suitable.length) throw Error("Insufficient clues for " + letter);
-      const ordered = vocabularyOrder(suitable,language,String(cfg.difficulty || 'medium'),seed);
-      const out = shuffle(suitable,seed);seed=out.seed;
+      const ordered = vocabularyOrder(
+        suitable,
+        language,
+        String(cfg.difficulty || "medium"),
+        seed,
+      );
+      const out = shuffle(suitable, seed);
+      seed = out.seed;
       const selected = ordered[0] || out.items[0];
       questions.push({
         letter,
@@ -231,6 +278,12 @@ export const ring: GameDefinition<State> = {
       questions,
       index,
       moves: s.moves + (a.type === "PASS" ? 0 : 1),
+      lastMiss:
+        q.result === "wrong"
+          ? s.index
+          : a.type === "PASS"
+            ? s.lastMiss
+            : undefined,
       score: correct * 100,
       status: done
         ? correct === questions.length
@@ -261,8 +314,8 @@ export const ring: GameDefinition<State> = {
     {
       title: labels("Tiempo y respuestas", "Time and answers"),
       text: labels(
-        "El reloj solo corre mientras juegas. Al terminar podrás revisar todas las soluciones.",
-        "The clock runs only while playing. Review every answer after the round ends.",
+        "Tras un fallo aparece la respuesta correcta. Pulsa una letra ya respondida para revisar su definición y solución. El reloj sigue corriendo mientras consultas. Al terminar puedes ver todas las soluciones.",
+        "A miss shows the correct answer. Click an answered letter to review its clue and solution. The clock keeps running while you review. All solutions are available after the round ends.",
       ),
     },
   ],
