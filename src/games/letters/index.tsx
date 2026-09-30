@@ -127,7 +127,7 @@ function LettersView(props:GameViewProps<LettersState>) {
   </section>;
 }
 export const letters:GameDefinition<LettersState>={
-  id:'letters',name:labels('Cruce de letras','Letter Crossing'),description:labels('Palabras que se cruzan. Cada casilla cuenta.','Crossing words. Every square counts.'),category:'words',icon:'Aa',version:1,
+  id:'letters',name:labels('Letras en juego','Word tiles'),description:labels('Forma palabras con tus fichas y suma puntos.','Build words with your tiles and score points.'),category:'words',icon:'Aa',version:1,
   defaults:{language:'es',players:2,humans:1,difficulty:'medium'},options:[select('language','Idioma del léxico y fichas','Lexicon and tile language',[['es','Español','Spanish'],['en','Inglés','English']],'es'),select('players','Jugadores','Players',[[2,'2','2'],[3,'3','3'],[4,'4','4']],2),select('humans','Jugadores humanos','Human players',[[1,'1','1'],[2,'2','2'],[3,'3','3'],[4,'4','4']],1),{...difficulty,visibleWhen:c=>Number(c.humans)<(c.mode==='pairs'?4:Number(c.players))}],
   create:createLetters,reducer:lettersReducer,View:LettersView,bot:lettersBot,getTurn:(s,c)=>s.status!=='playing'?null:{player:s.turn,bot:s.turn>=Math.min(s.players.length,Number(c.humans)||1),hidden:true},
   guide:[

@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { vocabularyOrder, wordBand } from '../../core/vocabulary';
 import {
   baseState,
+  difficulty,
   labels,
   select,
   tr,
@@ -28,6 +30,7 @@ interface State extends GameState {
 function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
   const [answer, setAnswer] = useState("");
   const q = s.questions[s.index];
+  useEffect(() => setAnswer(''), [s.index]);
   return (
     <div className="ring-layout">
       <div className="word-ring">
@@ -36,6 +39,7 @@ function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
           return (
             <button
               key={q.letter}
+              disabled={paused || s.status !== 'playing'}
               style={{
                 left: `${50 + 43 * Math.cos(angle)}%`,
                 top: `${50 + 43 * Math.sin(angle)}%`,
@@ -67,7 +71,7 @@ function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
           <small>{s.duration ? s.remaining + "s" : "∞"}</small>
         </div>
       </div>
-      <div className="question-card">
+      <div className="question-card" key={s.index}>
         {s.status === "playing" ? (
           <>
             <p className="eyebrow">
@@ -99,6 +103,7 @@ function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
             </form>
             <div className="controls">
               <button
+                disabled={paused}
                 onClick={() => {
                   dispatch({ type: "PASS" });
                   setAnswer("");
@@ -106,7 +111,7 @@ function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
               >
                 {tr(locale, "Pasar palabra", "Pass")}
               </button>
-              <button onClick={() => dispatch({ type: "REVEAL" })}>
+              <button disabled={paused} onClick={() => dispatch({ type: "REVEAL" })}>
                 {tr(locale, "Revelar (fallo)", "Reveal (miss)")}
               </button>
             </div>
@@ -132,14 +137,15 @@ export const ring: GameDefinition<State> = {
   id: "ring",
   name: labels("Ronda de letras", "Letter ring"),
   description: labels(
-    "Da una vuelta al abecedario.",
-    "Take a lap around the alphabet.",
+    "Adivina una palabra por cada letra.",
+    "Guess a word for each letter.",
   ),
   category: "words",
   icon: "◎",
   version: 1,
-  defaults: { duration: 180 },
+  defaults: { duration: 180, difficulty:'medium' },
   options: [
+    difficulty,
     select(
       "duration",
       "Tiempo",
@@ -155,7 +161,7 @@ export const ring: GameDefinition<State> = {
   create: async (cfg, seed) => {
     const language = cfg.language === "en" ? "en" : "es";
     await loadLexicon(language);
-    const pool = clueWords(language),
+    const pool = clueWords(language).filter(w=>cfg.difficulty !== 'easy' || wordBand(w,language)<2),
       alphabet =
         language === "es"
           ? "abcdefghijklmnñopqrstuvwxyz"
@@ -169,9 +175,9 @@ export const ring: GameDefinition<State> = {
         contains = true;
       }
       if (!suitable.length) throw Error("Insufficient clues for " + letter);
-      const out = shuffle(suitable, seed);
-      seed = out.seed;
-      const selected = out.items[0];
+      const ordered = vocabularyOrder(suitable,language,String(cfg.difficulty || 'medium'),seed);
+      const out = shuffle(suitable,seed);seed=out.seed;
+      const selected = ordered[0] || out.items[0];
       questions.push({
         letter,
         w: selected.w,

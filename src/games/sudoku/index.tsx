@@ -26,6 +26,9 @@ function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
   useEffect(() => {
     const fn = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement) return;
+      if(e.target instanceof HTMLSelectElement || e.target instanceof HTMLTextAreaElement) return;
+      const arrows:Record<string,number>={ArrowLeft:-1,ArrowRight:1,ArrowUp:-9,ArrowDown:9};
+      if(arrows[e.key]) {e.preventDefault();if(!paused)dispatch({type:'SELECT',index:Math.max(0,Math.min(80,s.selected+arrows[e.key]))});}
       if (/^[1-9]$/.test(e.key)) {
         e.preventDefault();
         if (!paused) dispatch({ type: "NUMBER", value: Number(e.key) });
@@ -37,14 +40,15 @@ function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
     };
     window.addEventListener("keydown", fn);
     return () => window.removeEventListener("keydown", fn);
-  }, [dispatch, paused]);
+  }, [dispatch, paused, s.selected]);
   return (
     <div className="sudoku">
       <div className="sudoku-grid">
         {s.board.map((v, i) => {
           const peers =
             i % 9 === s.selected % 9 ||
-            Math.floor(i / 9) === Math.floor(s.selected / 9);
+            Math.floor(i / 9) === Math.floor(s.selected / 9) ||
+            (Math.floor(i%9/3)===Math.floor(s.selected%9/3)&&Math.floor(i/27)===Math.floor(s.selected/27));
           return (
             <button
               key={i}
@@ -53,6 +57,7 @@ function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
                 (s.puzzle[i] ? " given" : "") +
                 (s.selected === i ? " selected" : peers ? " peer" : "") +
                 (v && v !== s.solution[i] ? " invalid" : "") +
+                (v && v === s.board[s.selected] ? ' matching' : '') +
                 (i % 9 === 2 || i % 9 === 5 ? " box-right" : "") +
                 (Math.floor(i / 9) === 2 || Math.floor(i / 9) === 5
                   ? " box-bottom"
@@ -60,6 +65,7 @@ function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
               }
               aria-label={`${tr(locale, "Fila", "Row")} ${Math.floor(i / 9) + 1}, ${tr(locale, "columna", "column")} ${(i % 9) + 1}: ${v || tr(locale, "vacía", "empty")}`}
               onClick={() => dispatch({ type: "SELECT", index: i })}
+              disabled={paused}
             >
               {v || (
                 <span className="notes">
@@ -78,10 +84,10 @@ function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
         {[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((v) => (
           <button
             key={v}
-            disabled={paused}
+            disabled={paused || (v>0 && s.board.filter(n=>n===v).length===9)}
             onClick={() => dispatch({ type: "NUMBER", value: v })}
           >
-            {v || "⌫"}
+            {v || "⌫"}<small className="number-remaining">{v ? Math.max(0,9-s.board.filter(n=>n===v).length) : ''}</small>
           </button>
         ))}
       </div>
@@ -113,7 +119,7 @@ export const sudoku: GameDefinition<State> = {
   id: "sudoku",
   name: labels("Sudoku", "Sudoku"),
   description: labels(
-    "Nueve números. Un poco de calma.",
+    "Completa la cuadrícula sin repetir números.",
     "Nine numbers. A moment of calm.",
   ),
   category: "puzzles",

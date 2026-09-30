@@ -9,15 +9,15 @@ const names = [
   "Cinco letras",
   "Crucigramas",
   "Ronda de letras",
-  "Cruce de letras",
+  "Letras en juego",
   "Ajedrez",
   "Póker",
   "Dominó",
   "Billar",
-  "Órbita del saber",
+  "Preguntas y respuestas",
   "Serpiente",
-  "Carrera de pulso",
-  "Vuelo de pulso",
+  "Salto de dinosaurio",
+  "Vuelo entre tubos",
   "Rompebloques",
   "Caída de bloques",
 ];
@@ -194,7 +194,7 @@ test("mobile catalog, theme, language and tactile controls", async ({
     .getByRole("button", { name: "Change language / Cambiar idioma" })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Slow down. Play a little." }),
+    page.getByRole("heading", { name: "Collection" }),
   ).toBeVisible();
   await page.getByRole("button", { name: /Settings/ }).click();
   await page

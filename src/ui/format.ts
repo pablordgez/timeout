@@ -4,6 +4,7 @@ import {
   type GameDefinition,
   type Locale,
 } from "../core/types";
+import { triviaLevel } from '../core/feel';
 export const resultLabels = {
   playing: labels("En curso", "In progress"),
   won: labels("Completada / victoria", "Completed / won"),
@@ -50,12 +51,13 @@ export function configDescription(
   config: Config,
   locale: Locale,
 ): string {
+  if(game?.id==='trivia')config={...config,difficulty:triviaLevel(config)};
   const options =
     game?.options.filter((o) => !o.visibleWhen || o.visibleWhen(config)) ?? [];
   return options
     .map(
       (o) =>
-        `${o.label[locale]}: ${o.values.find((v) => v.value === config[o.key])?.label[locale] ?? config[o.key]}`,
+        `${o.label[locale]}: ${o.values.find((v) => v.value === (config[o.key] ?? o.default))?.label[locale] ?? config[o.key] ?? o.default}`,
     )
     .concat(
       config.language ? [config.language === "es" ? "Español" : "English"] : [],

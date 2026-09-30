@@ -34,7 +34,7 @@ function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
   const submit = () => {
     if (!paused) {
       dispatch({ type: "GUESS", word: input });
-      setInput("");
+      if(accepted(s.language).has(normalize(input)) && input.length===5) setInput("");
     }
   };
   const keyStatus: Record<string, number> = {};
@@ -58,7 +58,8 @@ function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
             const mark = s.marks[row]?.[col];
             return (
               <div
-                key={`${row}-${col}`}
+                key={`${row}-${col}-${mark ?? 'input'}`}
+                style={mark===undefined ? undefined : {animationDelay:`${col*85}ms`}}
                 className={
                   "letter-cell " +
                   (mark === 2
@@ -103,6 +104,7 @@ function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
           </label>
           <input
             id="word-guess"
+            disabled={paused}
             maxLength={5}
             autoComplete="off"
             value={input}
@@ -126,6 +128,7 @@ function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
         {[...keys].map((ch) => (
           <button
             key={ch}
+            data-sound="write"
             className={
               keyStatus[ch] === 2
                 ? "correct"
@@ -135,13 +138,13 @@ function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
                     ? "absent"
                     : ""
             }
-            disabled={paused}
+            disabled={paused || s.status !== 'playing'}
             onClick={() => setInput((v) => (v.length < 5 ? v + ch : v))}
           >
             {ch.toUpperCase()}
           </button>
         ))}
-        <button onClick={() => setInput((v) => v.slice(0, -1))}>⌫</button>
+        <button data-sound="erase" disabled={paused || s.status !== 'playing'} onClick={() => setInput((v) => v.slice(0, -1))}>⌫</button>
       </div>
     </div>
   );

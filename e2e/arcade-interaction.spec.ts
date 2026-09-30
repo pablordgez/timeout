@@ -45,7 +45,7 @@ test('crossword direction, clue focus, letter progress and hint survive reload',
 
 test('sound preference mutes generated effects and persists',async({page})=>{
  await page.addInitScript(()=>{const Native=window.AudioContext||(window as any).webkitAudioContext;if(Native){(window as any).__sounds=0;const original=Native.prototype.createOscillator;Native.prototype.createOscillator=function(){(window as any).__sounds++;return original.call(this);};}});
- await page.goto('/');await start(page,'Carrera de pulso');await page.keyboard.press('Space');
+ await page.goto('/');await start(page,'Salto de dinosaurio');await page.keyboard.press('Space');
  const supported=await page.evaluate(()=>typeof window.AudioContext==='function'||typeof (window as any).webkitAudioContext==='function');
  if(supported)await expect.poll(()=>page.evaluate(()=>(window as any).__sounds||0)).toBeGreaterThan(0);else test.info().annotations.push({type:'compatibility',description:'This browser build has no Web Audio API; mute/persistence and graceful fallback are checked.'});await pause(page);
  await page.getByRole('button',{name:'← Colección',exact:true}).click();await page.getByRole('button',{name:/Ajustes/}).click();const toggle=page.getByRole('checkbox',{name:'Efectos de sonido',exact:true});await toggle.click();await expect(toggle).not.toBeChecked();

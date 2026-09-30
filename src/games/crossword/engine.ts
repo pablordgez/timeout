@@ -1,7 +1,7 @@
 import { baseState, type Action, type Config, type GameState } from '../../core/types';
 import { normalizeAnswer, type Puzzle } from './generator';
 export interface CrosswordState extends GameState {puzzle:Puzzle;board:string[];selected:number;direction:'across'|'down';hints:number;checks:number;check:boolean}
-export function createState(puzzle:Puzzle,seed:number):CrosswordState{return {...baseState(seed),puzzle,board:Array(puzzle.mask.length).fill(''),selected:puzzle.mask.indexOf(true),direction:'across',hints:0,checks:0,check:false};}
+export function createState(puzzle:Puzzle,seed:number):CrosswordState{return {...baseState(seed),puzzle,board:Array(puzzle.mask.length).fill(''),selected:puzzle.mask.indexOf(true),direction:puzzle.slots.find(slot=>slot.cells.includes(puzzle.mask.indexOf(true)))?.direction||'across',hints:0,checks:0,check:false};}
 export function currentSlot(s:CrosswordState){return s.puzzle.slots.find(slot=>slot.direction===s.direction&&slot.cells.includes(s.selected))||s.puzzle.slots.find(slot=>slot.cells.includes(s.selected))!;}
 export function crosswordReducer(s:CrosswordState,a:Action,_config?:Config):CrosswordState{
  if(a.type==='CELL'&&s.puzzle.mask[a.index])return {...s,selected:a.index,direction:a.toggle&&a.index===s.selected?(s.direction==='across'?'down':'across'):s.direction};
@@ -14,6 +14,6 @@ export function crosswordReducer(s:CrosswordState,a:Action,_config?:Config):Cros
  if(a.type==='HINT'){if(board[selected]===s.puzzle.solution[selected])selected=slot.cells.find(i=>board[i]!==s.puzzle.solution[i])??s.puzzle.mask.findIndex((v,i)=>v&&board[i]!==s.puzzle.solution[i]);if(selected<0)return s;board[selected]=s.puzzle.solution[selected];hints++;}
  if(a.type==='BACKSPACE'){if(!board[selected]&&at>0)selected=slot.cells[at-1];board[selected]='';}
  if(a.type==='INPUT'){const i=Number.isInteger(a.index)?a.index:selected;if(!s.puzzle.mask[i])return s;const value=normalizeAnswer(String(a.value||''));if(value&&!/^[a-zñ]$/.test(value))return s;board[i]=value;selected=value?(slot.cells[slot.cells.indexOf(i)+1]??i):i;}
- if(a.type==='PASTE'){const value=normalizeAnswer(String(a.value)).replace(/[^a-zñ]/g,'');for(let j=0;j<value.length&&at+j<slot.cells.length;j++)board[slot.cells[at+j]]=value[j];selected=slot.cells[Math.min(slot.cells.length-1,at+value.length)];}
+ if(a.type==='PASTE'){const value=normalizeAnswer(String(a.value)).replace(/[^a-zñ]/g,'');const start=value.length===slot.cells.length?0:at;for(let j=0;j<value.length&&start+j<slot.cells.length;j++)board[slot.cells[start+j]]=value[j];selected=slot.cells[Math.min(slot.cells.length-1,start+value.length)];}
  const won=s.puzzle.mask.every((v,i)=>!v||board[i]===s.puzzle.solution[i]);return {...s,board,selected,hints,moves:s.moves+1,status:won?'won':'playing',score:won?Math.max(0,s.puzzle.mask.filter(Boolean).length*10-hints*20):0};
 }

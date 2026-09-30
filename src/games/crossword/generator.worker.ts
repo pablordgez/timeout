@@ -1,2 +1,3 @@
 import { generate } from './generator';
-self.onmessage=e=>{try{const result=generate(e.data.size,e.data.entries,e.data.seed,12);self.postMessage(result?{result}:{error:'No valid crossword found within the bounded search. Try another seed.'});}catch(error){self.postMessage({error:String(error)});}};
+import { generateFamiliar } from './familiar';
+self.onmessage=e=>{try{const {size,entries,seed,locale,difficulty}=e.data;const result=difficulty?generateFamiliar(size,entries,seed,locale,difficulty):generate(size,entries,seed,12);self.postMessage(result?{result}:{error:'No valid crossword found within the bounded search. Try another seed.'});}catch(error){self.postMessage({error:String(error)});}};

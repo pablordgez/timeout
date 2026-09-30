@@ -23,3 +23,10 @@ export function seedNow() {
   crypto.getRandomValues(a);
   return a[0] || 1;
 }
+/** Avalanche nearby seeds before assigning personal profiles or generation bands. */
+export function mixSeed(seed:number,salt=0) {
+  let x=(seed^salt)>>>0;
+  x=Math.imul(x^(x>>>16),0x85ebca6b);
+  x=Math.imul(x^(x>>>13),0xc2b2ae35);
+  return (x^(x>>>16))>>>0 || 1;
+}

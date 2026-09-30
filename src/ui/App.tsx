@@ -6,6 +6,7 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
+import { GameIcon } from "./GameIcon";
 import { games, gameById } from "../core/registry";
 import { applyTheme, themes } from "../core/themes";
 import {
@@ -32,6 +33,8 @@ import {
   type Action,
 } from "../core/types";
 import { seedNow } from "../core/random";
+import { botDelay, botSpeeds, nextStep, triviaLevel } from "../core/feel";
+import { soundEventForTransition } from "../core/sound-design";
 import { loadLexicon } from "../core/lexicon";
 import gpl from "../../LICENSE?raw";
 import thirdPartyNotices from "../../licenses/THIRD-PARTY-NOTICES.txt?raw";
@@ -41,7 +44,7 @@ import { validateGameSession } from "../core/save-validation";
 import {
   setSoundEnabled,
   unlockAudio,
-  playSound,
+  playGameSound,
   soundForTransition,
 } from "../core/audio";
 import {
@@ -112,7 +115,6 @@ class GameBoundary extends Component<
 export function App() {
   const [data, setData] = useState<SaveData>(emptyData),
     [ready, setReady] = useState(false),
-    [storage, setStorage] = useState(""),
     [warning, setWarning] = useState(""),
     [tab, setTab] = useState("games"),
     [search, setSearch] = useState(""),
@@ -169,7 +171,6 @@ export function App() {
         if (live) {
           latest.current = result.data;
           setData(result.data);
-          setStorage(result.backend);
           setWarning(result.warning || "");
           setReady(true);
         }
@@ -368,9 +369,6 @@ export function App() {
             timeout<span className="brand-dot">.</span>
           </span>
         </a>
-        <p className="sidebar-tag">
-          {tr(locale, "TU MOMENTO DE PAUSA", "YOUR MOMENT OF PAUSE")}
-        </p>
         <nav>
           {[
             ["games", "▦", tr(locale, "Colección", "Collection")],
@@ -409,18 +407,13 @@ export function App() {
               ? tr(locale, "Disponible sin conexión", "Available offline")
               : tr(locale, "Preparando modo offline", "Preparing offline mode")}
           <button className="text-button" onClick={() => setLicenses(true)}>
-            {tr(locale, "Licencias y fuentes", "Licenses & sources")}
+            {tr(locale, "Créditos y licencias", "Credits & licenses")}
           </button>
-          <small>
-            v{__APP_VERSION__} · {storage}
-          </small>
         </div>
       </aside>
       <main className="main">
         <header className="topbar">
-          <span className="eyebrow">
-            {tr(locale, "UN RATO PARA TI", "A LITTLE TIME FOR YOU")}
-          </span>
+          <span className="eyebrow">{tr(locale, "Juegos", "Games")}</span>
           <div>
             <button
               className="sound-toggle text-button"
@@ -532,50 +525,11 @@ export function App() {
           </GameBoundary>
         ) : tab === "games" ? (
           <>
-            <section className="hero">
-              <div>
-                <p className="eyebrow">PLAY. PAUSE. REPEAT.</p>
-                <h1>
-                  {tr(locale, "Baja el ritmo.", "Slow down.")}
-                  <br />
-                  <span>
-                    {tr(locale, "Sube la partida.", "Play a little.")}
-                  </span>
-                </h1>
-                <p>
-                  {tr(
-                    locale,
-                    "Pequeños juegos para grandes pausas. Sin prisas, sin cuentas. Solo tú y el siguiente movimiento.",
-                    "Small games for bigger breaks. No rush, no accounts. Just you and the next move.",
-                  )}
-                </p>
-              </div>
-              <div className="hero-art" aria-hidden="true">
-                <div className="pixel-orbit">
-                  {Array.from({ length: 64 }, (_, i) => (
-                    <i
-                      key={i}
-                      style={{
-                        opacity: [
-                          0, 1, 7, 8, 10, 13, 15, 16, 19, 20, 23, 25, 27, 28,
-                          30, 31, 32, 33, 35, 36, 38, 40, 43, 44, 47, 48, 50,
-                          53, 55, 56, 57, 63,
-                        ].includes(i)
-                          ? 1
-                          : 0.12,
-                      }}
-                    />
-                  ))}
-                </div>
-                <span>INSERT A LITTLE TIME</span>
-              </div>
-            </section>
             <section className="catalog-head">
               <div>
-                <h2>{tr(locale, "Elige tu pausa", "Choose your pause")}</h2>
+                <h1>{tr(locale, "Colección", "Collection")}</h1>
                 <span className="muted">
-                  {games.length}{" "}
-                  {tr(locale, "juegos, cero prisa", "games, zero rush")}
+                  {games.length} {tr(locale, "juegos", "games")}
                 </span>
               </div>
               <input
@@ -614,7 +568,9 @@ export function App() {
                     style={{ animationDelay: Math.min(i, 10) * 25 + "ms" }}
                   >
                     <div className="game-card-top">
-                      <span className="game-icon">{g.icon}</span>
+                      <span className="game-icon">
+                        <GameIcon id={g.id} fallback={g.icon} />
+                      </span>
                       <button
                         className="favorite-button"
                         aria-label={
@@ -636,12 +592,11 @@ export function App() {
                         {data.preferences.favorites.includes(g.id) ? "♥" : "♡"}
                       </button>
                     </div>
-                    <p className="eyebrow">{categories[g.category][locale]}</p>
                     <h3>{g.name[locale]}</h3>
                     <p>{g.description[locale]}</p>
                     <footer>
                       <button className="play-link" onClick={() => setSetup(g)}>
-                        {tr(locale, "Jugar", "Play")} <span>↗</span>
+                        {tr(locale, "Jugar", "Play")} <span>→</span>
                       </button>
                       {saved ? (
                         <button
@@ -654,9 +609,7 @@ export function App() {
                         >
                           {saved} {tr(locale, "pendiente", "saved")}
                         </button>
-                      ) : (
-                        <span className="micro-label">OFFLINE READY</span>
-                      )}
+                      ) : null}
                     </footer>
                   </article>
                 );
@@ -671,30 +624,18 @@ export function App() {
                 )}
               </p>
             ) : null}
-            <footer className="page-footer">
-              {tr(
-                locale,
-                "Hecho para desconectar. Todo se queda en tu dispositivo.",
-                "Made to disconnect. Everything stays on your device.",
-              )}
-              <span>TIMEOUT / LOCAL FIRST</span>
-            </footer>
           </>
         ) : tab === "saved" ? (
           <>
-            <PageTitle
-              title={tr(locale, "Tu próxima jugada", "Your next move")}
-              subtitle={tr(
-                locale,
-                "Las partidas que te esperan.",
-                "Games waiting for you.",
-              )}
-            />
+            <PageTitle title={tr(locale, "Continuar", "Continue")} />
             {data.sessions.length ? (
               data.sessions.map((s) => (
                 <div key={s.id} className="saved-row">
                   <span className="game-icon">
-                    {gameById(s.gameId)?.icon || "?"}
+                    <GameIcon
+                      id={s.gameId}
+                      fallback={gameById(s.gameId)?.icon}
+                    />
                   </span>
                   <div>
                     <h3>{gameById(s.gameId)?.name[locale] || s.gameId}</h3>
@@ -780,32 +721,45 @@ export function App() {
             >
               ×
             </button>
-            <p className="eyebrow">OPEN BY DESIGN</p>
             <h2 id="licenses-title">
-              {tr(locale, "Licencias y fuentes", "Licenses & sources")}
+              {tr(locale, "Créditos y licencias", "Credits & licenses")}
             </h2>
             <p>
               {tr(
                 locale,
-                "Timeout y Stockfish: GPLv3. Se permite uso comercial respetando la licencia. El código fuente correspondiente acompaña cada entrega.",
-                "Timeout and Stockfish: GPLv3. Commercial use is permitted under the license. Corresponding source accompanies each release.",
+                "Timeout y Stockfish: GPLv3.",
+                "Timeout and Stockfish: GPLv3.",
               )}
             </p>
             <p>
               {tr(
                 locale,
-                "Palabras y definiciones: colaboradores de Wikcionario/Wiktionary, extracción Kaikki/Wiktextract. Filtrado y compactado; CC BY-SA 4.0. Cada término procede del artículo del mismo nombre.",
-                "Words and definitions: Wiktionary contributors, extraction by Kaikki/Wiktextract. Filtered and compacted; CC BY-SA 4.0. Each entry comes from its article of the same name.",
+                "Palabras: colaboradores de Wikcionario/Wiktionary, vía Kaikki/Wiktextract. Filtradas y compactadas; CC BY-SA 4.0. Cada entrada corresponde al artículo del mismo nombre.",
+                "Words: Wiktionary contributors, via Kaikki/Wiktextract. Filtered and compacted; CC BY-SA 4.0. Each entry comes from its article of the same name.",
               )}
             </p>
             <p>
               {tr(
                 locale,
-                "Preguntas inglesas: Open Trivia DB, adaptadas a respuesta abierta. Preguntas españolas: contenido original de Timeout. Ambos paquetes: CC BY-SA 4.0.",
-                "English questions: Open Trivia DB, adapted to open answers. Spanish questions: original Timeout content. Both datasets: CC BY-SA 4.0.",
+                "Preguntas: Open Trivia DB (inglés, adaptadas a respuesta abierta) y Timeout (español). CC BY-SA 4.0. Tipografías: IBM Plex, SIL OFL.",
+                "Questions: Open Trivia DB (English, adapted to open answers) and Timeout (Spanish). CC BY-SA 4.0. Typefaces: IBM Plex, SIL OFL.",
               )}
             </p>
             <div className="controls">
+              <a
+                href="https://es.wiktionary.org/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Wikcionario
+              </a>
+              <a
+                href="https://en.wiktionary.org/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Wiktionary
+              </a>
               <a href="https://kaikki.org/" target="_blank" rel="noreferrer">
                 Kaikki
               </a>
@@ -870,12 +824,11 @@ export function App() {
     </>
   );
 }
-function PageTitle({ title, subtitle }: { title: string; subtitle: string }) {
+function PageTitle({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <div className="page-title">
-      <p className="eyebrow">TIMEOUT / YOUR SPACE</p>
       <h1>{title}</h1>
-      <p>{subtitle}</p>
+      {subtitle ? <p>{subtitle}</p> : null}
     </div>
   );
 }
@@ -905,6 +858,21 @@ function Setup({
   useEffect(() => () => creation.current?.abort(), []);
   const options = [
     ...game.options,
+    ...(game.bot
+      ? [
+          select(
+            "botSpeed",
+            "Ritmo del bot",
+            "Bot pace",
+            botSpeeds.map(([value, es, en]) => [value, es, en]),
+            "normal",
+            (c) =>
+              Number(c.humans || 1) <
+                (game.playerCount?.(c) ?? Number(c.players || 2)) &&
+              c.mode !== "practice",
+          ),
+        ]
+      : []),
     ...(languageGames.includes(game.id) &&
     !game.options.some((o) => o.key === "language")
       ? [languageOption]
@@ -1057,7 +1025,22 @@ function Play({
     [revealed, setRevealed] = useState<string | null>(null),
     [thinking, setThinking] = useState(false),
     [error, setError] = useState(""),
-    [elapsed, setElapsed] = useState(session.elapsed);
+    [elapsed, setElapsed] = useState(session.elapsed),
+    [config, setConfig] = useState(() =>
+      game.id === "trivia"
+        ? { ...session.config, difficulty: triviaLevel(session.config) }
+        : session.config,
+    ),
+    [botStep, setBotStep] = useState(false),
+    [feedback, setFeedback] = useState<{
+      id: number;
+      cue: string;
+      text: string;
+    } | null>(null),
+    [reaction, setReaction] = useState<{ id: number; event: string } | null>(
+      null,
+    );
+  const interactionSerial = useRef(0);
   const stateRef = useRef(state),
     pausedRef = useRef(paused),
     elapsedRef = useRef(elapsed),
@@ -1067,13 +1050,18 @@ function Play({
   pausedRef.current = paused;
   practiceRef.current = practice;
   elapsedRef.current = elapsed;
-  const turn = game.getTurn?.(state, session.config),
+  const turn = game.getTurn?.(state, config),
     turnKey = turn
       ? `${turn.player}:${state.round ?? state.handNumber ?? state.hand ?? ""}`
       : null;
   const hidden = !!turn?.hidden && !turn.bot && revealed !== turnKey;
+  const hasBots =
+    !!game.bot &&
+    config.mode !== "practice" &&
+    Number(config.humans || 1) <
+      (game.playerCount?.(config) ?? Number(config.players || 2));
   const sessionRef = useRef(session);
-  sessionRef.current = session;
+  sessionRef.current = { ...session, config };
   const recorded = useRef(!!session.finishedAt);
   const save = useCallback(() => {
     if (practiceRef.current) return;
@@ -1103,9 +1091,50 @@ function Play({
       try {
         const old = stateRef.current;
         if (old.status !== "playing" && action.type !== "SELECT") return;
-        const next = game.reducer(old, action, session.config);
-        const cue = soundForTransition(game.id, old, next, action);
-        if (cue) playSound(cue);
+        const next = game.reducer(old, action, config);
+        interactionSerial.current++;
+        const reaction = soundEventForTransition(game.id, old, next, action);
+        const cue =
+          reaction?.cue ?? soundForTransition(game.id, old, next, action);
+        if (reaction) {
+          playGameSound(game.id, reaction.event);
+          setReaction({ id: performance.now(), event: reaction.event });
+        }
+        if (
+          cue &&
+          (!["TICK", "CLOCK"].includes(action.type) ||
+            ["eat", "coin", "clear", "failure", "success", "error"].includes(
+              cue,
+            ))
+        ) {
+          const delta = next.score - old.score;
+          const log = next.log?.at(-1);
+          const detail =
+            log !== old.log?.at(-1)
+              ? typeof log === "string"
+                ? log
+                : log?.[locale]
+              : next.event !== old.event
+                ? next.event?.[locale]
+                : null;
+          const text =
+            detail ||
+            (game.id === "trivia" && next.lastAnswer !== old.lastAnswer
+              ? next.lastAnswer?.[locale]
+              : null) ||
+            (delta > 0
+              ? `+${delta} ${tr(locale, "puntos", "points")}`
+              : cue === "error"
+                ? tr(locale, "Revisa la jugada", "Check your move")
+                : cue === "failure"
+                  ? tr(locale, "Fin de partida", "Game over")
+                  : cue === "clear"
+                    ? tr(locale, "¡Completado!", "Cleared!")
+                    : cue === "success"
+                      ? tr(locale, "¡Bien hecho!", "Well done!")
+                      : "");
+          if (text) setFeedback({ id: performance.now(), cue, text });
+        }
         if (next !== old) {
           stateRef.current = next;
           setState(next);
@@ -1121,8 +1150,13 @@ function Play({
         setPaused(true);
       }
     },
-    [game, session.config, save],
+    [game, config, save, locale],
   );
+  useEffect(() => {
+    if (!feedback || paused) return;
+    const timer = setTimeout(() => setFeedback(null), 4500);
+    return () => clearTimeout(timer);
+  }, [feedback, paused]);
   useEffect(() => {
     const timer = setInterval(() => {
       if (
@@ -1170,32 +1204,41 @@ function Play({
       paused ||
       state.status !== "playing" ||
       practice ||
-      !game.bot
+      !game.bot ||
+      (config.botSpeed === "step" && !botStep)
     )
       return;
     let cancel = false;
     setThinking(true);
-    const timer = setTimeout(() => {
-      Promise.resolve(game.bot!(stateRef.current, session.config))
-        .then((action) => {
-          if (!cancel && action) dispatch(action);
-        })
-        .catch((e) => {
-          if (!cancel) {
-            setError(String(e));
-            setPaused(true);
-          }
-        })
-        .finally(() => {
-          if (!cancel) setThinking(false);
-        });
-    }, 500);
+    const timer = setTimeout(
+      () => {
+        Promise.resolve()
+          .then(() => game.bot!(stateRef.current, config))
+          .then((action) => {
+            if (!cancel) {
+              setBotStep(false);
+              if (action) dispatch(action);
+            }
+          })
+          .catch((e) => {
+            if (!cancel) {
+              setError(String(e));
+              setPaused(true);
+            }
+          })
+          .finally(() => {
+            if (!cancel) setThinking(false);
+          });
+      },
+      config.botSpeed === "step" ? 0 : botDelay(config, state),
+    );
     return () => {
       cancel = true;
       clearTimeout(timer);
       setThinking(false);
     };
   }, [
+    state,
     turn?.player,
     turn?.bot,
     state.moves,
@@ -1206,11 +1249,12 @@ function Play({
     practice,
     dispatch,
     game,
-    session.config,
+    config,
+    botStep,
   ]);
   const startPractice = async () => {
     try {
-      const demo = await game.create(session.config, 42);
+      const demo = await game.create(config, 42);
       setPractice({ state: stateRef.current, elapsed: elapsedRef.current });
       stateRef.current = demo;
       setState(demo);
@@ -1298,6 +1342,77 @@ function Play({
             {tr(locale, "El bot está pensando…", "Bot is thinking…")}
           </span>
         ) : null}
+        {hasBots && (
+          <label className="bot-speed">
+            {tr(locale, "Ritmo del bot", "Bot pace")}
+            <select
+              value={String(config.botSpeed || "normal")}
+              onChange={(e) => {
+                const next = { ...config, botSpeed: e.target.value };
+                sessionRef.current = { ...sessionRef.current, config: next };
+                setConfig(next);
+                setBotStep(false);
+                save();
+              }}
+            >
+              {botSpeeds.map(([value, es, en]) => (
+                <option key={value} value={value}>
+                  {tr(locale, es, en)}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+        {turn?.bot && config.botSpeed === "step" && (
+          <button
+            disabled={paused || thinking}
+            onClick={() => setBotStep(true)}
+          >
+            {tr(locale, "Siguiente acción del bot", "Next bot action")} →
+          </button>
+        )}
+      </div>
+      <div
+        className={"game-direction" + (turn?.bot ? " bot-turn" : "")}
+        role="status"
+      >
+        <span
+          key={reaction?.id}
+          className={`direction-marker ${reaction ? "reaction-pulse" : ""} ${reaction?.event === "reject" ? "reaction-rejected" : ""}`}
+          aria-hidden="true"
+        >
+          {paused
+            ? "Ⅱ"
+            : reaction?.event === "reject"
+              ? "!"
+              : turn?.bot
+                ? "◷"
+                : "→"}
+        </span>
+        <span>
+          {paused && state.status === "playing"
+            ? tr(locale, "Partida en pausa.", "Game paused.")
+            : turn?.bot
+              ? tr(
+                  locale,
+                  `Turno del bot ${turn.player + 1} · ${config.botSpeed === "step" ? "Pulsa «Siguiente acción» para avanzar." : "Observa su siguiente acción."}`,
+                  `Bot ${turn.player + 1}’s turn · ${config.botSpeed === "step" ? "Press “Next action” to advance." : "Watch its next action."}`,
+                )
+              : nextStep(game.id, state, locale, config)}
+        </span>
+      </div>
+      <div className="feedback-slot" aria-live="polite" aria-atomic="true">
+        {feedback ? (
+          <p
+            key={feedback.id}
+            className={`action-feedback feedback-${feedback.cue}`}
+          >
+            <span aria-hidden="true">
+              {["error", "failure"].includes(feedback.cue) ? "!" : "✓"}
+            </span>{" "}
+            {feedback.text}
+          </p>
+        ) : null}
       </div>
       {guide ? (
         <div className="guide-panel">
@@ -1356,17 +1471,54 @@ function Play({
           </div>
         ) : (
           <>
-            <game.View
-              state={state}
-              dispatch={dispatch}
-              config={session.config}
-              locale={locale}
-              paused={paused}
-            />
+            <div
+              className="game-view"
+              onClickCapture={(e) => {
+                if (
+                  paused ||
+                  !(e.target instanceof Element) ||
+                  !e.target.closest("button,summary")
+                )
+                  return;
+                const serial = interactionSerial.current;
+                const event =
+                  e.target.closest<HTMLElement>("[data-sound]")?.dataset
+                    .sound || "select";
+                setTimeout(() => {
+                  if (serial === interactionSerial.current) {
+                    playGameSound(game.id, event);
+                    setReaction({ id: performance.now(), event });
+                  }
+                }, 0);
+              }}
+              onInputCapture={(e) => {
+                if (paused || !(e.target instanceof HTMLInputElement)) return;
+                const serial = interactionSerial.current;
+                const event = (
+                  e.nativeEvent as InputEvent
+                ).inputType?.startsWith("delete")
+                  ? "erase"
+                  : "write";
+                setTimeout(() => {
+                  if (serial === interactionSerial.current) {
+                    playGameSound(game.id, event);
+                    setReaction({ id: performance.now(), event });
+                  }
+                }, 0);
+              }}
+            >
+              <game.View
+                state={state}
+                dispatch={dispatch}
+                config={config}
+                locale={locale}
+                paused={paused || (!!turn?.bot && !practice)}
+              />
+            </div>
             {paused && state.status === "playing" && !guide ? (
               <div className="pause-overlay">
                 <span>Ⅱ</span>
-                <h2>{tr(locale, "Una pequeña pausa", "A little pause")}</h2>
+                <h2>{tr(locale, "En pausa", "Paused")}</h2>
                 <button className="primary" onClick={() => setPaused(false)}>
                   {tr(locale, "Continuar", "Continue")} →
                 </button>
@@ -1375,7 +1527,7 @@ function Play({
           </>
         )}
       </div>
-      {state.message ? (
+      {state.message && !["solitaire", "letters"].includes(game.id) ? (
         <p className="game-message" role="status">
           {localizedMessage(state.message, locale)}
         </p>
@@ -1444,14 +1596,7 @@ function Stats({ data, locale }: { data: SaveData; locale: Locale }) {
   );
   return (
     <>
-      <PageTitle
-        title={tr(locale, "Cada pausa cuenta", "Every break counts")}
-        subtitle={tr(
-          locale,
-          "Tu historial vive aquí, en este dispositivo.",
-          "Your history lives here, on this device.",
-        )}
-      />
+      <PageTitle title={tr(locale, "Estadísticas", "Statistics")} />
       <div className="stat-grid">
         <div>
           <span>{tr(locale, "Partidas terminadas", "Finished games")}</span>
@@ -1577,14 +1722,7 @@ function Settings({
   const input = useRef<HTMLInputElement>(null);
   return (
     <>
-      <PageTitle
-        title={tr(locale, "A tu manera", "Make it yours")}
-        subtitle={tr(
-          locale,
-          "Aspecto, idioma y datos. Todo bajo tu control.",
-          "Appearance, language and data. All in your control.",
-        )}
-      />
+      <PageTitle title={tr(locale, "Ajustes", "Settings")} />
       <section className="settings-card">
         <h2>{tr(locale, "Aspecto", "Appearance")}</h2>
         <label className="setting">
@@ -1634,16 +1772,9 @@ function Settings({
             onChange={(e) => onPreferences({ sound: e.target.checked })}
           />
         </label>
-        <p className="muted">
-          {tr(
-            locale,
-            "Sonidos discretos generados en tu dispositivo. El navegador los activa tras tu primer toque.",
-            "Subtle sounds generated on your device. Your browser activates them after your first interaction.",
-          )}
-        </p>
       </section>
       <section className="settings-card">
-        <h2>{tr(locale, "Tus datos, contigo", "Take your data with you")}</h2>
+        <h2>{tr(locale, "Partidas y copias", "Games & backups")}</h2>
         <p>
           {tr(
             locale,

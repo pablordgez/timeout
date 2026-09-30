@@ -8,6 +8,7 @@ export function CanvasBoard({
   keys,
   width = 720,
   height = 440,
+  warmup = false,
 }: {
   state: GameState;
   dispatch: (a: Action) => void;
@@ -20,6 +21,7 @@ export function CanvasBoard({
   keys?: Record<string, string>;
   width?: number;
   height?: number;
+  warmup?: boolean;
 }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const current = useRef(state);
@@ -29,8 +31,12 @@ export function CanvasBoard({
   useEffect(() => {
     const canvas = ref.current!;
     const ctx = canvas.getContext("2d")!;
+    const ratio = Math.min(2, window.devicePixelRatio || 1);
+    canvas.width = width * ratio; canvas.height = height * ratio;
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
     let frame = 0,
-      last = 0;
+      last = 0,
+      readyAt = performance.now() + (warmup && !paused ? 900 : 0);
     const root = getComputedStyle(document.documentElement);
     const colors: Record<string, string> = {};
     function paint(now: number) {
@@ -41,6 +47,7 @@ export function CanvasBoard({
         "text",
         "muted",
         "accent",
+        "raised",
         "border",
         "felt",
         "board-light",
@@ -54,13 +61,19 @@ export function CanvasBoard({
         "piece-l",
       ])
         colors[k] = root.getPropertyValue("--" + k).trim();
-      if (!paused && last && current.current.status === "playing")
+      if (!paused && last && now >= readyAt && current.current.status === "playing")
         callback.current({
           type: "TICK",
           dt: Math.min((now - last) / 1000, 0.05),
         });
       last = now;
       draw(ctx, current.current, colors);
+      if (!paused && now < readyAt) {
+        ctx.fillStyle = colors.surface; ctx.globalAlpha=.9;
+        ctx.fillRect(width/2-65,45,130,38); ctx.globalAlpha=1;
+        ctx.fillStyle=colors.text;ctx.font='15px '+(colors['font-mono']||'monospace');ctx.textAlign='center';
+        ctx.fillText('LISTO / READY',width/2,69);ctx.textAlign='start';
+      }
       frame = requestAnimationFrame(paint);
     }
     frame = requestAnimationFrame(paint);
@@ -70,7 +83,7 @@ export function CanvasBoard({
       cancelAnimationFrame(frame);
       window.removeEventListener("blur", release);
     };
-  }, [paused, draw]);
+  }, [paused, draw, height, width, warmup]);
   useEffect(() => {
     if (!keys) return;
     const handle = (e: KeyboardEvent) => {
@@ -106,6 +119,8 @@ export function CanvasBoard({
       className="game-canvas"
       aria-label="Game board / Tablero"
       onPointerDown={(e) => {
+        if(e.button !== 0) return;
+        e.currentTarget.setPointerCapture(e.pointerId);
         const r = e.currentTarget.getBoundingClientRect();
         if (!paused)
           dispatch({
@@ -126,6 +141,7 @@ export function CanvasBoard({
           });
       }}
       onPointerUp={() => dispatch({ type: "POINTER_UP" })}
+      onPointerCancel={() => dispatch({type:'RELEASE'})}
     />
   );
 }
