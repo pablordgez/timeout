@@ -1,0 +1,27 @@
+{
+  "version": "19.0.0",
+  "license": "GPL-3.0",
+  "source": "https://github.com/nmrugg/stockfish.js/tree/v19.0.0",
+  "files": [
+    {
+      "url": "https://github.com/nmrugg/stockfish.js/releases/download/v19.0.0/stockfish-19-lite-single.js",
+      "path": "src/vendor/stockfish.js",
+      "sha256": "d3344124ab067fb0b90ee77873bb8e9fbf5fc01bc525fe714b0f942581e889e6"
+    },
+    {
+      "url": "https://github.com/nmrugg/stockfish.js/releases/download/v19.0.0/stockfish-19-lite-single.wasm",
+      "path": "src/vendor/stockfish.wasm",
+      "sha256": "57ac2d72312aba346760e3f173f687a8c211208e97a87268436f7f0e10bb5387"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/nmrugg/stockfish.js/v19.0.0/Copying.txt",
+      "path": "LICENSE",
+      "sha256": "0b383d5a63da644f628d99c33976ea6487ed89aaa59f0b3257992deac1171e6b"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/nmrugg/stockfish.js/v19.0.0/AUTHORS",
+      "path": "licenses/STOCKFISH-AUTHORS.txt",
+      "sha256": "f81e7d74c350626766382ec67fa262c38cda00cb8b501790f95cdebb526006c1"
+    }
+  ]
+}
