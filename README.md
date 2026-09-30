@@ -9,6 +9,8 @@ Timeout no necesita cuentas, servidor de partidas ni conexión durante el juego.
 - **Web:** sirve la carpeta `dist/` mediante HTTPS o en `localhost`. Espera al indicador «Disponible sin conexión» antes de desconectarte. La primera visita necesita descargar los recursos; posteriormente la caché permite volver a abrirla sin red. Instalarla como PWA es opcional.
 - **Portable:** abre `dist-portable/index.html` directamente en un navegador. Es un archivo autocontenido de aproximadamente **22 MB**, con juegos, fuentes, diccionarios, workers y Stockfish. Puedes trasladarlo sin instalar la aplicación ni arrancar un servidor.
 - **Guías:** cada juego incluye reglas y ejemplos visuales. El botón «Guía» permite abrir una práctica que no modifica la partida ni las estadísticas. Solitarios y Cruce de letras también incluyen ejercicios interactivos específicos dentro de su guía del tablero.
+- **Interacción:** los solitarios admiten arrastrar cartas o secuencias con ratón y pantalla táctil. En billar, apunta y arrastra hacia atrás para cargar el tiro, con una previsión aproximada de trayectoria; los controles precisos siguen disponibles. Serpiente admite gestos y mando direccional. Las opciones de inicio se adaptan a la modalidad elegida.
+- **Sonido:** efectos originales generados localmente, con silencio persistente en la barra superior y en Ajustes. Se activan tras interactuar con la página cuando el navegador dispone de Web Audio.
 
 En un móvil, algunos tableros se desplazan horizontalmente para conservar casillas y cartas legibles. Los controles del juego explican el teclado y las acciones táctiles disponibles. La compatibilidad comprobada y los resultados de las pruebas se documentan en [docs/verification.md](docs/verification.md).
 
@@ -61,6 +63,8 @@ npm run build
 ```
 
 `build` comprueba TypeScript y genera `dist/` y `dist-portable/`. También existen `build:web` y `build:portable` para generar cada formato por separado.
+
+Tras verificar y confirmar el código en Git, `npm run release` crea los paquetes web, portable y fuente en `artifacts/0.1.0/`, con licencias, manifiesto SHA-256 y fuente correspondiente de Stockfish, incluido su modelo Lite. Esta preparación descarga la fuente fijada del motor si aún no está disponible. Las versiones están en la sección Releases del repositorio privado.
 
 Las pruebas de navegador usan Playwright. Descarga sus navegadores una vez y sirve primero la compilación web; en otra terminal, ejecuta las pruebas:
 
