@@ -1,0 +1,13 @@
+node_modules/
+dist/
+dist-portable/
+artifacts/
+.cache/
+playwright-report/
+test-results/
+*.log
+src/data/es.json
+src/data/en.json
+
+output/
+.playwright-cli/
