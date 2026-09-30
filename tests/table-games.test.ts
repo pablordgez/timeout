@@ -40,7 +40,7 @@ describe('Hold’em evaluator and pot accounting',()=>{
       const before=s.players.reduce((n,p)=>n+p.stack+(s.street==='showdown'?0:p.total),0);expect(before).toBe(3000);
       if(s.street==='showdown')s=pokerReducer(s,{type:'NEXT_HAND'});else {const a=pokerBot(s,{difficulty:'easy'});expect(a).not.toBeNull();const next=pokerReducer(s,a!);expect(next).not.toBe(s);s=next;}
       expect(s.players.every(p=>p.stack>=0&&p.bet>=0)).toBe(true);
-    }}
+    }expect(s.status).not.toBe('playing');expect(s.players.filter(p=>p.stack>0)).toHaveLength(1);expect(s.players.reduce((n,p)=>n+p.stack,0)).toBe(3000);}
   });
   it('bot decisions cannot depend on hidden cards or the future deck',()=>{
     const s=createPoker({players:3},61);const altered=structuredClone(s);altered.deck=[];altered.players.forEach((p,i)=>{if(i!==s.turn)p.hole=[card(14),card(14,1)];});
@@ -67,6 +67,16 @@ describe('double-six domino rules',()=>{
   it('compares total pips across partners and gives no score on a blocked tie',()=>{
     const s=createDomino({mode:'pairs'},10);const one=tiles.findIndex(t=>t[0]===0&&t[1]===1),two=tiles.findIndex(t=>t[0]===0&&t[1]===2);s.hands=[[one],[two],[one],[two]];expect(roundWinners(s,{mode:'pairs'})).toEqual([0,2]);
     s.hands=[[one],[two],[two],[one]];expect(roundWinners(s,{mode:'pairs'})).toEqual([]);expect(pipSum([one,two])).toBe(3);
+  });
+  it('finishes seeded all-bot matches with monotonic scores and finite rounds',()=>{
+    for(const mode of ['draw','pairs'])for(const seed of [3,23,97]){const c={mode,players:3,target:50,difficulty:'hard'};let s=createDomino(c,seed);
+      for(let i=0;i<2000&&s.status==='playing';i++){const action=s.phase==='roundover'?{type:'NEXT_ROUND'}:dominoBot(s,c);expect(action).not.toBeNull();const next=dominoReducer(s,action!,c);expect(next).not.toBe(s);expect(next.points.every((p,index)=>Number.isFinite(p)&&p>=s.points[index])).toBe(true);s=next;}
+      expect(s.status).not.toBe('playing');expect(s.points.some(p=>p>=50)).toBe(true);if(mode==='pairs'){expect(s.points[0]).toBe(s.points[2]);expect(s.points[1]).toBe(s.points[3]);}
+    }
+  });
+  it('domino strategy never consults the identities of opponents’ hidden tiles or the draw stock',()=>{
+    const c={mode:'draw',players:3,difficulty:'hard'};let s=createDomino(c,61);s=dominoReducer(s,dominoBot(s,c)!,c);const masked=structuredClone(s);masked.hands.forEach((h,i)=>{if(i!==s.turn)masked.hands[i]=h.map(()=>0);});masked.stock.reverse();
+    expect(dominoBot(s,c)).toEqual(dominoBot(masked,c));
   });
 });
 function shot(overrides:Partial<Shot>={}):Shot{return {shooter:0,first:1,pocketed:[],railAfter:true,railBalls:[1],calledBall:1,calledPocket:2,wasBreak:false,onEight:false,age:2,crossedHead:true,behindHead:false,...overrides};}
