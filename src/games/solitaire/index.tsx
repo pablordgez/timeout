@@ -68,6 +68,7 @@ function Board({ state, dispatch, locale, paused, compact }: BoardProps) {
     : tr(locale, 'Pulsa una carta para elegirla y después su destino. Las cartas inferiores se mueven juntas.', 'Select a card, then its destination. The cards below it move together.');
   return <div className={`sol-board ${compact ? 'sol-compact' : ''}`}>
     <p className="sol-instruction">{instruction}</p>
+    <p className="sol-scroll-help">{tr(locale,'↔ Desliza el tablero para ver todas las columnas.', '↔ Swipe the board to see every column.')}</p>
     <div className="sol-scroll">
       <div className={`sol-top sol-top-${state.variant}`}>
         {state.variant !== 'freecell' && <div className="sol-pile"><span className="sol-label">{tr(locale, 'Mazo', 'Stock')}</span>{drawButton()}</div>}
