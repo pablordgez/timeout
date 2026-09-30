@@ -76,7 +76,7 @@ sourceFiles[
 sourceFiles[`timeout-${version}/vendor-source/BUILD.md`] = strToU8(
   "Stockfish source revision " +
     expected +
-    "\nInstall Emscripten 3.1.7 and make, then inside stockfish.js-19.0.0 run:\nnode build.js --lite --single-threaded --no-split\nThe included nn-61e7af4bb97d.nnue is the embedded Lite network.\nTimeout uses upstream release binaries with hashes in licenses/stockfish-manifest.json.\nTimeout: npm ci; npm run build. See README.md and docs/verification.md.\n",
+    "\nInstall Emscripten 3.1.7 and make, then inside stockfish.js-19.0.0 run:\nnode build.js --lite --single-threaded --no-split\nThe included nn-61e7af4bb97d.nnue is the embedded Lite network.\nTimeout uses upstream release binaries with hashes in licenses/stockfish-manifest.json.\nTimeout: npm ci; npm run build. See README.md.\n",
 );
 async function tree(directory, prefix = "") {
   const files = {};
@@ -115,7 +115,7 @@ const web = { ...(await tree(resolve("dist"))), ...licenseFiles };
 web["README.txt"] = strToU8(
   "Timeout " +
     version +
-    "\nServe this directory with HTTPS or localhost. Wait for Available offline before disconnecting. No hosting was published by this release.\nCorresponding source: timeout-" +
+    "\nServe this directory with HTTPS or localhost. Wait for Available offline before disconnecting.\nCorresponding source: timeout-" +
     version +
     "-source.zip\n",
 );

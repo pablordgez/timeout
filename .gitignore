@@ -11,3 +11,10 @@ src/data/en.json
 
 output/
 .playwright-cli/
+
+# Local design notes and internal documentation
+docs/
+.agent_specs/
+src/games/**/README.md
+src/games/**/RULES.md
+src/games/**/THEMES.md

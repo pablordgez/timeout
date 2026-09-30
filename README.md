@@ -1,112 +1,69 @@
 # Timeout
 
-Una colección de juegos para hacer una pausa. Interfaz en español e inglés, temas claro y oscuro, partidas guardadas en el dispositivo y dos formas de jugar sin conexión: web con caché offline y un HTML portable.
+16 juegos de cartas, palabras, tablero y arcade para jugar en el navegador. Sin cuentas, sin anuncios y sin conexión durante las partidas.
 
-Timeout no necesita cuentas, servidor de partidas ni conexión durante el juego. El multijugador consiste en compartir un dispositivo; los juegos con información privada muestran una pantalla de relevo. El repositorio es privado y esta entrega no publica la web en un alojamiento.
+Incluye español e inglés, temas claros y oscuros, guardado automático, guías de juego y rivales controlados por el ordenador. También puedes jugar con otras personas compartiendo un dispositivo.
 
 ## Jugar
 
-- **Web:** sirve la carpeta `dist/` mediante HTTPS o en `localhost`. Espera al indicador «Disponible sin conexión» antes de desconectarte. La primera visita necesita descargar los recursos; posteriormente la caché permite volver a abrirla sin red. Instalarla como PWA es opcional.
-- **Portable:** abre `dist-portable/index.html` directamente en un navegador. Es un archivo autocontenido de aproximadamente **22 MB**, con juegos, fuentes, diccionarios, workers y Stockfish. Puedes trasladarlo sin instalar la aplicación ni arrancar un servidor.
-- **Guías:** cada juego incluye reglas y ejemplos visuales. El botón «Guía» permite abrir una práctica que no modifica la partida ni las estadísticas. Solitarios y Cruce de letras también incluyen ejercicios interactivos específicos dentro de su guía del tablero.
-- **Interacción:** los solitarios admiten arrastrar cartas o secuencias con ratón y pantalla táctil. En billar, apunta y arrastra hacia atrás para cargar el tiro, con una previsión aproximada de trayectoria; los controles precisos siguen disponibles. Serpiente admite gestos y mando direccional. Las opciones de inicio se adaptan a la modalidad elegida.
-- **Sonido:** efectos originales generados localmente, con silencio persistente en la barra superior y en Ajustes. Se activan tras interactuar con la página cuando el navegador dispone de Web Audio.
+Descarga una versión desde [Releases](https://github.com/pablordgez/timeout/releases):
 
-En un móvil, algunos tableros se desplazan horizontalmente para conservar casillas y cartas legibles. Los controles del juego explican el teclado y las acciones táctiles disponibles. La compatibilidad comprobada y los resultados de las pruebas se documentan en [docs/verification.md](docs/verification.md).
+- **Portable:** abre `timeout.html` en un navegador de escritorio. Es un único archivo y funciona sin instalar nada.
+- **Web:** publica el contenido del paquete web en un alojamiento estático con HTTPS. Después de la primera visita, espera a «Disponible sin conexión» para jugar sin red. Puedes instalarlo como aplicación desde el navegador.
 
-## Colección
+Elige un juego, configura la partida y pulsa **Empezar**. Las partidas pendientes aparecen en **Continuar**; cada juego tiene una **Guía** con sus controles y reglas.
 
-| Juego | Modalidades y características |
-| --- | --- |
-| Solitarios | Klondike de una o tres cartas; Spider de uno, dos o cuatro palos; FreeCell; Pirámide. Deshacer y pistas. |
-| Ronda de letras | Rosco de definiciones en español o inglés, pasar palabra y tiempo configurable. |
-| Crucigramas | Cuadrículas conectadas de 9×9, 11×11 y 13×13 con pistas horizontales y verticales; ayudas y nuevas partidas generadas. |
-| Cruce de letras | Tablero 15×15, léxicos y fichas ES/EN, 2–4 participantes humanos o bots, comodines, cruces y desglose de puntuación. |
-| Ajedrez | Dos personas o Stockfish con dificultad configurable; promoción, enroque, captura al paso y tablas. |
-| Póker | Texas Hold’em sin límite, 2–6 participantes, humanos o bots, fichas ficticias y botes secundarios. |
-| Dominó | Doble seis individual con robo o parejas; humanos y bots. |
-| Carrera de pulso | Saltos, obstáculos y velocidad progresiva. |
-| Vuelo de pulso | Vuelo entre obstáculos con controles de teclado o táctiles. |
-| Sudoku | Nuevas partidas con solución única, cuatro dificultades, notas y ayudas. |
-| Cinco letras | Palabras de cinco letras, seis intentos y tratamiento individual de letras repetidas. |
-| Caída de bloques | Contrarreloj, objetivo de líneas o infinito; perfiles moderno SRS y clásico NES NTSC. |
-| Billar | Bola 8 con tiro anunciado, dos personas o bot; práctica individual y simulación 2D. |
-| Órbita del saber | Tablero de seis categorías, objetivos coleccionables, humanos o bots; respuestas abiertas y autoevaluación tras revelar la solución. |
-| Serpiente | Comida, crecimiento, velocidad configurable y puntuaciones. |
-| Rompebloques | Pala, rebotes, ladrillos, niveles y vidas. |
+Los guardados se quedan en tu navegador. Para trasladarlos o conservar una copia, usa **Ajustes → Exportar todos los datos** e **Importar copia**. Exporta antes de mover el HTML portable o borrar los datos del navegador.
 
-Las partidas de palabras eligen su idioma al comenzar, independientemente del idioma de la interfaz. Cuando no coinciden, la aplicación muestra un aviso y permite seguir jugando.
+## Juegos
 
-## Guardados y transferencia
+| Juego                  | Qué incluye                                                  |
+| ---------------------- | ------------------------------------------------------------ |
+| Solitarios             | Klondike, Spider, FreeCell y Pirámide; pistas y deshacer.    |
+| Sudoku                 | Cuatro dificultades, notas y ayudas.                         |
+| Cinco letras           | Una palabra de cinco letras y seis intentos.                 |
+| Crucigramas            | Tres tamaños de cuadrícula y nuevas partidas generadas.      |
+| Ronda de letras        | Una definición por letra, con tiempo configurable.           |
+| Letras en juego        | Forma palabras con tus fichas en un tablero; 2–4 jugadores.  |
+| Ajedrez                | Dos personas o contra Stockfish.                             |
+| Póker                  | Texas Hold’em con fichas ficticias; 2–6 jugadores.           |
+| Dominó                 | Doble seis, individual o por parejas.                        |
+| Billar                 | Bola 8 y práctica individual.                                |
+| Preguntas y respuestas | Un tablero con seis categorías de preguntas.                 |
+| Serpiente              | Recoge comida y evita chocar.                                |
+| Salto de dinosaurio    | Salta los cactus mientras aumenta la velocidad.              |
+| Vuelo entre tubos      | Da impulsos al pájaro para atravesar los huecos.             |
+| Rompebloques           | Pala, pelota, ladrillos y niveles.                           |
+| Caída de bloques       | Reglas modernas o clásicas; líneas, contrarreloj o infinito. |
 
-Las acciones importantes se guardan automáticamente. Los juegos en tiempo real también se guardan periódicamente y al pausar. Al reabrir una partida, comienza en pausa. «Continuar» reúne las partidas pendientes; «Estadísticas» muestra resultados, tiempos y mejores puntuaciones por juego y variante.
+Los juegos de palabras y preguntas permiten elegir español o inglés al iniciar la partida.
 
-El almacenamiento principal es **IndexedDB**. Si no está disponible se intenta `localStorage`; si tampoco puede escribir, la aplicación avisa de que solo conserva datos en memoria. Los guardados pertenecen al navegador y al origen de la página. En `file://`, su persistencia y relación con la ruta del HTML dependen del navegador: mover el archivo, cambiar de navegador, usar navegación privada o borrar los datos del sitio puede separar o eliminar los guardados.
+## Capturas
 
-Para trasladarlos, abre **Ajustes → Exportar todos los datos**. En el otro dispositivo, usa **Importar copia**: verás partidas pendientes, resultados y conflictos antes de confirmar. Puedes combinar sin duplicar identificadores, elegir qué versión conservar en los conflictos o reemplazar el conjunto. Se guarda una copia previa a la importación, recuperable desde «Recuperar copia anterior». El mismo JSON funciona en la web y en la edición portable.
+![Colección de juegos](screenshots/collection.png)
 
-## Desarrollo
+![Partida de billar](screenshots/billiards.png)
 
-Requisitos: **Node.js 22.12 o posterior** y npm. El entorno de desarrollo utilizado tiene Node.js 22.19. El lockfile fija las dependencias de esta versión.
+## Construir
+
+Necesitas **Node.js 22.12 o posterior** y npm.
 
 ```sh
 npm ci
-npm run dev
-```
-
-Vite muestra la dirección local del servidor de desarrollo. Para comprobar y compilar:
-
-```sh
-npm run check
-npm test
 npm run build
 ```
 
-`build` comprueba TypeScript y genera `dist/` y `dist-portable/`. También existen `build:web` y `build:portable` para generar cada formato por separado.
+Se generan dos versiones:
 
-Tras verificar y confirmar el código en Git, `npm run release` crea los paquetes web, portable y fuente en `artifacts/0.1.0/`, con licencias, manifiesto SHA-256 y fuente correspondiente de Stockfish, incluido su modelo Lite. Esta preparación descarga la fuente fijada del motor si aún no está disponible. Las versiones están en la sección Releases del repositorio privado.
+- `dist/`: web lista para un alojamiento estático.
+- `dist-portable/index.html`: archivo portable autocontenido.
 
-Las pruebas de navegador usan Playwright. Descarga sus navegadores una vez y sirve primero la compilación web; en otra terminal, ejecuta las pruebas:
+Para probar la web en tu equipo, ejecuta `npx vite preview`. Para preparar los paquetes web, portable y de código fuente, haz un commit y ejecuta `npm run release`; estarán en `artifacts/`. Este último paso puede descargar el código fuente de Stockfish.
 
-```sh
-npx playwright install chromium firefox webkit
-npx vite preview --host 127.0.0.1 --port 4173
-```
+La web incluye una política de seguridad en el HTML y un archivo `_headers` para alojamientos compatibles, como Netlify o Cloudflare Pages. En otros servidores, configura las cabeceras equivalentes para bloquear también su inclusión en marcos.
 
-```sh
-npm run test:e2e
-```
+## Licencia
 
-Los paquetes de palabras y preguntas están incluidos; jugar y compilar no requieren consultar sus servicios de origen. Los scripts `npm run data:words` y `npm run data:trivia` regeneran contenido mediante descargas y actualizan sus manifiestos de procedencia. Estas tareas requieren red y pueden descargar archivos grandes. `scripts/vendor-stockfish.mjs` documenta la obtención de los recursos del motor de ajedrez.
+El código se distribuye bajo [GPL-3.0-only](LICENSE). Las distribuciones deben incluir el código fuente correspondiente y los avisos de [licenses/](licenses/).
 
-## Arquitectura y ampliación
-
-React, TypeScript y Vite forman la interfaz y las compilaciones. Los motores de reglas conservan estados serializables y reciben acciones mediante reducers; DOM/SVG presenta tableros y Canvas 2D presenta los juegos de acción y billar. Las búsquedas y generaciones costosas utilizan Web Workers. Los recursos necesarios se distribuyen localmente.
-
-- [Añadir un juego](docs/adding-games.md): contrato, registro, estado, guardados, bots, idiomas y guías.
-- [Añadir un tema](docs/adding-themes.md): registro de temas, variables CSS, tableros y Canvas.
-- [Verificación y compatibilidad](docs/verification.md): alcance real de las pruebas de esta entrega.
-
-## Reglas y límites de esta versión
-
-- «Infinito» permite generar nuevas sesiones sin un límite de la aplicación. Los corpus son finitos; las palabras y preguntas pueden repetirse.
-- Los léxicos proceden de Wikcionario/Wiktionary. Pueden incluir formas flexionadas y términos regionales, técnicos o antiguos. **No son diccionarios oficiales de competición.** En Cruce de letras, los bots usan hasta 120 000 entradas con definición y priorizan las cortas para limitar memoria; la validación humana utiliza el léxico completo.
-- En español se ignoran tildes al introducir respuestas y se mantiene la distinción entre N y Ñ. Cruce de letras usa CH, LL y RR como fichas indivisibles, cada una ocupa una casilla.
-- Pirámide utiliza una sola vuelta del mazo; Klondike permite reciclarlo sin límite. La guía de cada variante especifica sus reglas.
-- El perfil clásico de bloques reproduce las mecánicas documentadas de NES NTSC: rotación, gravedad, repetición lateral, azar y puntuación. Es una implementación independiente, no un emulador de ROM; no pretende reproducir todos los errores, desbordamientos ni detalles de hardware originales. El perfil moderno incluye SRS, bolsa de siete, reserva y sombra.
-- El billar simula colisiones, bandas y rozamiento en dos dimensiones. No ofrece efectos de giro, saltos ni simulación tridimensional.
-- En las preguntas abiertas, el participante decide si su respuesta coincide suficientemente con la solución revelada. Los bots usan una probabilidad de acierto configurable.
-- No hay sincronización en nube ni multijugador por red. El HTML portable se orienta principalmente a escritorio; en móviles, la web con caché es la vía principal sin conexión.
-
-## Licencias y fuentes
-
-El código de Timeout se distribuye bajo **GPL-3.0-only**, según [LICENSE](LICENSE). Stockfish mantiene GPLv3; los manifiestos de `licenses/` identifican su versión, fuentes y hashes. Las entregas deben acompañar las compilaciones con el código fuente correspondiente y las licencias de todos los recursos redistribuidos.
-
-Los datos mantienen sus licencias independientes:
-
-- **Palabras y definiciones:** colaboradores de [Wikcionario](https://es.wiktionary.org/) y [Wiktionary](https://en.wiktionary.org/), extraídos por [Kaikki/Wiktextract](https://kaikki.org/), filtrados y compactados; CC BY-SA 4.0. Cada término conserva atribución al artículo del mismo nombre. Los manifiestos `licenses/words-es.json` y `licenses/words-en.json` registran procedencia y transformaciones.
-- **Preguntas inglesas:** [Open Trivia DB](https://opentdb.com/), adaptadas a respuestas abiertas y almacenadas localmente; CC BY-SA 4.0. `licenses/trivia.json` registra su procedencia.
-- **Preguntas españolas:** contenido original de Timeout, publicado como parte del paquete de preguntas bajo CC BY-SA 4.0.
-- **Fuentes:** IBM Plex Sans y Mono, incluidas mediante `@fontsource`, conservan SIL Open Font License.
-
-Los recursos visuales del juego se dibujan con código propio. Los nombres y gráficos de los títulos comerciales que inspiran ciertas mecánicas no forman parte de la distribución.
+Las palabras proceden de Wikcionario/Wiktionary, vía Kaikki/Wiktextract, y las preguntas inglesas de Open Trivia DB; sus paquetes conservan CC BY-SA 4.0. Stockfish usa GPLv3 y las tipografías IBM Plex, SIL OFL. Los créditos y textos de licencia también están disponibles dentro del juego.
