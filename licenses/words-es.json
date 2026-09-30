@@ -1,0 +1,13 @@
+{
+  "lang": "es",
+  "url": "https://kaikki.org/dictionary/downloads/es/es-extract.jsonl.gz",
+  "source": "https://kaikki.org/eswiktionary/",
+  "license": "CC-BY-SA-4.0",
+  "attribution": "Wiktionary contributors; machine extraction by Kaikki / Wiktextract",
+  "retrievedAt": "2026-09-29T23:31:00.019Z",
+  "sha256": "f787368d1bfce1ce83c40f1551358751bca89c1de6afd6d5ba2a793c0f5df3ff",
+  "records": 854466,
+  "entries": 763756,
+  "clues": 86805,
+  "changes": "Filtered by language, part of speech, spelling and clue quality; selected gloss; compacted. Article attribution URLs: https://es.wiktionary.org/wiki/{word}"
+}

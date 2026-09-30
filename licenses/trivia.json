@@ -1,0 +1,8 @@
+{
+  "source": "https://opentdb.com/",
+  "license": "CC-BY-SA-4.0",
+  "retrievedAt": "2026-09-29T23:31:47.357Z",
+  "attribution": "Open Trivia Database contributors",
+  "changes": "Removed incorrect options; mapped categories; decoded HTML; offline snapshot",
+  "questions": 500
+}
