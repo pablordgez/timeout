@@ -105,7 +105,17 @@ async function loadStorage(): Promise<{
   }
 }
 export function exportOriginalData() {
-  if (original !== undefined) downloadJson(original as SaveData);
+  if (original === undefined) return;
+  const raw =
+    typeof original === "string" ? original : JSON.stringify(original, null, 2);
+  const url = URL.createObjectURL(
+    new Blob([raw], { type: "application/json" }),
+  );
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "timeout-original-backup.json";
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 export function writeData(data: SaveData): Promise<void> {
   const snapshot = structuredClone(data);

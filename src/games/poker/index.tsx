@@ -19,7 +19,7 @@ function PokerView({state:s,dispatch,locale:l,paused}:GameViewProps<PokerState>)
 }
 export const poker:GameDefinition<PokerState>={
   id:'poker',name:labels('Póker','Poker'),description:labels('Texas Hold’em sin límite. Fichas ficticias y decisiones reales.','No-limit Texas Hold’em. Play chips, real decisions.'),category:'cards',icon:'♠',version:1,
-  defaults:{players:2,humans:1,difficulty:'medium'},options:[select('players','Jugadores','Players',[[2,'2','2'],[3,'3','3'],[4,'4','4'],[5,'5','5'],[6,'6','6']],2),select('humans','Humanos','Humans',[[1,'1','1'],[2,'2','2'],[3,'3','3'],[4,'4','4'],[5,'5','5'],[6,'6','6']],1),difficulty],
+  defaults:{players:2,humans:1,difficulty:'medium'},options:[select('players','Jugadores','Players',[[2,'2','2'],[3,'3','3'],[4,'4','4'],[5,'5','5'],[6,'6','6']],2),select('humans','Humanos','Humans',[[1,'1','1'],[2,'2','2'],[3,'3','3'],[4,'4','4'],[5,'5','5'],[6,'6','6']],1),{...difficulty,visibleWhen:c=>Number(c.humans)<(c.mode==='pairs'?4:Number(c.players))}],
   create:createPoker,reducer:pokerReducer,View:PokerView,bot:async(s,c)=>{
     // Send only the acting player's hand and public information to the worker.
     const publicState=structuredClone(s);publicState.deck=[];publicState.players.forEach((p,i)=>{if(i!==s.turn)p.hole=[];});
