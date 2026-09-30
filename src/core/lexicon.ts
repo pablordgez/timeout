@@ -1,5 +1,5 @@
-import es from "../data/es.json.gz?url&inline";
-import en from "../data/en.json.gz?url&inline";
+import es from "../data/es.json.gz?url";
+import en from "../data/en.json.gz?url";
 import type { Locale } from "./types";
 export interface Word {
   w: string;
@@ -17,13 +17,23 @@ export const words: Record<Locale, Word[]> = { es: [], en: [] };
 const loaded: Partial<Record<Locale, Promise<void>>> = {};
 export function loadLexicon(locale: Locale): Promise<void> {
   return (loaded[locale] ??= (async () => {
-    const raw = atob((locale === "es" ? es : en).split(",")[1]);
-    const bytes = Uint8Array.from(raw, (c) => c.charCodeAt(0));
+    const url = locale === "es" ? es : en;
+    let bytes: Uint8Array<ArrayBuffer>;
+    if (url.startsWith("data:"))
+      bytes = Uint8Array.from(atob(url.split(",")[1]), (c) => c.charCodeAt(0));
+    else {
+      const response = await fetch(url);
+      if (!response.ok) throw Error("Unable to load local lexicon");
+      bytes = new Uint8Array(await response.arrayBuffer());
+    }
     const stream = new Blob([bytes])
       .stream()
       .pipeThrough(new DecompressionStream("gzip"));
     words[locale] = JSON.parse(await new Response(stream).text());
-  })());
+  })().catch((error) => {
+    delete loaded[locale];
+    throw error;
+  }));
 }
 const cache: Partial<Record<Locale, Set<string>>> = {};
 export function accepted(locale: Locale) {

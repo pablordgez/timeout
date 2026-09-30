@@ -6,6 +6,18 @@ import { VitePWA } from "vite-plugin-pwa";
 export default defineConfig(({ mode }) => ({
   define: { __APP_VERSION__: JSON.stringify("0.1.0") },
   base: "./",
+  server: {
+    watch: {
+      ignored: [
+        "**/.cache/**",
+        "**/test-results/**",
+        "**/dist/**",
+        "**/dist-portable/**",
+        "**/playwright-report/**",
+        "**/output/**",
+      ],
+    },
+  },
   plugins: [
     react(),
     ...(mode === "portable"
@@ -32,7 +44,7 @@ export default defineConfig(({ mode }) => ({
             },
             workbox: {
               clientsClaim: true,
-              globPatterns: ["**/*.{js,css,html,svg,woff2}"],
+              globPatterns: ["**/*.{js,css,html,svg,woff2,bin,wasm}"],
               maximumFileSizeToCacheInBytes: 40 * 1024 * 1024,
               navigateFallback: "index.html",
             },
@@ -40,6 +52,15 @@ export default defineConfig(({ mode }) => ({
         ]),
   ],
   build: {
+    rollupOptions: {
+      output: {
+        // Application-owned gzip data must not be decoded by the HTTP server.
+        assetFileNames: (asset) =>
+          asset.names.some((name) => name.endsWith(".gz"))
+            ? "assets/[name]-[hash].bin"
+            : "assets/[name]-[hash][extname]",
+      },
+    },
     outDir: mode === "portable" ? "dist-portable" : "dist",
     assetsInlineLimit: mode === "portable" ? 100000000 : 4096,
     chunkSizeWarningLimit: 40000,
