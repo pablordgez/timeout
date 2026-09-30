@@ -26,10 +26,13 @@ export function loadLexicon(locale: Locale): Promise<void> {
       if (!response.ok) throw Error("Unable to load local lexicon");
       bytes = new Uint8Array(await response.arrayBuffer());
     }
-    const stream = new Blob([bytes])
-      .stream()
-      .pipeThrough(new DecompressionStream("gzip"));
-    words[locale] = JSON.parse(await new Response(stream).text());
+    // Dev servers or custom hosts may transparently decode Content-Encoding.
+    const compressed = bytes[0] === 0x1f && bytes[1] === 0x8b;
+    const stream = new Blob([bytes]).stream();
+    const decoded = compressed
+      ? stream.pipeThrough(new DecompressionStream("gzip"))
+      : stream;
+    words[locale] = JSON.parse(await new Response(decoded).text());
   })().catch((error) => {
     delete loaded[locale];
     throw error;
