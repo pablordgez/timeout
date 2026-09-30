@@ -6,6 +6,8 @@ import { createPool } from "../src/games/billiards/engine";
 import { createDomino } from "../src/games/domino/engine";
 import { createPoker, pokerReducer } from "../src/games/poker/engine";
 import { createSolitaire } from "../src/games/solitaire/engine";
+import { createArcade } from "../src/games/arcade/engines";
+import { createBlocks } from "../src/games/arcade/blocks";
 const definition = (id: string) =>
   ({ id, version: 1, options: [] }) as unknown as GameDefinition;
 const record = (id: string, state: any, config: any = {}): Session => ({
@@ -18,6 +20,43 @@ const record = (id: string, state: any, config: any = {}): Session => ({
   startedAt: "2026-09-30T00:00:00Z",
   updatedAt: "2026-09-30T00:00:00Z",
   elapsed: 0,
+});
+it("rejects invalid snake timing, directions and animation snapshots", () => {
+  const state = createArcade("snake", {}, 42);
+  expect(() =>
+    validateGameSession(record("snake", state), definition("snake")),
+  ).not.toThrow();
+  for (const change of [
+    { period: 0 },
+    { direction: [1, 1] },
+    { snakeFrom: [[Infinity, 0]] },
+  ]) {
+    expect(() =>
+      validateGameSession(
+        record("snake", { ...state, ...change }),
+        definition("snake"),
+      ),
+    ).toThrow();
+  }
+});
+it("rejects block coordinates that would make ghost search unbounded and invalid piece names", () => {
+  const state = createBlocks({}, 42);
+  expect(() =>
+    validateGameSession(record("blocks", state), definition("blocks")),
+  ).not.toThrow();
+  for (const change of [
+    { y: -1e12 },
+    { piece: "" },
+    { piece: "IO" },
+    { rotation: 0.5 },
+  ]) {
+    expect(() =>
+      validateGameSession(
+        record("blocks", { ...state, ...change }),
+        definition("blocks"),
+      ),
+    ).toThrow();
+  }
 });
 it("accepts legitimate partner domino saves with the fixed four seats", () => {
   const config = { mode: "pairs", players: 2, humans: 4, target: 50 };
@@ -78,4 +117,3 @@ it("checks solitaire card conservation while accepting all four variants", () =>
     ).toThrow();
   }
 });
-

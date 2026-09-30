@@ -21,6 +21,7 @@ export function validateGameSession(
     array(v, n).every((x) => Number.isInteger(x) && x >= min && x <= max);
   const text = (v: any) => typeof v === "string";
   const num = (v: any) => Number.isFinite(v);
+  const piece = (v: any) => typeof v === "string" && /^[IOTSZJL]$/.test(v);
   const s = session.state;
   require(
     session.gameVersion <= game.version &&
@@ -340,10 +341,11 @@ export function validateGameSession(
     case "blocks":
       require(
         array(s.board, 20).every((r) =>
-          array(r, 10).every((v) => v === null || "IOTSZJL".includes(v)),
+          array(r, 10).every((v) => v === null || piece(v)),
         ) &&
-          "IOTSZJL".includes(s.piece) &&
-          array(s.queue).every((v) => "IOTSZJL".includes(v)) &&
+          piece(s.piece) &&
+          array(s.queue).length <= 14 &&
+          s.queue.every(piece) &&
           ["modern", "classic"].includes(s.profile),
       );
       require(
@@ -365,18 +367,44 @@ export function validateGameSession(
             (k) => typeof s.input[k] === "boolean",
           ),
       );
+      require(
+        Number.isInteger(s.x) &&
+          s.x >= -4 &&
+          s.x <= 9 &&
+          Number.isInteger(s.y) &&
+          s.y >= -4 &&
+          s.y <= 20 &&
+          Number.isInteger(s.rotation) &&
+          s.rotation >= 0 &&
+          s.rotation <= 3,
+      );
       array(s.pending);
       break;
     case "snake":
       require(
         s.kind === "snake" &&
           array(s.snake).length > 0 &&
+          s.snake.length <= 400 &&
           s.snake.every((p: any) => ints(p, 0, 19, 2)) &&
           ints(s.food, 0, 19, 2) &&
           ints(s.direction, -1, 1, 2) &&
           ints(s.queued, -1, 1, 2) &&
-          num(s.period),
+          num(s.period) &&
+          s.period >= 0.05 &&
+          s.period <= 1 &&
+          num(s.clock) &&
+          s.clock >= -1e-9 &&
+          s.clock <= s.period + 1e-9 &&
+          [s.direction, s.queued].every(
+            (p: number[]) => Math.abs(p[0]) + Math.abs(p[1]) === 1,
+          ),
       );
+      if (s.snakeFrom !== undefined)
+        require(
+          array(s.snakeFrom).length > 0 &&
+            s.snakeFrom.length <= 400 &&
+            s.snakeFrom.every((p: any) => ints(p, 0, 19, 2)),
+        );
       break;
     case "runner":
       require(
