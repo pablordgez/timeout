@@ -26,11 +26,10 @@ export function GameIcon({
     runner: (
       <>
         <path
-          d="M5 10v8l5 5h4v6h4v-7h4v-5h5v-5h-7V4h11v9h-8v5h-7l-5-4v-4z"
+          d="M21 4h11v10h-8v3h5v3h-3v-1h-3v5h-3v5h4v3h-7v-7h-3v4h-3v3H7v-4h4v-6l-5-4-3-7v-3l5 6 5 2h4v-4h4z"
           fill="currentColor"
         />
-        <rect x="26" y="6" width="2" height="2" fill="var(--raised)" />
-        <path d="M3 31h28" stroke="currentColor" strokeWidth="2" />
+        <rect x="25" y="6" width="2" height="2" fill="var(--raised)" />
       </>
     ),
     flappy: (

@@ -46,18 +46,6 @@ function runner(
   dinosaur(ctx, s.elapsed, s.y, reduced ? 0 : landing, reduced);
   for (const o of s.obstacles)
     cactus(ctx, o.x, 380, o.w, o.h, "#55896b", o.variant);
-  const next = s.obstacles.find((o: any) => o.x + o.w > 100),
-    near = next && next.x - 110 < s.speed * 0.7;
-  if (near && s.y === 0 && s.status === "playing") {
-    ctx.strokeStyle = c.accent;
-    ctx.setLineDash([3, 5]);
-    ctx.beginPath();
-    ctx.moveTo(125, 325);
-    ctx.quadraticCurveTo(170, 210, 220, 315);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    label(ctx, "↑", 130, 305, c.accent, 24);
-  }
 }
 function flight(
   ctx: CanvasRenderingContext2D,
