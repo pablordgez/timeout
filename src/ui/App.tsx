@@ -34,6 +34,9 @@ import {
 import { seedNow } from "../core/random";
 import { loadLexicon } from "../core/lexicon";
 import gpl from "../../LICENSE?raw";
+import thirdPartyNotices from "../../licenses/THIRD-PARTY-NOTICES.txt?raw";
+import dataLicense from "../../licenses/CC-BY-SA-4.0.txt?raw";
+import stockfishAuthors from "../../licenses/STOCKFISH-AUTHORS.txt?raw";
 import { validateGameSession } from "../core/save-validation";
 import {
   setSoundEnabled,
@@ -828,6 +831,39 @@ export function App() {
               <summary>GNU GPL v3</summary>
               <pre>{gpl}</pre>
             </details>
+            <details>
+              <summary>
+                {tr(
+                  locale,
+                  "Dependencias y fuentes tipográficas",
+                  "Dependencies and typefaces",
+                )}
+              </summary>
+              <pre>{thirdPartyNotices}</pre>
+            </details>
+            <details>
+              <summary>Creative Commons BY-SA 4.0</summary>
+              <pre>{dataLicense}</pre>
+            </details>
+            <details>
+              <summary>
+                {tr(locale, "Autores de Stockfish", "Stockfish authors")}
+              </summary>
+              <pre>{stockfishAuthors}</pre>
+            </details>
+            <p>
+              <a
+                href={`https://github.com/pablordgez/timeout/releases/tag/v${__APP_VERSION__}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {tr(
+                  locale,
+                  "Descargas y código fuente correspondiente",
+                  "Downloads and corresponding source",
+                )}
+              </a>
+            </p>
           </section>
         </div>
       ) : null}
