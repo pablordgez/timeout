@@ -1,7 +1,8 @@
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react';
+import { createPortal } from 'react-dom';
 import type { Action, Config, GameDefinition, GameViewProps, Locale } from '../../core/types';
 import { labels, select, tr } from '../../core/types';
-import { canMove, createSolitaire, pyramidExposed, rankLabel, red, solitaireReducer, suitLabel, type Card, type Place, type SolitaireState, type Variant } from './engine';
+import { canMove, canPair, createSolitaire, movableRun, pyramidExposed, rankLabel, red, solitaireReducer, suitLabel, type Card, type Place, type SolitaireState, type Variant } from './engine';
 import './solitaire.css';
 
 const names = { klondike: 'Klondike', spider: 'Spider', freecell: 'FreeCell', pyramid: 'Pirámide' };
@@ -20,14 +21,76 @@ function cardName(card: Card, locale: Locale) {
   return `${rankLabel(card.rank)} ${suits[card.suit]}`;
 }
 interface BoardProps { state: SolitaireState; dispatch: (action: Action) => void; locale: Locale; paused: boolean; compact?: boolean }
+interface CardDrag { pointerId:number; from:Place; cards:Card[]; startX:number; startY:number; x:number; y:number; offsetX:number; offsetY:number; width:number; height:number; overlap:number; moved:boolean; target:Place|null }
 function Board({ state, dispatch, locale, paused, compact }: BoardProps) {
   const [selection, setSelection] = useState<Place | null>(null);
-  useEffect(() => { setSelection(null); }, [state.moves, state.variant]);
+  const boardRef=useRef<HTMLDivElement>(null);
+  const pointerRef=useRef<CardDrag|null>(null);
+  const captureRef=useRef<HTMLButtonElement|null>(null);
+  const [drag,setDrag]=useState<CardDrag|null>(null);
+  const suppressClick=useRef(false);
+  function cancelDrag() {
+    const current=pointerRef.current;
+    pointerRef.current=null;setDrag(null);
+    const captured=captureRef.current;captureRef.current=null;
+    if(captured&&current) { try { if(captured.hasPointerCapture(current.pointerId))captured.releasePointerCapture(current.pointerId); } catch { /* Pointer may already have been cancelled by the browser. */ } }
+  }
+  useEffect(() => { setSelection(null); cancelDrag(); }, [state.moves, state.variant, paused]);
+  useEffect(()=>{
+    const cancel=()=>{if(pointerRef.current?.moved)suppressClick.current=true;cancelDrag();};
+    const key=(event:KeyboardEvent)=>{if(event.key==='Escape'){cancel();setSelection(null);}};
+    window.addEventListener('blur',cancel);window.addEventListener('keydown',key);
+    return()=>{window.removeEventListener('blur',cancel);window.removeEventListener('keydown',key);};
+  },[]);
   const hint = state.hint;
   const hintSource: Place | undefined = hint?.from || hint?.first;
   const hintTarget: Place | undefined = hint?.to || hint?.second;
   const disabled = paused || state.status !== 'playing';
-  function choose(place: Place, card?: Card) {
+  const activeSource=drag?.moved?drag.from:selection;
+  function legalTarget(from:Place,to:Place) { return state.variant==='pyramid'?canPair(state,from,to):canMove(state,from,to); }
+  function hitTarget(x:number,y:number):Place|null {
+    const hit=document.elementFromPoint(x,y)?.closest<HTMLElement>('[data-sol-zone]');
+    if(!hit||!boardRef.current?.contains(hit))return null;
+    return {zone:hit.dataset.solZone as Place['zone'],index:Number(hit.dataset.solIndex)};
+  }
+  function beginDrag(event:ReactPointerEvent<HTMLButtonElement>,from:Place,card:Card) {
+    if(disabled||event.button!==0||!event.isPrimary||!card.up)return;
+    const cards=from.zone==='tableau'?state.tableau[from.index].slice(from.offset):[card];
+    if(state.variant==='pyramid') { if(from.zone==='pyramid'&&!pyramidExposed(state,from.index))return; }
+    else if(!movableRun(cards,state.variant==='spider'))return;
+    const rect=event.currentTarget.getBoundingClientRect();
+    const overlap=parseFloat(getComputedStyle(boardRef.current!).getPropertyValue('--sol-overlap'))||27;
+    pointerRef.current={pointerId:event.pointerId,from,cards,startX:event.clientX,startY:event.clientY,x:event.clientX,y:event.clientY,offsetX:event.clientX-rect.left,offsetY:event.clientY-rect.top,width:rect.width,height:rect.height,overlap,moved:false,target:null};
+    suppressClick.current=false;captureRef.current=event.currentTarget;
+    event.currentTarget.setPointerCapture(event.pointerId);
+  }
+  function moveDrag(event:ReactPointerEvent<HTMLButtonElement>) {
+    const current=pointerRef.current;
+    if(!current||current.pointerId!==event.pointerId||disabled)return;
+    const moved=current.moved||Math.hypot(event.clientX-current.startX,event.clientY-current.startY)>6;
+    if(!moved)return;
+    event.preventDefault();
+    const next={...current,moved:true,x:event.clientX,y:event.clientY,target:hitTarget(event.clientX,event.clientY)};
+    pointerRef.current=next;setDrag(next);setSelection(null);
+    // Scroll wide boards near their edges without making a touch gesture move the page.
+    const scroll=boardRef.current?.querySelector<HTMLElement>('.sol-scroll');
+    if(scroll) {const bounds=scroll.getBoundingClientRect();const edge=28;if(event.clientX>bounds.right-edge)scroll.scrollLeft+=18;else if(event.clientX<bounds.left+edge)scroll.scrollLeft-=18;}
+  }
+  function endDrag(event:ReactPointerEvent<HTMLButtonElement>,cancelled=false) {
+    const current=pointerRef.current;
+    if(!current||current.pointerId!==event.pointerId)return;
+    pointerRef.current=null;setDrag(null);captureRef.current=null;
+    if(event.currentTarget.hasPointerCapture(event.pointerId))event.currentTarget.releasePointerCapture(event.pointerId);
+    if(!current.moved)return;
+    suppressClick.current=true;event.preventDefault();setSelection(null);
+    if(cancelled||disabled)return;
+    const target=hitTarget(event.clientX,event.clientY);
+    if(state.variant==='pyramid'&&canPair(state,current.from)&&boardRef.current?.contains(document.elementFromPoint(event.clientX,event.clientY)))dispatch({type:'pair',first:current.from});
+    else if(target&&legalTarget(current.from,target))dispatch(state.variant==='pyramid'?{type:'pair',first:current.from,second:target}:{type:'move',from:current.from,to:target});
+  }
+  function choose(place: Place, card?: Card, pointerClick=false) {
+    if(pointerClick&&suppressClick.current){suppressClick.current=false;return;}
+    suppressClick.current=false;
     if (disabled || card && !card.up) return;
     if (state.variant === 'pyramid') {
       if (!card || place.zone === 'pyramid' && !pyramidExposed(state, place.index)) return;
@@ -43,20 +106,26 @@ function Board({ state, dispatch, locale, paused, compact }: BoardProps) {
     }
   }
   function cardButton(card: Card, place: Place, style?: CSSProperties, unavailable = false) {
-    const selected = samePlace(selection, place) && (selection?.offset === undefined || place.offset === undefined || place.offset >= selection.offset);
+    const selected = samePlace(activeSource, place) && (activeSource?.offset === undefined || place.offset === undefined || place.offset >= activeSource.offset);
     const suggested = samePlace(hintSource, place) && (hintSource?.offset === undefined || place.offset === undefined || place.offset >= hintSource.offset) || samePlace(hintTarget, place);
-    const target = !!selection && canMove(state, selection, place);
+    const target = !!activeSource && legalTarget(activeSource, place);
+    const over=drag?.moved&&samePlace(drag.target,place)&&target;
+    const dragging=drag?.moved&&samePlace(drag.from,place)&&(drag.from.offset===undefined||place.offset===undefined||place.offset>=drag.from.offset);
     return <button key={card.id} type="button" style={style}
-      className={`sol-card ${card.up ? '' : 'sol-back'} ${card.up && red(card) ? 'sol-red' : ''} ${selected ? 'sol-selected' : ''} ${suggested ? 'sol-suggested' : ''} ${target ? 'sol-target' : ''} ${unavailable ? 'sol-covered' : ''}`}
+      data-sol-zone={place.zone} data-sol-index={place.index} data-sol-offset={place.offset}
+      className={`sol-card ${card.up ? '' : 'sol-back'} ${card.up && red(card) ? 'sol-red' : ''} ${selected ? 'sol-selected' : ''} ${suggested ? 'sol-suggested' : ''} ${target ? 'sol-target' : ''} ${over?'sol-drop-ready':''} ${dragging?'sol-drag-source':''} ${unavailable ? 'sol-covered' : ''}`}
       disabled={disabled || !card.up || unavailable}
       aria-label={card.up ? `${cardName(card, locale)} · ${place.zone === 'tableau' ? tr(locale, 'columna', 'column') : place.zone === 'foundation' ? tr(locale, 'base', 'home') : place.zone === 'cell' ? tr(locale, 'celda', 'cell') : place.zone === 'pyramid' ? tr(locale, 'pirámide', 'pyramid') : tr(locale, 'descarte', 'waste')} ${place.index + 1}${selected ? tr(locale, ', seleccionada', ', selected') : ''}` : tr(locale, 'Carta boca abajo', 'Face-down card')}
-      aria-pressed={selected} onClick={() => choose(place, card)}>
+      aria-pressed={selected} onClick={event => choose(place, card,event.detail>0)}
+      onPointerDown={event=>beginDrag(event,place,card)} onPointerMove={moveDrag} onPointerUp={event=>endDrag(event)} onPointerCancel={event=>endDrag(event,true)}
+      onLostPointerCapture={()=>{if(pointerRef.current){pointerRef.current=null;setDrag(null);}}} onDragStart={event=>event.preventDefault()}>
       {card.up ? <><span className="sol-corner">{rankLabel(card.rank)}<small>{suitLabel(card.suit)}</small></span><span className="sol-center">{suitLabel(card.suit)}</span><span className="sol-corner sol-bottom">{rankLabel(card.rank)}<small>{suitLabel(card.suit)}</small></span></> : <span aria-hidden="true">···</span>}
     </button>;
   }
   function empty(place: Place, text: string) {
-    const highlighted = samePlace(hintTarget, place) || selection && canMove(state, selection, place);
-    return <button type="button" className={`sol-slot ${highlighted ? 'sol-target' : ''}`} disabled={disabled} onClick={() => choose(place)} aria-label={text}>{text}</button>;
+    const highlighted = samePlace(hintTarget, place) || activeSource && legalTarget(activeSource, place);
+    const over=drag?.moved&&samePlace(drag.target,place)&&highlighted;
+    return <button type="button" data-sol-zone={place.zone} data-sol-index={place.index} className={`sol-slot ${highlighted ? 'sol-target' : ''} ${over?'sol-drop-ready':''}`} disabled={disabled} onClick={event => choose(place,undefined,event.detail>0)} aria-label={text}>{text}</button>;
   }
   function drawButton() {
     return <button className={`sol-card sol-stock ${hint?.type === 'draw' ? 'sol-suggested' : ''}`} disabled={disabled || !state.stock.length && (state.variant !== 'klondike' || !state.waste.length)} onClick={() => { dispatch({ type: 'draw' }); setSelection(null); }} aria-label={tr(locale, 'Robar o reciclar el mazo', 'Draw or recycle the stock')}>
@@ -64,9 +133,9 @@ function Board({ state, dispatch, locale, paused, compact }: BoardProps) {
     </button>;
   }
   const instruction = state.variant === 'pyramid'
-    ? tr(locale, 'Pulsa dos cartas libres que sumen 13. Los reyes se retiran solos.', 'Select two exposed cards totalling 13. Kings are removed alone.')
-    : tr(locale, 'Pulsa una carta para elegirla y después su destino. Las cartas inferiores se mueven juntas.', 'Select a card, then its destination. The cards below it move together.');
-  return <div className={`sol-board ${compact ? 'sol-compact' : ''}`}>
+    ? tr(locale, 'Arrastra una carta libre sobre otra que sume 13, o pulsa las dos. Los reyes se retiran solos.', 'Drag an exposed card onto another totalling 13, or select both. Kings are removed alone.')
+    : tr(locale, 'Arrastra una carta o grupo al destino marcado. También puedes pulsar una carta y después su destino.', 'Drag a card or group to an outlined destination. You can also select a card, then its destination.');
+  return <div ref={boardRef} className={`sol-board ${compact ? 'sol-compact' : ''} ${drag?.moved?'sol-is-dragging':''}`}>
     <p className="sol-instruction">{instruction}</p>
     <p className="sol-scroll-help">{tr(locale,'↔ Desliza el tablero para ver todas las columnas.', '↔ Swipe the board to see every column.')}</p>
     <div className="sol-scroll">
@@ -99,6 +168,9 @@ function Board({ state, dispatch, locale, paused, compact }: BoardProps) {
       <span>{tr(locale, 'Movimientos', 'Moves')}: {state.moves} · {tr(locale, 'Puntos', 'Points')}: {state.score}</span>
     </div>
     <p className="sol-message" role="status">{state.status === 'won' ? tr(locale, '¡Solitario completado!', 'Solitaire complete!') : state.message && messages[state.message] ? messages[state.message][locale === 'es' ? 0 : 1] : '\u00a0'}</p>
+    {drag?.moved&&createPortal(<div className={`sol-drag-ghost ${drag.target&&legalTarget(drag.from,drag.target)?'sol-ghost-valid':''}`} aria-hidden="true" style={{left:drag.x-drag.offsetX,top:drag.y-drag.offsetY,width:drag.width,height:drag.height+(drag.cards.length-1)*drag.overlap,'--sol-width':`${drag.width}px`,'--sol-height':`${drag.height}px`,'--sol-overlap':`${drag.overlap}px`} as CSSProperties}>
+      {drag.cards.map((card,index)=><div key={card.id} className={`sol-card ${red(card)?'sol-red':''}`} style={{position:'absolute',top:index*drag.overlap,zIndex:index+1}}><span className="sol-corner">{rankLabel(card.rank)}<small>{suitLabel(card.suit)}</small></span><span className="sol-center">{suitLabel(card.suit)}</span><span className="sol-corner sol-bottom">{rankLabel(card.rank)}<small>{suitLabel(card.suit)}</small></span></div>)}
+    </div>,document.body)}
   </div>;
 }
 
@@ -162,7 +234,7 @@ export const solitaire: GameDefinition<SolitaireState> = {
   id: 'solitaire', name: labels('Solitarios', 'Solitaire'), icon: '♠', category: 'cards', version: 1,
   description: labels('Cuatro clásicos de cartas, a tu ritmo.', 'Four classic card games at your own pace.'),
   defaults: { variant: 'klondike', draw: 1, suits: 1 },
-  options: [select('variant', 'Variante', 'Variant', [['klondike', 'Klondike', 'Klondike'], ['spider', 'Spider', 'Spider'], ['freecell', 'FreeCell', 'FreeCell'], ['pyramid', 'Pirámide', 'Pyramid']], 'klondike'), select('draw', 'Klondike: cartas por robo', 'Klondike: cards per draw', [[1, 'Una', 'One'], [3, 'Tres', 'Three']], 1), select('suits', 'Spider: número de palos', 'Spider: number of suits', [[1, 'Uno', 'One'], [2, 'Dos', 'Two'], [4, 'Cuatro', 'Four']], 1)],
+  options: [select('variant', 'Variante', 'Variant', [['klondike', 'Klondike', 'Klondike'], ['spider', 'Spider', 'Spider'], ['freecell', 'FreeCell', 'FreeCell'], ['pyramid', 'Pirámide', 'Pyramid']], 'klondike'), select('draw', 'Klondike: cartas por robo', 'Klondike: cards per draw', [[1, 'Una', 'One'], [3, 'Tres', 'Three']], 1,c=>c.variant==='klondike'), select('suits', 'Spider: número de palos', 'Spider: number of suits', [[1, 'Uno', 'One'], [2, 'Dos', 'Two'], [4, 'Cuatro', 'Four']], 1,c=>c.variant==='spider')],
   create: createSolitaire, reducer: solitaireReducer, View: SolitaireView,
   guide: [
     { title: labels('Klondike', 'Klondike'), text: labels(rules.klondike.map(rule => rule[0]).join(' '), rules.klondike.map(rule => rule[1]).join(' ')), diagram: 'A → 2 → 3 … K   |   7♣ → 6♥ → 5♠', action: { type: 'hint' } },
