@@ -1,11 +1,16 @@
 import { defineConfig } from "vite";
+import { readFileSync } from "node:fs";
 import react from "@vitejs/plugin-react";
 import { viteSingleFile } from "vite-plugin-singlefile";
 import { VitePWA } from "vite-plugin-pwa";
 import { securityPolicy } from "./scripts/security-policy.ts";
 
+const { version } = JSON.parse(
+  readFileSync(new URL("./package.json", import.meta.url), "utf8"),
+);
+
 export default defineConfig(({ mode }) => ({
-  define: { __APP_VERSION__: JSON.stringify("0.1.0") },
+  define: { __APP_VERSION__: JSON.stringify(version) },
   base: "./",
   server: {
     watch: {
