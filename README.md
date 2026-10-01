@@ -27,7 +27,7 @@ Los guardados se quedan en tu navegador. Para trasladarlos o conservar una copia
 | Letras en juego        | Forma palabras con tus fichas en un tablero; 2–4 jugadores.  |
 | Ajedrez                | Dos personas o contra Stockfish.                             |
 | Póker                  | Texas Hold’em con fichas ficticias; 2–6 jugadores.           |
-| Dominó                 | Doble seis, individual o por parejas.                        |
+| Dominó                 | Clásico, parejas y Todos cincos con ramas y puntos por jugada. |
 | Billar                 | Bola 8 y práctica individual.                                |
 | Preguntas y respuestas | Seis categorías; 500 preguntas en español y 500 en inglés.   |
 | Serpiente              | Recoge comida y evita chocar.                                |

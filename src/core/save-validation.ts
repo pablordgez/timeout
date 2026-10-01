@@ -1,6 +1,7 @@
 import { Chess } from "chess.js";
 import type { Session } from "./storage";
 import type { GameDefinition } from "./types";
+import { tiles as dominoTiles } from "../games/domino/engine";
 
 /** Validate imported game payloads before they can reach views or workers. */
 export function validateGameSession(
@@ -248,6 +249,15 @@ export function validateGameSession(
         session.config.mode === "pairs" ? 4 : Number(session.config.players),
       );
       turn(hands);
+      const placedTile = (t: any) =>
+        t &&
+        Number.isInteger(t.id) &&
+        t.id >= 0 &&
+        t.id < 28 &&
+        ((t.left === dominoTiles[t.id][0] &&
+          t.right === dominoTiles[t.id][1]) ||
+          (t.right === dominoTiles[t.id][0] &&
+            t.left === dominoTiles[t.id][1]));
       require(
         hands.every((h) => ints(h, 0, 27)) &&
           ints(s.stock, 0, 27) &&
@@ -265,18 +275,76 @@ export function validateGameSession(
               t.right <= 6,
           ),
       );
+      require(
+        s.chain.every(placedTile) &&
+          s.chain.every(
+            (t: any, i: number) => !i || s.chain[i - 1].right === t.left,
+          ),
+      );
+      const branchTiles: any[] = [];
+      if (session.config.mode === "fives") {
+        require(s.fives && s.opening === -1);
+        const f = s.fives;
+        require(
+          Number.isInteger(f.lastScore) &&
+            f.lastScore >= 0 &&
+            f.lastScore <= 35 &&
+            f.lastScore % 5 === 0,
+        );
+        require(
+          f.nextStarter === null ||
+            (Number.isInteger(f.nextStarter) &&
+              f.nextStarter >= 0 &&
+              f.nextStarter < hands.length),
+        );
+        const index = s.chain.findIndex((t: any) => t.id === f.spinner);
+        require(
+          f.spinner === null ||
+            (index >= 0 && s.chain[index].left === s.chain[index].right),
+        );
+        require(
+          f.spinner !== null || !s.chain.some((t: any) => t.left === t.right),
+        );
+        for (const direction of ["up", "down"]) {
+          const arm = array(f[direction]);
+          require(arm.every(placedTile));
+          if (arm.length) {
+            require(
+              index > 0 &&
+                index < s.chain.length - 1 &&
+                arm[0].left === s.chain[index].left,
+            );
+            require(
+              arm.every(
+                (t: any, i: number) => !i || arm[i - 1].right === t.left,
+              ),
+            );
+          }
+          branchTiles.push(...arm);
+        }
+      } else require(s.fives === undefined);
       const tiles = [
         ...hands.flat(),
         ...s.stock,
         ...s.chain.map((t: any) => t.id),
+        ...branchTiles.map((t) => t.id),
       ];
       require(
         tiles.length === 28 &&
           new Set(tiles).size === 28 &&
           ["play", "roundover"].includes(s.phase),
       );
-      array(s.points);
-      array(s.winners);
+      require(
+        ints(s.points, 0, Number.MAX_SAFE_INTEGER, hands.length) &&
+          ints(s.winners, 0, hands.length - 1),
+      );
+      require(
+        Number.isInteger(s.passes) &&
+          s.passes >= 0 &&
+          s.passes <= hands.length &&
+          Number.isInteger(s.round) &&
+          s.round > 0,
+      );
       break;
     }
     case "billiards":

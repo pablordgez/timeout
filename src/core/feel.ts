@@ -28,7 +28,12 @@ export function botDelay(config: Config, state: GameState) {
 }
 
 /** Contextual instructions shared by every game, without exposing private information. */
-export function nextStep(id: string, s: GameState, l: Locale, config: Config = {}): string {
+export function nextStep(
+  id: string,
+  s: GameState,
+  l: Locale,
+  config: Config = {},
+): string {
   const t = (es: string, en: string) => tr(l, es, en);
   if (s.status !== "playing")
     return t(
@@ -62,10 +67,15 @@ export function nextStep(id: string, s: GameState, l: Locale, config: Config = {
             "Revisa los puntos y abre la siguiente ronda.",
             "Review the points and start the next round.",
           )
-        : t(
-            "Juega una ficha con flecha en un extremo. Sin jugada, roba o pasa.",
-            "Play an arrowed tile on a matching end. Otherwise draw or pass.",
-          );
+        : s.fives
+          ? t(
+              "Haz que los extremos sumen 5, 10, 15… Las flechas indican dónde jugar.",
+              "Make the ends total 5, 10, 15… Arrows show where to play.",
+            )
+          : t(
+              "Juega una ficha con flecha en un extremo. Sin jugada, roba o pasa.",
+              "Play an arrowed tile on a matching end. Otherwise draw or pass.",
+            );
     case "poker":
       return s.street === "showdown"
         ? t(
@@ -123,9 +133,9 @@ export function nextStep(id: string, s: GameState, l: Locale, config: Config = {
                   "Aim on the table, pull back and release to shoot.",
                 )
               : t(
-                "Anuncia bola y tronera. Arrastra hacia atrás y suelta para tirar.",
-                "Call ball and pocket. Pull back and release to shoot.",
-              );
+                  "Anuncia bola y tronera. Arrastra hacia atrás y suelta para tirar.",
+                  "Call ball and pocket. Pull back and release to shoot.",
+                );
     case "solitaire":
       return t(
         "Selecciona o arrastra una carta. Pista muestra una jugada disponible.",
