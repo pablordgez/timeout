@@ -122,3 +122,32 @@
     var(--card-back, #ba242e);
   color: var(--card-back-ink, #fff);
 }
+.poker-table {
+  border-radius: 0;
+  border: 4px solid var(--border);
+  box-shadow: inset 0 0 0 2px #ffffff20;
+}
+.poker-game .poker-card {
+  border-radius: 0;
+  border-width: 2px;
+  box-shadow: 2px 3px 0 #0003;
+  gap: 3px;
+  align-content: center;
+}
+.poker-card b {
+  font-size: 0.95rem;
+}
+.poker-card .pixel-sprite {
+  width: 18px;
+  height: 18px;
+}
+.poker-game .poker-card.back {
+  background:
+    repeating-linear-gradient(0deg, transparent 0 4px, #ffffff18 4px 6px),
+    repeating-linear-gradient(90deg, transparent 0 4px, #ffffff18 4px 6px),
+    var(--card-back);
+  box-shadow:
+    inset 0 0 0 3px var(--card-back),
+    inset 0 0 0 5px #ffffff40,
+    2px 3px 0 #0003;
+}

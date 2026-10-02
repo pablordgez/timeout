@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { Action, GameState } from "../core/types";
+import { pixelText } from "./pixel-art";
 export function CanvasBoard({
   state,
   dispatch,
@@ -31,9 +32,9 @@ export function CanvasBoard({
   useEffect(() => {
     const canvas = ref.current!;
     const ctx = canvas.getContext("2d")!;
-    const ratio = Math.min(2, window.devicePixelRatio || 1);
-    canvas.width = width * ratio; canvas.height = height * ratio;
-    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    canvas.width = width;
+    canvas.height = height;
+    ctx.imageSmoothingEnabled = false;
     let frame = 0,
       last = 0,
       readyAt = performance.now() + (warmup && !paused ? 900 : 0);
@@ -61,7 +62,12 @@ export function CanvasBoard({
         "piece-l",
       ])
         colors[k] = root.getPropertyValue("--" + k).trim();
-      if (!paused && last && now >= readyAt && current.current.status === "playing")
+      if (
+        !paused &&
+        last &&
+        now >= readyAt &&
+        current.current.status === "playing"
+      )
         callback.current({
           type: "TICK",
           dt: Math.min((now - last) / 1000, 0.05),
@@ -69,10 +75,11 @@ export function CanvasBoard({
       last = now;
       draw(ctx, current.current, colors);
       if (!paused && now < readyAt) {
-        ctx.fillStyle = colors.surface; ctx.globalAlpha=.9;
-        ctx.fillRect(width/2-65,45,130,38); ctx.globalAlpha=1;
-        ctx.fillStyle=colors.text;ctx.font='15px '+(colors['font-mono']||'monospace');ctx.textAlign='center';
-        ctx.fillText('LISTO / READY',width/2,69);ctx.textAlign='start';
+        ctx.fillStyle = colors.surface;
+        ctx.globalAlpha = 0.9;
+        ctx.fillRect(width / 2 - 65, 45, 130, 38);
+        ctx.globalAlpha = 1;
+        pixelText(ctx, "LISTO / READY", width / 2 - 51, 59, colors.text, 2);
       }
       frame = requestAnimationFrame(paint);
     }
@@ -119,7 +126,7 @@ export function CanvasBoard({
       className="game-canvas"
       aria-label="Game board / Tablero"
       onPointerDown={(e) => {
-        if(e.button !== 0) return;
+        if (e.button !== 0) return;
         e.currentTarget.setPointerCapture(e.pointerId);
         const r = e.currentTarget.getBoundingClientRect();
         if (!paused)
@@ -141,7 +148,7 @@ export function CanvasBoard({
           });
       }}
       onPointerUp={() => dispatch({ type: "POINTER_UP" })}
-      onPointerCancel={() => dispatch({type:'RELEASE'})}
+      onPointerCancel={() => dispatch({ type: "RELEASE" })}
     />
   );
 }

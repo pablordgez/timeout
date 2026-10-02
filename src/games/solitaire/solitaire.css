@@ -469,3 +469,39 @@
     animation: none;
   }
 }
+/* Hard edges and a woven, four-pixel card back. */
+.sol-card,
+.sol-slot {
+  border-radius: 0;
+  box-shadow: 2px 3px 0 #0003;
+  border-width: 2px;
+}
+.sol-slot {
+  box-shadow: none;
+}
+.sol-card .pixel-sprite {
+  width: 12px;
+  height: 12px;
+}
+.sol-center {
+  top: 38%;
+  left: 32%;
+}
+.sol-center .pixel-sprite {
+  width: 24px;
+  height: 24px;
+}
+.sol-back {
+  background:
+    repeating-linear-gradient(0deg, transparent 0 4px, #ffffff18 4px 6px),
+    repeating-linear-gradient(90deg, transparent 0 4px, #ffffff18 4px 6px),
+    var(--card-back);
+  box-shadow:
+    inset 0 0 0 3px var(--card-back),
+    inset 0 0 0 5px var(--card-pattern, #ffffff50),
+    2px 3px 0 #0003;
+}
+.sol-drag-ghost {
+  transform: none;
+  filter: none;
+}

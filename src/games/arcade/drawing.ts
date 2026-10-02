@@ -1,6 +1,15 @@
 import type { ArcadeState } from "./engines";
 import { snakePositions } from "./snake-motion";
 import { desert, wetland, dinosaur, bird, cactus, reedPipe } from "./art";
+import {
+  apple,
+  ballMask,
+  pixels,
+  pixelRect,
+  pixelText,
+  pixelLine,
+} from "../../ui/pixel-art";
+import { suits } from "../../ui/pixel-art";
 
 type Colors = Record<string, string>;
 function box(
@@ -9,11 +18,9 @@ function box(
   y: number,
   w: number,
   h: number,
-  r = 4,
+  _r = 4,
 ) {
-  ctx.beginPath();
-  ctx.roundRect(x, y, w, h, r);
-  ctx.fill();
+  ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
 }
 function label(
   ctx: CanvasRenderingContext2D,
@@ -23,9 +30,8 @@ function label(
   c: string,
   size = 18,
 ) {
-  ctx.fillStyle = c;
-  ctx.font = `${size}px ${ctx.font.slice(ctx.font.indexOf(" ") + 1) || "monospace"}`;
-  ctx.fillText(value, x, y);
+  const scale = Math.max(1, Math.round(size / 7));
+  pixelText(ctx, value, x, y - scale * 5, c, scale);
 }
 function runner(
   ctx: CanvasRenderingContext2D,
@@ -38,9 +44,13 @@ function runner(
   ctx.save();
   ctx.globalAlpha = 0.16;
   ctx.fillStyle = "#473b2b";
-  ctx.beginPath();
-  ctx.ellipse(100, 382, Math.max(6, 18 - s.y * 0.05), 3, 0, 0, Math.PI * 2);
-  ctx.fill();
+  box(
+    ctx,
+    86 + Math.min(10, s.y * 0.025),
+    380,
+    Math.max(8, 28 - s.y * 0.05),
+    4,
+  );
   ctx.restore();
   const landing = s.effect?.type === "land" ? s.effect.left / s.effect.full : 0;
   dinosaur(ctx, s.elapsed, s.y, reduced ? 0 : landing, reduced);
@@ -67,25 +77,23 @@ function flight(
   if (next) {
     ctx.save();
     ctx.globalAlpha = 0.5;
-    ctx.strokeStyle = c.accent;
-    ctx.setLineDash([4, 7]);
-    ctx.beginPath();
-    ctx.moveTo(next.x - 8, next.gap);
-    ctx.lineTo(next.x + 66, next.gap);
-    ctx.stroke();
-    ctx.setLineDash([]);
+    pixelLine(
+      ctx,
+      next.x - 8,
+      next.gap,
+      next.x + 66,
+      next.gap,
+      c.accent,
+      2,
+      true,
+    );
     ctx.restore();
   }
   if (!reduced && s.trail) {
     ctx.save();
     s.trail.forEach(([_x, y]: number[], i: number) => {
       ctx.globalAlpha = (i / s.trail.length) * 0.17;
-      ctx.strokeStyle = "#ffffff";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(150 - (s.trail.length - i) * 6, y);
-      ctx.lineTo(144 - (s.trail.length - i) * 6, y + 2);
-      ctx.stroke();
+      pixelRect(ctx, 144 - (s.trail.length - i) * 6, y, 6, 2, "#fff9e5");
     });
     ctx.restore();
   }
@@ -105,18 +113,19 @@ function snake(
   ctx.strokeStyle = c.border;
   ctx.lineWidth = 1;
   for (let i = 0; i <= 20; i++) {
-    ctx.beginPath();
-    ctx.moveTo(x + i * cell, y);
-    ctx.lineTo(x + i * cell, y + 380);
-    ctx.moveTo(x, y + i * cell);
-    ctx.lineTo(x + 380, y + i * cell);
-    ctx.stroke();
+    pixelRect(ctx, x + i * cell, y, 1, 380, c.border);
+    pixelRect(ctx, x, y + i * cell, 380, 1, c.border);
   }
   snakePositions(s, reduced).forEach(([a, b], i) => {
     const xx = x + a * cell,
       yy = y + b * cell;
     ctx.fillStyle = i === 0 ? c.text : c.accent;
-    box(ctx, xx + 1, yy + 1, 17, 17, 5);
+    box(ctx, xx + 3, yy + 1, 13, 17);
+    box(ctx, xx + 1, yy + 3, 17, 13);
+    if (i > 0) {
+      pixelRect(ctx, xx + 3, yy + 3, 5, 2, "#ffffff50");
+      pixelRect(ctx, xx + 10, yy + 12, 5, 3, "#00000030");
+    }
     if (i === 0) {
       ctx.fillStyle = c.bg;
       const [dx, dy] = s.direction;
@@ -126,14 +135,13 @@ function snake(
   });
   const fx = x + s.food[0] * cell + 9,
     fy = y + s.food[1] * cell + 9;
-  ctx.fillStyle = c["piece-o"];
-  ctx.beginPath();
-  ctx.arc(fx, fy, 6, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = c.accent;
-  box(ctx, fx, fy - 9, 2, 5, 1);
-  ctx.fillStyle = c.text;
-  box(ctx, fx - 3, fy - 3, 2, 2, 1);
+  pixels(
+    ctx,
+    apple,
+    { r: c["piece-z"], h: "#ffe2b6", g: c["piece-s"], k: c.text },
+    fx - 5,
+    fy - 6,
+  );
 }
 function breakout(ctx: CanvasRenderingContext2D, s: ArcadeState, c: Colors) {
   for (const b of s.bricks) {
@@ -149,22 +157,31 @@ function breakout(ctx: CanvasRenderingContext2D, s: ArcadeState, c: Colors) {
     box(ctx, b.x + 3, b.y + 2, 52, 3, 1);
     ctx.fillStyle = "#00000022";
     box(ctx, b.x + 2, b.y + 14, 54, 3, 1);
-    if (b.hp > 1) label(ctx, "••", b.x + 23, b.y + 13, c.bg, 10);
+    if (b.hp > 1) {
+      pixelRect(ctx, b.x + 24, b.y + 8, 3, 3, c.bg);
+      pixelRect(ctx, b.x + 31, b.y + 8, 3, 3, c.bg);
+    }
   }
   ctx.fillStyle = c.accent;
   const hit = s.effect?.type === "paddle" ? s.effect.left / s.effect.full : 0;
   box(ctx, s.paddle - 55, 398 - hit * 2, 110, 9 + hit * 2, 4);
   ctx.fillStyle = c.text;
   box(ctx, s.paddle - 45, 398 - hit * 2, 90, 2, 1);
-  ctx.fillStyle = c.text;
-  ctx.shadowColor = c.accent;
-  ctx.shadowBlur = 12;
-  ctx.beginPath();
-  ctx.arc(s.x, s.y, 7, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.shadowBlur = 0;
-  label(ctx, `♥ ${s.lives}   ◆ ${s.level}`, 16, 428, c.muted, 15);
-  if (s.serve) label(ctx, "↑", s.paddle - 6, 366, c.accent, 22);
+  pixels(
+    ctx,
+    ballMask,
+    { k: c.accent, b: c.text, h: "#fff5db", s: c.muted },
+    s.x - 8,
+    s.y - 8,
+  );
+  for (let i = 0; i < s.lives; i++)
+    pixels(ctx, suits[1], { k: c["piece-z"] }, 16 + i * 24, 414, 2);
+  label(ctx, `LV ${s.level}`, 108, 428, c.muted, 15);
+  if (s.serve) {
+    pixelLine(ctx, s.paddle, 368, s.paddle, 356, c.accent);
+    pixelLine(ctx, s.paddle - 6, 362, s.paddle, 356, c.accent);
+    pixelLine(ctx, s.paddle + 6, 362, s.paddle, 356, c.accent);
+  }
 }
 export function drawArcade(
   ctx: CanvasRenderingContext2D,
@@ -182,10 +199,7 @@ export function drawArcade(
     ctx.save();
     s.trail.forEach(([x, y]: number[], i: number) => {
       ctx.globalAlpha = (i / s.trail.length) * 0.2;
-      ctx.fillStyle = c.accent;
-      ctx.beginPath();
-      ctx.arc(x, y, s.kind === "flappy" ? 6 : 4, 0, Math.PI * 2);
-      ctx.fill();
+      pixelRect(ctx, x - 2, y - 2, 4, 4, c.accent);
     });
     ctx.restore();
   }
@@ -205,15 +219,7 @@ export function drawArcade(
       ctx.globalAlpha = (1 - progress) * 0.65;
       ctx.lineWidth = 1.5;
       for (let i = 0; i < 2; i++) {
-        ctx.beginPath();
-        ctx.moveTo(x - 18 - progress * 12, y + 5 + i * 5);
-        ctx.quadraticCurveTo(
-          x - 28 - progress * 10,
-          y + 9 + i * 5,
-          x - 33 - progress * 12,
-          y + 5 + i * 5,
-        );
-        ctx.stroke();
+        pixelRect(ctx, x - 33 - progress * 12, y + 5 + i * 5, 12, 2, "#fff9e5");
       }
     } else if (!reduced && ["land", "jump"].includes(fx.type)) {
       ctx.fillStyle = "#c6a074";
@@ -234,14 +240,11 @@ export function drawArcade(
           1,
         );
       }
-      ctx.beginPath();
-      ctx.arc(x, y, 12 + progress * 28, 0, Math.PI * 2);
-      ctx.stroke();
     }
     if (fx.value)
       label(
         ctx,
-        fx.type === "milestone" ? `★ ${fx.value}` : `+${fx.value}`,
+        fx.type === "milestone" ? `${fx.value}!` : `+${fx.value}`,
         x + 18,
         y - 10 - (reduced ? 0 : progress * 22),
         c.text,
@@ -258,8 +261,8 @@ export function drawArcade(
     ctx.restore();
     label(
       ctx,
-      s.status === "won" ? "✓" : "×",
-      s.kind === "snake" ? 205 : 342,
+      s.status === "won" ? "OK" : "×",
+      s.kind === "snake" ? 198 : 336,
       215,
       c.accent,
       35,

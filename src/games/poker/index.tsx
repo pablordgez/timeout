@@ -1,3 +1,4 @@
+import { PixelSprite, suits } from '../../ui/PixelSprite';
 import { useState } from 'react';
 import { difficulty, labels, select, tr, type GameDefinition, type GameViewProps } from '../../core/types';
 import { canRaise, cardLabel, createPoker, evaluate, pokerBot, pokerReducer, suit, type PokerState } from './engine';
@@ -5,7 +6,7 @@ import PokerWorker from './bot.worker?worker&inline';
 import './poker.css';
 
 const categoryNames=[labels('Carta alta','High card'),labels('Pareja','Pair'),labels('Doble pareja','Two pair'),labels('Trío','Three of a kind'),labels('Escalera','Straight'),labels('Color','Flush'),labels('Full','Full house'),labels('Póker','Four of a kind'),labels('Escalera de color','Straight flush')];
-function Cards({cards,hidden=false}:{cards:number[];hidden?:boolean}) {return <div className="poker-cards">{cards.map((c,i)=><span key={`${i}:${c}`} style={{animationDelay:`${i*65}ms`}} className={`poker-card ${hidden?'back':suit(c)===1||suit(c)===2?'red':''}`} aria-label={hidden?'Carta oculta / Hidden card':cardLabel(c)}>{hidden?'⠿':cardLabel(c)}</span>)}</div>;}
+function Cards({cards,hidden=false}:{cards:number[];hidden?:boolean}) {return <div className="poker-cards">{cards.map((c,i)=><span key={`${i}:${c}`} style={{animationDelay:`${i*65}ms`}} className={`poker-card ${hidden?'back':suit(c)===1||suit(c)===2?'red':''}`} aria-label={hidden?'Carta oculta / Hidden card':cardLabel(c)}>{hidden?<span aria-hidden="true">+</span>:<><b>{cardLabel(c).slice(0,-1)}</b><PixelSprite sprite={suits[[3,2,1,0][suit(c)]]} palette={{k:'currentColor'}}/></>}</span>)}</div>;}
 function PokerView({state:s,dispatch,locale:l,paused,config:c}:GameViewProps<PokerState>) {
   const [amount,setAmount]=useState('');const p=s.players[s.turn];const showdown=s.street==='showdown';const owed=p?Math.max(0,s.highest-p.bet):0;const min=s.highest+s.lastRaise;const pot=s.players.reduce((n,p)=>n+p.total,0);
   return <div className="poker-game">

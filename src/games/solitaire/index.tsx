@@ -1,3 +1,4 @@
+import { PixelSprite, suits } from "../../ui/PixelSprite";
 import {
   useEffect,
   useRef,
@@ -24,7 +25,6 @@ import {
   rankLabel,
   red,
   solitaireReducer,
-  suitLabel,
   type Card,
   type Place,
   type SolitaireState,
@@ -398,12 +398,27 @@ function Board({ state, dispatch, locale, paused, compact }: BoardProps) {
           <>
             <span className="sol-corner">
               {rankLabel(card.rank)}
-              <small>{suitLabel(card.suit)}</small>
+              <small>
+                <PixelSprite
+                  sprite={suits[card.suit]}
+                  palette={{ k: "currentColor" }}
+                />
+              </small>
             </span>
-            <span className="sol-center">{suitLabel(card.suit)}</span>
+            <span className="sol-center">
+              <PixelSprite
+                sprite={suits[card.suit]}
+                palette={{ k: "currentColor" }}
+              />
+            </span>
             <span className="sol-corner sol-bottom">
               {rankLabel(card.rank)}
-              <small>{suitLabel(card.suit)}</small>
+              <small>
+                <PixelSprite
+                  sprite={suits[card.suit]}
+                  palette={{ k: "currentColor" }}
+                />
+              </small>
             </span>
           </>
         ) : (
@@ -704,12 +719,27 @@ function Board({ state, dispatch, locale, paused, compact }: BoardProps) {
               >
                 <span className="sol-corner">
                   {rankLabel(card.rank)}
-                  <small>{suitLabel(card.suit)}</small>
+                  <small>
+                    <PixelSprite
+                      sprite={suits[card.suit]}
+                      palette={{ k: "currentColor" }}
+                    />
+                  </small>
                 </span>
-                <span className="sol-center">{suitLabel(card.suit)}</span>
+                <span className="sol-center">
+                  <PixelSprite
+                    sprite={suits[card.suit]}
+                    palette={{ k: "currentColor" }}
+                  />
+                </span>
                 <span className="sol-corner sol-bottom">
                   {rankLabel(card.rank)}
-                  <small>{suitLabel(card.suit)}</small>
+                  <small>
+                    <PixelSprite
+                      sprite={suits[card.suit]}
+                      palette={{ k: "currentColor" }}
+                    />
+                  </small>
                 </span>
               </div>
             ))}

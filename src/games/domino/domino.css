@@ -45,7 +45,10 @@
   height: 34px;
   border: 1px solid var(--border);
   background: var(--tile-bg, var(--surface));
-  border-radius: 5px;
+  border-radius: 0;
+  box-shadow:
+    2px 2px 0 var(--border),
+    inset 2px 2px 0 #ffffff25;
   color: var(--text);
   flex-shrink: 0;
 }
@@ -138,26 +141,26 @@
   margin: auto;
   overflow: visible;
 }
-.domino-board-tile rect {
+.domino-board-tile .tile-face {
   fill: var(--tile-bg, var(--surface));
   stroke: var(--border);
-  stroke-width: 1.5;
+  stroke-width: 2;
 }
 .domino-board-tile path {
   stroke: var(--border);
   stroke-width: 1;
 }
-.domino-board-tile circle {
+.domino-board-tile .tile-pip {
   fill: var(--text);
 }
-.domino-board-tile.spinner rect {
+.domino-board-tile.spinner .tile-face {
   stroke: var(--accent);
   stroke-width: 2;
 }
-.domino-board-end circle {
+.domino-board-end rect {
   fill: var(--surface);
   stroke: var(--accent);
-  stroke-width: 1.5;
+  stroke-width: 2;
 }
 .domino-board-end text {
   fill: var(--text);
@@ -192,7 +195,7 @@
   width: 34px;
   height: 64px;
   border: 1px solid var(--border);
-  border-radius: 5px;
+  border-radius: 0;
   background: var(--raised);
   color: var(--muted);
 }

@@ -90,6 +90,7 @@ export function FivesBoard({
     >
       <svg
         className="domino-cross"
+        shapeRendering="crispEdges"
         viewBox={`${minX} ${minY} ${width} ${height}`}
         style={{
           minWidth: Math.max(340, width * 0.65),
@@ -104,12 +105,12 @@ export function FivesBoard({
             role="img"
             aria-label={`${tile.left}–${tile.right}${tile.id === s.fives?.spinner ? tr(l, ", doble central", ", spinner") : ""}`}
           >
-            <rect x="-32" y="-17" width="64" height="34" rx="5" />
+            <rect className="tile-face" x="-32" y="-17" width="64" height="34" />
             <path d="M0 -13V13" />
             {[tile.left, tile.right].map((value, side) => (
               <g key={side} transform={`translate(${side * 32 - 30} -15)`}>
                 {positions[value].map(([px, py], i) => (
-                  <circle key={i} cx={px} cy={py} r="2.5" />
+                  <rect className="tile-pip" key={i} x={px - 2} y={py - 2} width="4" height="4" />
                 ))}
               </g>
             ))}
@@ -121,7 +122,7 @@ export function FivesBoard({
             className="domino-board-end"
             aria-label={`${endName(end, l)}: ${endpoint(s, end)}`}
           >
-            <circle cx={x} cy={y} r="17" />
+            <rect x={Math.round(x) - 16} y={Math.round(y) - 16} width="32" height="32" />
             <text x={x} y={y} dy=".35em" textAnchor="middle">
               {endpoint(s, end)}
             </text>

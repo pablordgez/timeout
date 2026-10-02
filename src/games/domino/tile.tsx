@@ -34,9 +34,9 @@ export const positions: Record<number, [number, number][]> = {
 };
 function Pip({ value }: { value: number }) {
   return (
-    <svg viewBox="0 0 30 30" aria-hidden="true">
+    <svg viewBox="0 0 30 30" shapeRendering="crispEdges" aria-hidden="true">
       {positions[value].map(([x, y], i) => (
-        <circle key={i} cx={x} cy={y} r="2.5" />
+        <rect key={i} x={x - 2} y={y - 2} width="4" height="4" />
       ))}
     </svg>
   );
