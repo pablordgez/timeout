@@ -1,18 +1,13 @@
 import es from "../data/es.json.gz?url";
 import en from "../data/en.json.gz?url";
 import type { Locale } from "./types";
+import { normalize } from "./word-normalization";
+export { normalize } from "./word-normalization";
 export interface Word {
   w: string;
   g: string;
   p: string;
 }
-export const normalize = (s: string) =>
-  s
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/n\u0303/g, "ñ")
-    .replace(/[\u0300-\u036f]/g, "")
-    .normalize("NFC");
 export const words: Record<Locale, Word[]> = { es: [], en: [] };
 const loaded: Partial<Record<Locale, Promise<void>>> = {};
 export function loadLexicon(locale: Locale): Promise<void> {

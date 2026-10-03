@@ -198,14 +198,36 @@ export function App() {
     if (import.meta.env.MODE === "portable") return;
     let live = true;
     import("virtual:pwa-register").then(({ registerSW }) => {
+      if (!live) return;
       const apply = registerSW({
         immediate: true,
         onOfflineReady() {
           if (live) setOfflineReady(true);
         },
         onNeedRefresh() {
-          if (live) setUpdate(() => () => apply(true));
+          if (live)
+            setUpdate(() => () => {
+              const reload = () => window.location.reload();
+              navigator.serviceWorker.addEventListener(
+                "controllerchange",
+                reload,
+                {
+                  once: true,
+                },
+              );
+              writeData(latest.current)
+                .then(() => apply(true))
+                .catch(() => {
+                  navigator.serviceWorker.removeEventListener(
+                    "controllerchange",
+                    reload,
+                  );
+                  setWarning("write");
+                });
+            });
         },
+        // Native controllerchange also covers an update during the first visit.
+        onNeedReload() {},
         onRegisterError() {
           if (live) setWarning("offline");
         },

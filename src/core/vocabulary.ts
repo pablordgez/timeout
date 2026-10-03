@@ -1,4 +1,4 @@
-import { normalize } from "./lexicon";
+import { normalize } from "./word-normalization";
 import { random, shuffle } from "./random";
 import type { Locale } from "./types";
 

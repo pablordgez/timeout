@@ -26,6 +26,13 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
+    {
+      name: "timeout-portable-icons",
+      transformIndexHtml: (html) =>
+        mode === "portable"
+          ? html.replace(/<link rel="apple-touch-icon"[^>]+>/, "")
+          : html,
+    },
     securityPolicy(),
     ...(mode === "portable"
       ? [viteSingleFile()]
@@ -35,7 +42,8 @@ export default defineConfig(({ mode }) => ({
             manifest: {
               name: "Timeout",
               short_name: "Timeout",
-              description: "Pausa y juega. Offline games.",
+              description: "16 juegos de cartas, palabras, tablero y arcade.",
+              lang: "es",
               theme_color: "#ee353b",
               background_color: "#121314",
               display: "standalone",
@@ -47,11 +55,23 @@ export default defineConfig(({ mode }) => ({
                   type: "image/svg+xml",
                   purpose: "any",
                 },
+                {
+                  src: "icon-192.png",
+                  sizes: "192x192",
+                  type: "image/png",
+                  purpose: "any maskable",
+                },
+                {
+                  src: "icon-512.png",
+                  sizes: "512x512",
+                  type: "image/png",
+                  purpose: "any maskable",
+                },
               ],
             },
             workbox: {
               clientsClaim: true,
-              globPatterns: ["**/*.{js,css,html,svg,woff2,bin,wasm}"],
+              globPatterns: ["**/*.{js,css,html,svg,png,woff2,bin,wasm}"],
               maximumFileSizeToCacheInBytes: 40 * 1024 * 1024,
               navigateFallback: "index.html",
             },
