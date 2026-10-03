@@ -2,7 +2,7 @@
 
 16 juegos de cartas, palabras, tablero y arcade para jugar en el navegador. Sin cuentas, sin anuncios y sin conexión durante las partidas.
 
-Gráficos pixel art dibujados a mano, español e inglés, temas claros y oscuros, guardado automático y rivales controlados por el ordenador. También puedes jugar con otras personas compartiendo un dispositivo.
+Gráficos pixel art, español e inglés, temas claros y oscuros, guardado automático y rivales controlados por el ordenador. También puedes jugar con otras personas compartiendo un dispositivo.
 
 ## Jugar
 
