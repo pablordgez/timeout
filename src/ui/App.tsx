@@ -27,6 +27,7 @@ import {
   labels,
   tr,
   select,
+  getGameGuide,
   type Locale,
   type GameDefinition,
   type Config,
@@ -1104,6 +1105,7 @@ function Setup({
         {showGuide ? (
           <Guide
             game={game}
+            config={config}
             locale={locale}
             onClose={() => setShowGuide(false)}
           />
@@ -1544,6 +1546,7 @@ function Play({
       {guide ? (
         <Guide
           game={game}
+          config={config}
           locale={locale}
           practice={!!practice}
           onStartPractice={startPractice}
@@ -1556,9 +1559,43 @@ function Play({
                   dispatch(action);
                 }
           }
-          onClose={() => setGuide(false)}
+          onClose={() => {
+            if (practice) endPractice();
+            setGuide(false);
+          }}
         />
       ) : null}
+      {practice && (
+        <div className="practice-floating-banner sd-glass" role="status">
+          <div className="practice-banner-left">
+            <span className="guide-pulse-dot" aria-hidden="true" />
+            <div>
+              <strong>
+                {tr(
+                  locale,
+                  "Tablero de práctica interactiva",
+                  "Interactive practice board",
+                )}
+              </strong>
+              <span>
+                {tr(
+                  locale,
+                  "Tu partida real está en pausa y guardada a salvo.",
+                  "Your real game is paused and safely saved.",
+                )}
+              </span>
+            </div>
+          </div>
+          <div className="practice-banner-right">
+            <button
+              className="sd-button sd-button--accent sd-button--sm"
+              onClick={endPractice}
+            >
+              {tr(locale, "Volver a mi partida", "Return to my game")} →
+            </button>
+          </div>
+        </div>
+      )}
       {error ? (
         <p role="alert" className="notice sd-alert sd-alert--info">
           {error}
@@ -1688,6 +1725,7 @@ function Play({
 }
 function Guide({
   game,
+  config,
   locale,
   practice = false,
   onStartPractice,
@@ -1696,6 +1734,7 @@ function Guide({
   onClose,
 }: {
   game: GameDefinition;
+  config?: Config;
   locale: Locale;
   practice?: boolean;
   onStartPractice?: () => void | Promise<void>;
@@ -1703,10 +1742,22 @@ function Guide({
   dispatch?: (a: Action) => void;
   onClose?: () => void;
 }) {
+  const steps = getGameGuide(game, config);
   const [step, setStep] = useState(0);
   const [compact, setCompact] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
-  const current = game.guide[step] || game.guide[0];
+
+  const activeStep = Math.min(step, Math.max(0, steps.length - 1));
+  const current = steps[activeStep] || steps[0] || { title: labels("", ""), text: labels("", "") };
+
+  const handleClose = () => {
+    if (practice && onEndPractice) {
+      onEndPractice();
+    }
+    if (onClose) {
+      onClose();
+    }
+  };
 
   const handleTryAction = async () => {
     if (!current.action) return;
@@ -1735,7 +1786,7 @@ function Guide({
       >
         <div className="guide-assistant-header">
           <span className="guide-step-chip">
-            {step + 1}/{game.guide.length}
+            {activeStep + 1}/{steps.length}
           </span>
           <strong className="guide-assistant-title">{current.title[locale]}</strong>
           {practice && (
@@ -1767,7 +1818,7 @@ function Guide({
           <div className="guide-assistant-nav">
             <button
               className="sd-button sd-button--sm"
-              disabled={step === 0}
+              disabled={activeStep === 0}
               onClick={() => setStep((s) => Math.max(0, s - 1))}
               aria-label={tr(locale, "Paso anterior", "Previous step")}
             >
@@ -1775,8 +1826,8 @@ function Guide({
             </button>
             <button
               className="sd-button sd-button--sm"
-              disabled={step >= game.guide.length - 1}
-              onClick={() => setStep((s) => Math.min(game.guide.length - 1, s + 1))}
+              disabled={activeStep >= steps.length - 1}
+              onClick={() => setStep((s) => Math.min(steps.length - 1, s + 1))}
               aria-label={tr(locale, "Siguiente paso", "Next step")}
             >
               →
@@ -1791,7 +1842,7 @@ function Guide({
             {onClose && (
               <button
                 className="sd-button sd-button--ghost sd-button--sm"
-                onClick={onClose}
+                onClick={handleClose}
                 aria-label={tr(locale, "Cerrar guía", "Close guide")}
               >
                 ✕
@@ -1817,13 +1868,13 @@ function Guide({
         <div className="guide-header">
           <div className="guide-meta">
             <span className="guide-kicker">
-              {tr(locale, "GUÍA INTERACTIVA", "INTERACTIVE GUIDE")} · {step + 1} / {game.guide.length}
+              {tr(locale, "GUÍA INTERACTIVA", "INTERACTIVE GUIDE")} · {activeStep + 1} / {steps.length}
             </span>
             <div className="guide-stepper-dots" aria-hidden="true">
-              {game.guide.map((_, i) => (
+              {steps.map((_, i) => (
                 <span
                   key={i}
-                  className={`guide-dot ${i === step ? "active" : i < step ? "completed" : ""}`}
+                  className={`guide-dot ${i === activeStep ? "active" : i < activeStep ? "completed" : ""}`}
                 />
               ))}
             </div>
@@ -1843,7 +1894,7 @@ function Guide({
             {onClose && (
               <button
                 className="sd-button sd-button--ghost sd-button--sm"
-                onClick={onClose}
+                onClick={handleClose}
                 aria-label={tr(locale, "Cerrar guía", "Close guide")}
               >
                 ✕
@@ -1853,13 +1904,13 @@ function Guide({
         </div>
 
         <div className="guide-tabs" role="tablist">
-          {game.guide.map((g, i) => (
+          {steps.map((g, i) => (
             <button
               className="sd-button"
               key={i}
               role="tab"
-              aria-selected={i === step}
-              aria-pressed={i === step}
+              aria-selected={i === activeStep}
+              aria-pressed={i === activeStep}
               onClick={() => setStep(i)}
             >
               {i + 1}. {g.title[locale]}
@@ -1963,7 +2014,7 @@ function Guide({
           <div className="guide-nav-buttons">
             <button
               className="sd-button"
-              disabled={step === 0}
+              disabled={activeStep === 0}
               onClick={() => setStep((s) => Math.max(0, s - 1))}
             >
               ← {tr(locale, "Anterior", "Previous")}
@@ -1971,21 +2022,21 @@ function Guide({
             <button
               className="sd-button"
               onClick={() => {
-                if (step < game.guide.length - 1) {
+                if (activeStep < steps.length - 1) {
                   setStep((s) => s + 1);
-                } else if (onClose) {
-                  onClose();
+                } else {
+                  handleClose();
                 }
               }}
             >
-              {step < game.guide.length - 1
+              {activeStep < steps.length - 1
                 ? `${tr(locale, "Siguiente", "Next")} →`
                 : tr(locale, "Entendido", "Got it")}
             </button>
           </div>
           {onClose && (
             <div className="guide-footer-right">
-              <button className="sd-button" onClick={onClose}>
+              <button className="sd-button" onClick={handleClose}>
                 {tr(locale, "Cerrar guía", "Close guide")}
               </button>
             </div>

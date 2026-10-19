@@ -7,8 +7,8 @@ async function practice(page:Page,variant='klondike') {
   await page.getByRole('combobox',{name:'Variante',exact:true}).selectOption(variant);
   await page.getByRole('button',{name:/Empezar partida/}).click();
   await page.locator('.pause-overlay').getByRole('button',{name:/Continuar/}).click();
-  await page.getByText('Cómo jugar · guía visual y práctica',{exact:true}).click();
-  await page.getByRole('button',{name:'Abrir práctica interactiva',exact:true}).click();
+  await page.getByRole('button',{name:/Guía/}).click();
+  await page.getByRole('button',{name:/Abrir práctica guiada/}).click();
   return page.locator('.sol-demo');
 }
 async function points(source:Locator,target:Locator) {

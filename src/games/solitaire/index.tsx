@@ -13,6 +13,7 @@ import type {
   Config,
   GameDefinition,
   GameViewProps,
+  GuideStep,
   Locale,
 } from "../../core/types";
 import { labels, select, tr } from "../../core/types";
@@ -887,11 +888,9 @@ function practice(variant: Variant): SolitaireState {
   return s;
 }
 function SolitaireView(props: GameViewProps<SolitaireState>) {
-  const { state, config, locale, paused } = props;
-  const [demo, setDemo] = useState<SolitaireState | null>(null);
-  useEffect(() => setDemo(null), [state.variant]);
+  const { state, config, locale, paused, practice } = props;
   return (
-    <section className="solitaire">
+    <section className={`solitaire ${practice ? "sol-demo" : ""}`}>
       <div className="sol-meta">
         <strong>
           {state.variant === "pyramid"
@@ -915,108 +914,6 @@ function SolitaireView(props: GameViewProps<SolitaireState>) {
         </span>
       </div>
       <Board {...props} />
-      <details className="sol-guide">
-        <summary>
-          {tr(
-            locale,
-            "Cómo jugar · guía visual y práctica",
-            "How to play · visual guide and practice",
-          )}
-        </summary>
-        <ol>
-          {rules[state.variant].map(([es, en], i) => (
-            <li key={i}>{tr(locale, es, en)}</li>
-          ))}
-        </ol>
-        <div
-          className="sol-rule-diagram"
-          aria-label={tr(
-            locale,
-            "Ejemplo de una jugada válida",
-            "Example of a legal move",
-          )}
-        >
-          {state.variant === "pyramid" ? (
-            <>
-              <span>6♠ + 7♥</span>
-              <b>→</b>
-              <span>13 ✓</span>
-              <span>K♣ → ✓</span>
-            </>
-          ) : (
-            <>
-              <span className={state.variant === "spider" ? "" : "sol-red"}>
-                {state.variant === "spider" ? "6♠" : "6♥"}
-              </span>
-              <span>5♠</span>
-              <b>→</b>
-              <span>7♣</span>
-              <small>
-                {state.variant === "spider"
-                  ? tr(locale, "Grupos del mismo palo", "Same-suit groups")
-                  : tr(
-                      locale,
-                      "Orden descendente · alterna colores",
-                      "Descending rank · alternate colours",
-                    )}
-              </small>
-            </>
-          )}
-        </div>
-        <p>
-          {tr(
-            locale,
-            "Prueba los controles en un tablero de práctica. No cambia tu partida ni tus estadísticas.",
-            "Try the controls on a practice board. Your saved game and statistics are unaffected.",
-          )}
-        </p>
-        <button className="sd-button" onClick={() => setDemo(practice(state.variant))}>
-          {demo
-            ? tr(locale, "Reiniciar práctica", "Reset practice")
-            : tr(
-                locale,
-                "Abrir práctica interactiva",
-                "Open interactive practice",
-              )}
-        </button>
-        {demo && (
-          <div className="sol-demo">
-            <p>
-              {state.variant === "pyramid"
-                ? tr(
-                    locale,
-                    "Ejercicio: empareja 6 y 7, retira el rey y combina el as liberado con la dama del descarte.",
-                    "Exercise: pair 6 with 7, remove the king and pair the newly exposed ace with the waste queen.",
-                  )
-                : state.variant === "spider"
-                  ? tr(
-                      locale,
-                      "Ejercicio: mueve el 6 con el 5 sobre el 7. Se libera una carta tapada. Prueba después a mover grupos a columnas vacías.",
-                      "Exercise: move the 6 and 5 onto the 7. This uncovers a hidden card. Then try moving groups into empty columns.",
-                    )
-                  : tr(
-                      locale,
-                      "Ejercicio: mueve el 6 con el 5 sobre el 7; después coloca el as en una base. En FreeCell puedes guardar una carta en una celda.",
-                      "Exercise: move the 6 and 5 onto the 7, then place the ace in a home. In FreeCell, try keeping a card in a cell.",
-                    )}
-            </p>
-            <Board
-              state={demo}
-              dispatch={(action) =>
-                setDemo((current) =>
-                  current ? solitaireReducer(current, action, config) : null,
-                )
-              }
-              locale={locale}
-              paused={false}
-              compact
-            />
-            <button className="sd-button" onClick={() => setDemo(null)}>
-              {tr(locale, "Cerrar práctica", "Close practice")}
-            </button>
-          </div>
-        )}
-      </details>
       {paused && (
         <p className="sol-paused">
           {tr(
@@ -1029,6 +926,164 @@ function SolitaireView(props: GameViewProps<SolitaireState>) {
     </section>
   );
 }
+
+const solitaireGuidesByVariant: Record<Variant, GuideStep[]> = {
+  klondike: [
+    {
+      title: labels("Cuatro bases por palo", "Four home piles by suit"),
+      text: labels(
+        "Construye cuatro bases en la parte superior, una por cada palo, del As al Rey. Llevar todas las cartas a las bases completa el juego.",
+        "Build four foundation piles at the top, one per suit, from Ace to King. Moving all cards to foundations wins the game.",
+      ),
+      diagram: "[A♠] → [2♠] … [K♠] × 4",
+      action: { type: "hint" },
+    },
+    {
+      title: labels("Construye alternando colores", "Build alternating colors"),
+      text: labels(
+        "En las 7 columnas del tablero, desciende de rango alternando rojo y negro (por ejemplo, 6♥ sobre 7♠ o 5♠ sobre 6♥). Puedes mover secuencias ordenadas juntas.",
+        "In the 7 tableau columns, build downward alternating red and black (e.g. 6♥ on 7♠ or 5♠ on 6♥). Ordered sequences move together.",
+      ),
+      diagram: "[7♠] ── [6♥] ── [5♠]   |   rojo / negro ✓",
+      action: { type: "hint" },
+    },
+    {
+      title: labels("Reyes y columnas vacías", "Kings and empty columns"),
+      text: labels(
+        "Solo un Rey (o una secuencia que comience por un Rey) puede colocarse en una columna vacía. Al mover una carta y liberar una carta oculta, esta se gira automáticamente.",
+        "Only a King (or a sequence starting with a King) can fill an empty column. Uncovering a face-down card turns it face-up automatically.",
+      ),
+      diagram: "[Columna vacía] ← [K♠]",
+    },
+    {
+      title: labels("Mazo de robo y reciclaje", "Stock draw and recycling"),
+      text: labels(
+        "Roba del mazo cuando no tengas movimientos en el tablero. Solo la carta superior del descarte está en juego. Puedes reciclar el mazo cuantas veces quieras y devolver cartas de las bases al tablero si es necesario.",
+        "Draw from stock when no moves remain on the tableau. Only the top waste card is in play. You can recycle the stock without limit and move cards back from foundations if needed.",
+      ),
+      diagram: "[Mazo] → [Descarte] → [Tablero]",
+      action: { type: "hint" },
+    },
+  ],
+  spider: [
+    {
+      title: labels("Ocho secuencias completas", "Eight complete sequences"),
+      text: labels(
+        "El objetivo es formar ocho secuencias completas en el tablero, desde el Rey hasta el As del mismo palo. Al completar una secuencia entera (K a A), se retira automáticamente a la base.",
+        "Build eight complete sequences on the tableau from King to Ace of the same suit. A completed sequence (K to A) automatically moves to completed piles.",
+      ),
+      diagram: "K♠ → Q♠ → J♠ … A♠   × 8",
+      action: { type: "hint" },
+    },
+    {
+      title: labels("Construcción y grupos del mismo palo", "Building and same-suit groups"),
+      text: labels(
+        "Puedes colocar una carta sobre cualquier otra de valor inmediatamente superior (ej. 6 sobre 7 de cualquier palo). Sin embargo, ¡solo los grupos consecutivos del MISMO palo pueden moverse juntos!",
+        "You can place a card on any card of the next higher rank (e.g. 6 on 7 of any suit). However, only consecutive groups of the SAME suit can move together!",
+      ),
+      diagram: "[7♠] ── [6♠] ── [5♠]   |   mismo palo ✓",
+      action: { type: "hint" },
+    },
+    {
+      title: labels("Reparto del mazo", "Stock dealing"),
+      text: labels(
+        "Cualquier carta o grupo válido puede llenar una columna vacía. Cuando no queden movimientos útiles, pulsa el mazo para repartir diez cartas (una por columna). ¡Todas las columnas deben tener al menos una carta para poder repartir!",
+        "Any card or valid group can fill an empty column. When stuck, tap the stock to deal ten cards (one per column). Every column must have at least one card to deal!",
+      ),
+      diagram: "Mazo → 1 carta × 10 columnas",
+    },
+    {
+      title: labels("Destapar cartas ocultas", "Uncovering hidden cards"),
+      text: labels(
+        "Mueve cartas y grupos para voltear las cartas boca abajo. Cada carta descubierta amplía tus posibilidades. Si juegas con 2 o 4 palos, separa las mezclas para reagrupar por palo.",
+        "Move cards to flip face-down cards. Each revealed card expands your options. With 2 or 4 suits, break mixed stacks to regroup by pure suit.",
+      ),
+      diagram: "[7♠ tapada] → [6♠ 5♠] sobre [7♥] → [7♠ visible!]",
+      action: { type: "hint" },
+    },
+  ],
+  freecell: [
+    {
+      title: labels("Cartas visibles y 4 celdas libres", "Open cards and 4 free cells"),
+      text: labels(
+        "Todas las cartas se reparten descubiertas desde el inicio. Dispones de cuatro celdas libres en la parte superior para almacenar temporalmente una carta en cada una.",
+        "All cards are dealt face-up. You have four free cells at the top to temporarily store one card each while maneuvering.",
+      ),
+      diagram: "○ ○ ○ ○   |   4 celdas libres",
+      action: { type: "hint" },
+    },
+    {
+      title: labels("Cuatro bases y cascadas", "Four homes and cascades"),
+      text: labels(
+        "Construye las cuatro bases por palo del As al Rey. En las 8 columnas del tablero, construye en orden descendente alternando color (rojo sobre negro, etc.).",
+        "Build the four home piles by suit from Ace to King. In the 8 tableau cascades, build down alternating colors (red on black, etc.).",
+      ),
+      diagram: "[A♠] → [2♠] … [K♠]   |   [6♦] sobre [7♣]",
+      action: { type: "hint" },
+    },
+    {
+      title: labels("Capacidad de movimiento en bloque", "Supermove block capacity"),
+      text: labels(
+        "Para mover varias cartas juntas, debes disponer de suficientes celdas y columnas libres para trasladarlas una a una: capacidad = (celdas libres + 1) × 2^(columnas libres). ¡Aprovecha los espacios vacíos!",
+        "Moving multiple cards together requires enough free cells and empty columns to move them card by card: capacity = (free cells + 1) × 2^(empty columns). Use empty spaces wisely!",
+      ),
+      diagram: "(celdas libres + 1) × 2^columnas",
+      action: { type: "hint" },
+    },
+    {
+      title: labels("Estrategia y columnas vacías", "Strategy and empty cascades"),
+      text: labels(
+        "Una columna vacía puede ocuparse con cualquier carta o grupo permitido. Procura mantener celdas libres desocupadas para no quedarte sin movimientos posibles.",
+        "An empty cascade accepts any card or allowed group. Aim to keep free cells vacant so you never run out of maneuvering capacity.",
+      ),
+      diagram: "[Columna vacía] ← Cualquier carta",
+    },
+  ],
+  pyramid: [
+    {
+      title: labels("El objetivo: Sumar 13", "The goal: Sum to 13"),
+      text: labels(
+        "Retira las cartas de la pirámide emparejando dos cartas descubiertas que sumen 13. Valores: As = 1, J = 11, Q = 12, Rey = 13. Los números 2 a 10 valen su cifra.",
+        "Clear pyramid cards by pairing exposed cards that add up to 13. Values: Ace = 1, J = 11, Q = 12, King = 13. Numbers 2–10 equal their rank.",
+      ),
+      diagram: "[6♠] + [7♥] = 13 ✓   |   [A♦] + [Q♣] = 13 ✓",
+      action: { type: "hint" },
+    },
+    {
+      title: labels("Los Reyes se van solos", "Kings clear alone"),
+      text: labels(
+        "Dado que el Rey vale 13 por sí mismo, no necesita pareja: basta seleccionarlo para retirarlo de inmediato del tablero.",
+        "Since the King equals 13 on its own, it needs no pair: simply select it to remove it immediately from the board.",
+      ),
+      diagram: "[K♠] = 13 → ¡Retirar solo! ✓",
+      action: { type: "hint" },
+    },
+    {
+      title: labels("Cartas libres y desbloqueo", "Exposed cards and unblocking"),
+      text: labels(
+        "Una carta de la pirámide está libre solo cuando las dos cartas que la cubren en la fila inferior han sido retiradas. Puedes emparejar dos cartas libres entre sí o una libre con la del descarte.",
+        "A pyramid card is exposed only when both cards overlapping it in the row below are removed. Pair two exposed pyramid cards, or one exposed card with the top waste card.",
+      ),
+      diagram: "[Carta libre] + [Descarte] = 13 ✓",
+      action: { type: "hint" },
+    },
+    {
+      title: labels("Mazo de robo y descartes", "Stock draw and waste"),
+      text: labels(
+        "Roba del mazo para descubrir nuevas cartas con las que emparejar cartas libres de la pirámide. Solo hay una vuelta al mazo; puedes usar Deshacer para retroceder si te equivocas.",
+        "Draw from stock to uncover cards to pair with exposed pyramid cards. The deck is dealt once; use Undo if you make a mistake.",
+      ),
+      diagram: "[Mazo] → [Descarte] ── [Pirámide]",
+      action: { type: "hint" },
+    },
+  ],
+};
+
+const getSolitaireGuide = (variant: Variant): GuideStep[] =>
+  solitaireGuidesByVariant[variant] || solitaireGuidesByVariant.klondike;
+
+const solitaireGuideFn = (c?: Config): GuideStep[] =>
+  getSolitaireGuide((c?.variant || "klondike") as Variant);
 
 export const solitaire: GameDefinition<SolitaireState> = {
   id: "solitaire",
@@ -1082,44 +1137,7 @@ export const solitaire: GameDefinition<SolitaireState> = {
   practice: (c) => practice((c.variant || "klondike") as Variant),
   reducer: solitaireReducer,
   View: SolitaireView,
-  guide: [
-    {
-      title: labels("Klondike", "Klondike"),
-      text: labels(
-        rules.klondike.map((rule) => rule[0]).join(" "),
-        rules.klondike.map((rule) => rule[1]).join(" "),
-      ),
-      diagram: "A → 2 → 3 … K   |   7♣ → 6♥ → 5♠",
-      action: { type: "hint" },
-    },
-    {
-      title: labels("Spider", "Spider"),
-      text: labels(
-        rules.spider.map((rule) => rule[0]).join(" "),
-        rules.spider.map((rule) => rule[1]).join(" "),
-      ),
-      diagram: "K♠ → Q♠ → J♠ … A♠   × 8",
-      action: { type: "hint" },
-    },
-    {
-      title: labels("FreeCell", "FreeCell"),
-      text: labels(
-        rules.freecell.map((rule) => rule[0]).join(" "),
-        rules.freecell.map((rule) => rule[1]).join(" "),
-      ),
-      diagram: "○ ○ ○ ○   |   (celdas + 1) × 2^columnas",
-      action: { type: "hint" },
-    },
-    {
-      title: labels("Pirámide", "Pyramid"),
-      text: labels(
-        rules.pyramid.map((rule) => rule[0]).join(" "),
-        rules.pyramid.map((rule) => rule[1]).join(" "),
-      ),
-      diagram: "A + Q = 13   |   6 + 7 = 13   |   K = 13",
-      action: { type: "hint" },
-    },
-  ],
+  guide: solitaireGuideFn as any,
   summarize: (state, config) => ({
     variant: state.variant,
     draw: Number(config.draw || 1),

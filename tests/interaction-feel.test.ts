@@ -365,20 +365,26 @@ describe("Foley synthesis availability", () => {
     audio.playGameSound("poker", "chips-all-in");
     expect(sources.length).toBe(muted);
   });
-  it("initializes practice states and executes guide actions seamlessly", async () => {
+  it("initializes practice states and executes guide actions seamlessly with variant awareness", async () => {
     const { solitaire } = await import("../src/games/solitaire");
     const { letters } = await import("../src/games/letters");
+    const { getGameGuide } = await import("../src/core/types");
 
     expect(typeof solitaire.practice).toBe("function");
-    const solPracticeState = (await solitaire.practice!({ variant: "klondike" })) as any;
-    expect(solPracticeState).toBeDefined();
-    expect(solPracticeState.tableau.length).toBe(7);
 
-    // Guide actions for solitaire (hints)
-    for (const step of solitaire.guide) {
-      if (step.action) {
-        const nextState = solitaire.reducer(solPracticeState, step.action, { variant: "klondike" });
-        expect(nextState).toBeDefined();
+    for (const variant of ["klondike", "spider", "freecell", "pyramid"] as const) {
+      const steps = getGameGuide(solitaire, { variant });
+      expect(steps.length).toBe(4);
+      expect(steps[0].title.es.length).toBeGreaterThan(0);
+
+      const practiceState = (await solitaire.practice!({ variant })) as any;
+      expect(practiceState).toBeDefined();
+
+      for (const step of steps) {
+        if (step.action) {
+          const nextState = solitaire.reducer(practiceState, step.action, { variant });
+          expect(nextState).toBeDefined();
+        }
       }
     }
 
@@ -387,8 +393,8 @@ describe("Foley synthesis availability", () => {
     expect(letPracticeState).toBeDefined();
     expect(letPracticeState.status).toBe("playing");
 
-    // Guide actions for letters
-    for (const step of letters.guide) {
+    const letterSteps = getGameGuide(letters, { language: "es", players: 2 });
+    for (const step of letterSteps) {
       if (step.action) {
         const nextState = letters.reducer(letPracticeState, step.action, { language: "es", players: 2 });
         expect(nextState).toBeDefined();

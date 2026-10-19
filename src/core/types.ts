@@ -16,6 +16,7 @@ export interface GameViewProps<S extends GameState = GameState> {
   config: Config;
   locale: Locale;
   paused: boolean;
+  practice?: boolean;
 }
 export interface Option {
   key: string;
@@ -49,7 +50,7 @@ export interface GameDefinition<S extends GameState = any> {
   practice?: (config: Config) => S | Promise<S>;
   reducer: (state: S, action: Action, config: Config) => S;
   View: ComponentType<GameViewProps<S>>;
-  guide: GuideStep[];
+  guide: GuideStep[] | ((config: Config) => GuideStep[]);
   getTurn?: (
     state: S,
     config: Config,
@@ -58,6 +59,16 @@ export interface GameDefinition<S extends GameState = any> {
   summarize?: (state: S, config: Config) => Record<string, string | number>;
   migrate?: (state: any, fromVersion: number) => S;
 }
+export function getGameGuide(
+  game: GameDefinition,
+  config?: Config,
+): GuideStep[] {
+  if (typeof game.guide === "function") {
+    return game.guide(config || game.defaults || {});
+  }
+  return game.guide || [];
+}
+
 export const tr = (locale: Locale, es: string, en: string) =>
   locale === "es" ? es : en;
 export const labels = (es: string, en: string) => ({ es, en });

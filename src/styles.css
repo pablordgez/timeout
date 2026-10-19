@@ -848,6 +848,37 @@
   animation: guideFadeIn 0.2s ease-out;
   width: fit-content;
 }
+.practice-floating-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: var(--sd-radius-lg, 12px);
+  margin-bottom: 16px;
+  border: 1.5px solid var(--correct, #2e7d32);
+  background: rgba(46, 125, 50, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  flex-wrap: wrap;
+  animation: guideFadeIn 0.2s ease-out;
+}
+.practice-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.practice-banner-left strong {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--text);
+}
+.practice-banner-left span {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+.practice-banner-right {
+  margin-left: auto;
+}
 .guide-footer {
   display: flex;
   align-items: center;

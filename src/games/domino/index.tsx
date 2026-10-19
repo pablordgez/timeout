@@ -3,8 +3,10 @@ import {
   labels,
   select,
   tr,
+  type Config,
   type GameDefinition,
   type GameViewProps,
+  type GuideStep,
 } from "../../core/types";
 import {
   createDomino,
@@ -205,22 +207,130 @@ function DominoView({
     </div>
   );
 }
+
+const dominoGuidesByMode: Record<string, GuideStep[]> = {
+  fives: [
+    {
+      title: labels("Encaja una ficha", "Match a tile"),
+      text: labels(
+        "Se reparten 7 fichas a 2 jugadores, o 5 a 3-4. El primer turno se sortea y puede abrir con cualquier ficha. Coloca haciendo coincidir el número con uno de los extremos libres. Las flechas indican los extremos donde encaja cada ficha.",
+        "7 tiles are dealt to 2 players, or 5 to 3-4. The first turn is random and can lead any tile. Match your numbers with open ends. Arrows show available placement ends.",
+      ),
+      diagram: "[2|6] [6|3] → 2 o 3",
+    },
+    {
+      title: labels("Todos cincos: suma los extremos", "All Fives: add the ends"),
+      text: labels(
+        "Si la suma de todos los extremos abiertos es múltiplo de 5 (5, 10, 15, 20…), ganas esos puntos inmediatamente. Un doble expuesto cuenta sus dos mitades: el 5–5 suma 10. Las flechas muestran los puntos que daría cada jugada.",
+        "If all open ends total a multiple of 5 (5, 10, 15, 20…), you score those points immediately. An exposed double counts both halves: 5–5 adds 10. Arrows show points each move would score.",
+      ),
+      diagram: "2 + 3 = 5 → +5",
+    },
+    {
+      title: labels("El primer doble abre ramas", "The first double opens branches"),
+      text: labels(
+        "Solo el primer doble jugado permite construir en cuatro direcciones (spinner). Primero se juega a sus dos extremos laterales; después se pueden abrir ramas arriba y abajo. Una vez cubiertos ambos laterales, el doble deja de contar para la suma de extremos.",
+        "Only the first double played allows branching in four directions (spinner). Play on its sides first, then branch above and below. The spinner stops counting once its sides are covered.",
+      ),
+      diagram: "← [5|5] →     ↑ / ↓",
+    },
+    {
+      title: labels("Robar, pasar y final de ronda", "Draw, pass and round end"),
+      text: labels(
+        "Sin jugada válida, roba del pozo hasta poder jugar o agotar el montón; entonces pasa. Vaciar la mano gana la ronda; si todos pasan y se cierra la partida, gana quien tenga menor suma restante. El ganador suma los puntos restantes de los rivales, redondeados al múltiplo de 5 más cercano.",
+        "Without a valid move, draw until you can play or the boneyard empties, then pass. Emptying your hand wins the round; on a block, the lowest remaining total wins. The winner scores opponents' remaining pips rounded to the nearest multiple of 5.",
+      ),
+    },
+  ],
+  pairs: [
+    {
+      title: labels("Domino por parejas", "Partnership dominoes"),
+      text: labels(
+        "4 jugadores repartidos en dos equipos: los jugadores 1 y 3 juegan juntos contra los jugadores 2 y 4. Cada jugador recibe 7 fichas. Se abre la primera ronda con el doble seis [6|6].",
+        "4 players in two teams: players 1 & 3 team up against players 2 & 4. Each player receives 7 tiles. The first round opens with the double six [6|6].",
+      ),
+      diagram: "[Equipo A: 1 & 3]  vs  [Equipo B: 2 & 4]",
+    },
+    {
+      title: labels("Sin robo: o juegas o pasas", "No drawing: play or pass"),
+      text: labels(
+        "En el dominó por parejas no hay pozo de robo (las 28 fichas están repartidas). Si no tienes ninguna ficha que encaje en los extremos, debes pasar inmediatamente el turno al siguiente jugador.",
+        "In partners domino there is no boneyard (all 28 tiles are dealt). If you have no matching tile, you must pass your turn immediately.",
+      ),
+      diagram: "[6|4] … [2|5]   |   pasar si no encajas",
+    },
+    {
+      title: labels("Estrategia en equipo y cierre", "Team strategy and blocked game"),
+      text: labels(
+        "Observa qué números castigan o faltan a tus rivales y qué necesita tu compañero. Si la partida se cierra (nadie puede poner ficha), ambos equipos suman los puntos de las fichas que les quedan en mano; el equipo con menos puntos gana.",
+        "Pay attention to which numbers opponents pass on and support your partner. If the game is blocked, both teams sum remaining pips; the team with the lowest total wins.",
+      ),
+    },
+    {
+      title: labels("Puntuación de la ronda", "Round scoring"),
+      text: labels(
+        "El equipo del jugador que domine (vacíe su mano), o del que tenga menos puntos en un cierre, suma los puntos de las fichas restantes del equipo rival. El primer equipo en alcanzar la puntuación objetivo gana.",
+        "The team of the player who dominos (empties hand), or has the lowest pips on a block, scores all remaining pips from the opposing team. First team to the point target wins.",
+      ),
+    },
+  ],
+  draw: [
+    {
+      title: labels("Encaja una ficha", "Match a tile"),
+      text: labels(
+        "Cada jugador recibe 7 fichas (o 5 si son 3-4 jugadores). Abre la ronda el jugador con el doble más alto repartido. En tu turno, coloca una ficha que coincida con uno de los dos extremos abiertos de la cadena.",
+        "Each player receives 7 tiles (5 with 3-4 players). The player holding the highest double leads. Match one of your tiles with either of the two open ends.",
+      ),
+      diagram: "[2|6] [6|3] → extremos 2 y 3",
+    },
+    {
+      title: labels("Robar del pozo y pasar", "Draw from the boneyard and pass"),
+      text: labels(
+        "Si no tienes ninguna ficha que encaje en los extremos, debes robar del pozo (boneyard) una a una hasta obtener una que puedas colocar. Cuando el pozo se agote, si no puedes jugar, pasas tu turno.",
+        "If you cannot play, you must draw from the boneyard until you find a playable tile. When the boneyard is empty, you must pass if you have no legal move.",
+      ),
+      diagram: "Sin jugada → robar del pozo",
+    },
+    {
+      title: labels("Dobles y colocación", "Doubles and placement"),
+      text: labels(
+        "Los dobles se colocan transversalmente. En el modo clásico, la cadena se expande únicamente por dos extremos principales en línea continua.",
+        "Doubles are placed crosswise. In classic mode, play extends from two open line ends.",
+      ),
+      diagram: "─ [3|3] ─",
+    },
+    {
+      title: labels("Final de ronda y recuento", "Round end and counting"),
+      text: labels(
+        "La ronda termina cuando un jugador vacía su mano (¡Dominó!) o cuando la partida se cierra porque nadie puede jugar. El ganador suma los puntos de las fichas que les quedaron a todos los rivales en la mano.",
+        "The round ends when a player plays their last tile (Domino!) or when the board is blocked. The winner scores the sum of all pips left in opponents' hands.",
+      ),
+    },
+  ],
+};
+
+const getDominoGuide = (mode?: string): GuideStep[] =>
+  dominoGuidesByMode[mode || "draw"] || dominoGuidesByMode.draw;
+
+const dominoGuideFn = (c?: Config): GuideStep[] =>
+  getDominoGuide(c?.mode as string);
+
 export const domino: GameDefinition<DominoState> = {
   id: "domino",
   name: labels("Dominó", "Dominoes"),
-  description: labels(
-    "Clásico, por parejas o Todos cincos.",
-    "Classic, partners or All Fives.",
-  ),
+  icon: "🁠",
   category: "board",
-  icon: "⚅",
   version: 2,
+  description: labels(
+    "Tradicional con robo, por parejas y Todos Cincos.",
+    "Traditional draw, partners and All Fives.",
+  ),
   defaults: {
     mode: "draw",
     players: 2,
     humans: 1,
-    difficulty: "medium",
     target: 100,
+    difficulty: "medium",
   },
   options: [
     select(
@@ -293,47 +403,6 @@ export const domino: GameDefinition<DominoState> = {
           bot: s.turn >= Math.min(s.hands.length, Number(c.humans) || 1),
           hidden: true,
         },
-  guide: [
-    {
-      title: labels("Encaja una ficha", "Match a tile"),
-      text: labels(
-        "En clásico y parejas, cada jugador recibe siete fichas y abre el doble más alto repartido. En Todos cincos se reparten siete a dos jugadores, cinco a tres o cuatro; el primer turno se sortea y puede abrir con cualquier ficha. Las flechas indican los extremos donde encaja cada ficha.",
-        "Classic and partners deal seven tiles per player and start with the highest dealt double. All Fives deals seven tiles to two players, five to three or four; the first player is chosen at random and may lead any tile. Arrows show where each tile fits.",
-      ),
-      diagram: "[2|6] [6|3] → 2 o 3",
-    },
-    {
-      title: labels(
-        "Todos cincos: suma los extremos",
-        "All Fives: add the ends",
-      ),
-      text: labels(
-        "Si la suma de todos los extremos es 5, 10, 15… ganas esos puntos al colocar la ficha. Un doble en un extremo cuenta sus dos mitades: el 5–5 suma 10. Las flechas muestran los puntos que daría cada jugada. Gana quien alcanza el objetivo, aunque aún tenga fichas.",
-        "If all open ends total 5, 10, 15… you score that many points when playing. An exposed double counts both halves: 5–5 adds 10. Arrows show the points each move would score. Reaching the target wins immediately, even with tiles left.",
-      ),
-      diagram: "2 + 3 = 5 → +5",
-    },
-    {
-      title: labels(
-        "El primer doble abre ramas",
-        "The first double opens branches",
-      ),
-      text: labels(
-        "Solo el primer doble permite construir en cuatro direcciones. Primero se juega a sus dos lados; después se pueden abrir arriba y abajo. El doble central deja de sumar al tener ambos lados cubiertos. Las ramas nuevas no suman hasta colocar su primera ficha; desde entonces cuenta el extremo de cada rama.",
-        "Only the first double allows four directions. Play on its two sides first, then branch above and below. The spinner stops counting once both sides are covered. New arms do not count until their first tile is played; each arm then contributes its exposed end.",
-      ),
-      diagram: "← [5|5] →     ↑ / ↓",
-    },
-    {
-      title: labels(
-        "Robar, pasar y terminar una ronda",
-        "Draw, pass and end a round",
-      ),
-      text: labels(
-        "Sin jugada, roba hasta poder jugar o agotar el montón; entonces pasa. En parejas no se roba: 1+3 y 2+4 comparten equipo. Vaciar la mano gana la ronda; si todos pasan, gana la menor suma restante. Un empate no puntúa. El ganador suma los puntos que quedan a los rivales, redondeados al múltiplo de cinco más cercano en Todos cincos. Quien vacía la mano abre la siguiente ronda de Todos cincos; tras un cierre se sortea.",
-        "Without a move, draw until you can play or the stock runs out, then pass. Partners do not draw: 1+3 and 2+4 share teams. Emptying your hand wins the round; if everyone passes, the lowest remaining total wins. Ties score nothing. The winner scores opponents’ remaining pips, rounded to the nearest five in All Fives. The player who goes out leads the next All Fives round; after a block, the lead is random.",
-      ),
-    },
-  ],
+  guide: dominoGuideFn as any,
   summarize: (s) => ({ rounds: s.round, points: s.points[0] }),
 };
