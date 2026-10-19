@@ -1079,6 +1079,7 @@ export const solitaire: GameDefinition<SolitaireState> = {
     ),
   ],
   create: createSolitaire,
+  practice: (c) => practice((c.variant || "klondike") as Variant),
   reducer: solitaireReducer,
   View: SolitaireView,
   guide: [
@@ -1098,6 +1099,7 @@ export const solitaire: GameDefinition<SolitaireState> = {
         rules.spider.map((rule) => rule[1]).join(" "),
       ),
       diagram: "K♠ → Q♠ → J♠ … A♠   × 8",
+      action: { type: "hint" },
     },
     {
       title: labels("FreeCell", "FreeCell"),
@@ -1106,6 +1108,7 @@ export const solitaire: GameDefinition<SolitaireState> = {
         rules.freecell.map((rule) => rule[1]).join(" "),
       ),
       diagram: "○ ○ ○ ○   |   (celdas + 1) × 2^columnas",
+      action: { type: "hint" },
     },
     {
       title: labels("Pirámide", "Pyramid"),
@@ -1114,6 +1117,7 @@ export const solitaire: GameDefinition<SolitaireState> = {
         rules.pyramid.map((rule) => rule[1]).join(" "),
       ),
       diagram: "A + Q = 13   |   6 + 7 = 13   |   K = 13",
+      action: { type: "hint" },
     },
   ],
   summarize: (state, config) => ({

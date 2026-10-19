@@ -46,6 +46,7 @@ export interface GameDefinition<S extends GameState = any> {
     seed: number,
     signal?: AbortSignal,
   ) => S | Promise<S>;
+  practice?: (config: Config) => S | Promise<S>;
   reducer: (state: S, action: Action, config: Config) => S;
   View: ComponentType<GameViewProps<S>>;
   guide: GuideStep[];

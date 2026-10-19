@@ -42,6 +42,7 @@ import dataLicense from "../../licenses/CC-BY-SA-4.0.txt?raw";
 import spanishDataLicense from "../../licenses/CC-BY-4.0.txt?raw";
 import stockfishAuthors from "../../licenses/STOCKFISH-AUTHORS.txt?raw";
 import { validateGameSession } from "../core/save-validation";
+import { GuideDiagram } from "./GuideDiagram";
 import {
   setSoundEnabled,
   unlockAudio,
@@ -1100,7 +1101,13 @@ function Setup({
             {error}
           </p>
         ) : null}
-        {showGuide ? <Guide game={game} locale={locale} /> : null}
+        {showGuide ? (
+          <Guide
+            game={game}
+            locale={locale}
+            onClose={() => setShowGuide(false)}
+          />
+        ) : null}
       </section>
     </div>
   );
@@ -1367,7 +1374,9 @@ function Play({
   ]);
   const startPractice = async () => {
     try {
-      const demo = await game.create(config, 42);
+      const demo = await (game.practice
+        ? game.practice(config)
+        : game.create(config, 42));
       setPractice({ state: stateRef.current, elapsed: elapsedRef.current });
       stateRef.current = demo;
       setState(demo);
@@ -1533,26 +1542,22 @@ function Play({
         ) : null}
       </div>
       {guide ? (
-        <div className="guide-panel">
-          <Guide
-            game={game}
-            locale={locale}
-            dispatch={practice ? dispatch : undefined}
-          />
-          <div className="controls">
-            <button
-              className="sd-button"
-              onClick={practice ? endPractice : startPractice}
-            >
-              {practice
-                ? tr(locale, "Terminar práctica", "End practice")
-                : tr(locale, "Abrir práctica guiada", "Start guided practice")}
-            </button>
-            <button className="sd-button" onClick={() => setGuide(false)}>
-              {tr(locale, "Cerrar guía", "Close guide")}
-            </button>
-          </div>
-        </div>
+        <Guide
+          game={game}
+          locale={locale}
+          practice={!!practice}
+          onStartPractice={startPractice}
+          onEndPractice={endPractice}
+          dispatch={
+            practice
+              ? dispatch
+              : async (action) => {
+                  await startPractice();
+                  dispatch(action);
+                }
+          }
+          onClose={() => setGuide(false)}
+        />
       ) : null}
       {error ? (
         <p role="alert" className="notice sd-alert sd-alert--info">
@@ -1684,39 +1689,310 @@ function Play({
 function Guide({
   game,
   locale,
+  practice = false,
+  onStartPractice,
+  onEndPractice,
   dispatch,
+  onClose,
 }: {
   game: GameDefinition;
   locale: Locale;
+  practice?: boolean;
+  onStartPractice?: () => void | Promise<void>;
+  onEndPractice?: () => void;
   dispatch?: (a: Action) => void;
+  onClose?: () => void;
 }) {
   const [step, setStep] = useState(0);
-  const current = game.guide[step];
-  return (
-    <section className="guide">
-      <div className="guide-tabs">
-        {game.guide.map((g, i) => (
-          <button
-            className="sd-button"
-            key={i}
-            aria-pressed={i === step}
-            onClick={() => setStep(i)}
-          >
-            {i + 1}. {g.title[locale]}
-          </button>
-        ))}
+  const [compact, setCompact] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const current = game.guide[step] || game.guide[0];
+
+  const handleTryAction = async () => {
+    if (!current.action) return;
+    if (!practice && onStartPractice) {
+      await onStartPractice();
+    }
+    if (dispatch) {
+      dispatch(current.action);
+      setFeedback(
+        tr(
+          locale,
+          "Jugada demostrada en el tablero.",
+          "Move demonstrated on the board.",
+        ),
+      );
+      setTimeout(() => setFeedback(null), 3500);
+    }
+  };
+
+  if (compact) {
+    return (
+      <div
+        className="guide-assistant sd-glass"
+        role="region"
+        aria-label={tr(locale, "Asistente de guía", "Guide assistant")}
+      >
+        <div className="guide-assistant-header">
+          <span className="guide-step-chip">
+            {step + 1}/{game.guide.length}
+          </span>
+          <strong className="guide-assistant-title">{current.title[locale]}</strong>
+          {practice && (
+            <span className="guide-practice-tag">
+              🎯 {tr(locale, "Práctica", "Practice")}
+            </span>
+          )}
+        </div>
+        <p className="guide-assistant-text">{current.text[locale]}</p>
+        <div className="guide-assistant-controls">
+          {current.action && (
+            <button
+              className="sd-button sd-button--sm sd-button--accent guide-try-action"
+              onClick={handleTryAction}
+            >
+              {tr(locale, "Probar este paso", "Try this step")} ▶
+            </button>
+          )}
+          {onStartPractice && (
+            <button
+              className="sd-button sd-button--sm"
+              onClick={practice ? onEndPractice : onStartPractice}
+            >
+              {practice
+                ? tr(locale, "Terminar práctica", "End practice")
+                : tr(locale, "Abrir práctica guiada", "Start guided practice")}
+            </button>
+          )}
+          <div className="guide-assistant-nav">
+            <button
+              className="sd-button sd-button--sm"
+              disabled={step === 0}
+              onClick={() => setStep((s) => Math.max(0, s - 1))}
+              aria-label={tr(locale, "Paso anterior", "Previous step")}
+            >
+              ←
+            </button>
+            <button
+              className="sd-button sd-button--sm"
+              disabled={step >= game.guide.length - 1}
+              onClick={() => setStep((s) => Math.min(game.guide.length - 1, s + 1))}
+              aria-label={tr(locale, "Siguiente paso", "Next step")}
+            >
+              →
+            </button>
+            <button
+              className="sd-button sd-button--ghost sd-button--sm"
+              onClick={() => setCompact(false)}
+              aria-label={tr(locale, "Expandir guía", "Expand guide")}
+            >
+              ⤢ {tr(locale, "Expandir", "Expand")}
+            </button>
+            {onClose && (
+              <button
+                className="sd-button sd-button--ghost sd-button--sm"
+                onClick={onClose}
+                aria-label={tr(locale, "Cerrar guía", "Close guide")}
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        </div>
+        {feedback && (
+          <div className="guide-action-feedback" role="status">
+            ✓ {feedback}
+          </div>
+        )}
       </div>
-      <h3>{current.title[locale]}</h3>
-      <p>{current.text[locale]}</p>
-      {current.diagram ? (
-        <pre className="guide-diagram">{current.diagram}</pre>
-      ) : null}
-      {current.action && dispatch ? (
-        <button className="sd-button" onClick={() => dispatch(current.action!)}>
-          {tr(locale, "Probar este paso", "Try this step")} →
-        </button>
-      ) : null}
-    </section>
+    );
+  }
+
+  return (
+    <div className="guide-panel sd-glass">
+      <section
+        className="guide"
+        aria-label={tr(locale, "Guía del juego", "Game guide")}
+      >
+        <div className="guide-header">
+          <div className="guide-meta">
+            <span className="guide-kicker">
+              {tr(locale, "GUÍA INTERACTIVA", "INTERACTIVE GUIDE")} · {step + 1} / {game.guide.length}
+            </span>
+            <div className="guide-stepper-dots" aria-hidden="true">
+              {game.guide.map((_, i) => (
+                <span
+                  key={i}
+                  className={`guide-dot ${i === step ? "active" : i < step ? "completed" : ""}`}
+                />
+              ))}
+            </div>
+          </div>
+          <div className="guide-header-actions">
+            <button
+              className="sd-button sd-button--ghost sd-button--sm"
+              onClick={() => setCompact(true)}
+              title={tr(
+                locale,
+                "Minimizar para ver el tablero completo mientras juegas",
+                "Minimize to view the entire board while playing",
+              )}
+            >
+              📌 {tr(locale, "Modo asistente", "Assistant mode")}
+            </button>
+            {onClose && (
+              <button
+                className="sd-button sd-button--ghost sd-button--sm"
+                onClick={onClose}
+                aria-label={tr(locale, "Cerrar guía", "Close guide")}
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="guide-tabs" role="tablist">
+          {game.guide.map((g, i) => (
+            <button
+              className="sd-button"
+              key={i}
+              role="tab"
+              aria-selected={i === step}
+              aria-pressed={i === step}
+              onClick={() => setStep(i)}
+            >
+              {i + 1}. {g.title[locale]}
+            </button>
+          ))}
+        </div>
+
+        <article className="guide-content">
+          <h3>{current.title[locale]}</h3>
+          <p className="guide-text">{current.text[locale]}</p>
+          {current.diagram ? (
+            <GuideDiagram
+              diagram={current.diagram}
+              gameId={game.id}
+              locale={locale}
+            />
+          ) : null}
+        </article>
+
+        <div className="guide-interactive-section">
+          {practice ? (
+            <div className="guide-practice-card sd-card--sm sd-glass--flat">
+              <div className="guide-practice-status">
+                <span className="guide-pulse-dot" aria-hidden="true" />
+                <div>
+                  <strong>{tr(locale, "Práctica interactiva activa", "Guided practice active")}</strong>
+                  <p>
+                    {tr(
+                      locale,
+                      "Experimenta libremente en este tablero de prueba. Tu partida real permanece guardada.",
+                      "Experiment freely on this practice board. Your real match remains safely saved.",
+                    )}
+                  </p>
+                </div>
+              </div>
+              <div className="guide-practice-actions">
+                {current.action && (
+                  <button
+                    className="sd-button sd-button--accent guide-try-action"
+                    onClick={handleTryAction}
+                  >
+                    {tr(locale, "Probar este paso", "Try this step")} →
+                  </button>
+                )}
+                {onStartPractice && (
+                  <button className="sd-button" onClick={onStartPractice}>
+                    ↻ {tr(locale, "Reiniciar tablero", "Reset board")}
+                  </button>
+                )}
+                {onEndPractice && (
+                  <button className="sd-button" onClick={onEndPractice}>
+                    {tr(locale, "Terminar práctica", "End practice")}
+                  </button>
+                )}
+              </div>
+              {feedback && (
+                <div className="guide-action-feedback" role="status">
+                  ✓ {feedback}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="guide-practice-card sd-card--sm sd-glass--flat">
+              <div className="guide-practice-status">
+                <div>
+                  <strong>{tr(locale, "¿Quieres practicar esta jugada?", "Want to practice this move?")}</strong>
+                  <p>
+                    {tr(
+                      locale,
+                      "Abre una sesión de prueba sin riesgos para poner en práctica las reglas.",
+                      "Open a risk-free demo session to practice the rules.",
+                    )}
+                  </p>
+                </div>
+              </div>
+              <div className="guide-practice-actions">
+                {current.action && (
+                  <button
+                    className="sd-button sd-button--accent guide-try-action"
+                    onClick={handleTryAction}
+                  >
+                    {tr(locale, "Probar este paso", "Try this step")} →
+                  </button>
+                )}
+                {onStartPractice && (
+                  <button className="sd-button" onClick={onStartPractice}>
+                    🎯 {tr(locale, "Abrir práctica guiada", "Start guided practice")}
+                  </button>
+                )}
+              </div>
+              {feedback && (
+                <div className="guide-action-feedback" role="status">
+                  ✓ {feedback}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        <footer className="guide-footer">
+          <div className="guide-nav-buttons">
+            <button
+              className="sd-button"
+              disabled={step === 0}
+              onClick={() => setStep((s) => Math.max(0, s - 1))}
+            >
+              ← {tr(locale, "Anterior", "Previous")}
+            </button>
+            <button
+              className="sd-button"
+              onClick={() => {
+                if (step < game.guide.length - 1) {
+                  setStep((s) => s + 1);
+                } else if (onClose) {
+                  onClose();
+                }
+              }}
+            >
+              {step < game.guide.length - 1
+                ? `${tr(locale, "Siguiente", "Next")} →`
+                : tr(locale, "Entendido", "Got it")}
+            </button>
+          </div>
+          {onClose && (
+            <div className="guide-footer-right">
+              <button className="sd-button" onClick={onClose}>
+                {tr(locale, "Cerrar guía", "Close guide")}
+              </button>
+            </div>
+          )}
+        </footer>
+      </section>
+    </div>
   );
 }
 function Stats({ data, locale }: { data: SaveData; locale: Locale }) {

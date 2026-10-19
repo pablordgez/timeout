@@ -365,4 +365,35 @@ describe("Foley synthesis availability", () => {
     audio.playGameSound("poker", "chips-all-in");
     expect(sources.length).toBe(muted);
   });
+  it("initializes practice states and executes guide actions seamlessly", async () => {
+    const { solitaire } = await import("../src/games/solitaire");
+    const { letters } = await import("../src/games/letters");
+
+    expect(typeof solitaire.practice).toBe("function");
+    const solPracticeState = (await solitaire.practice!({ variant: "klondike" })) as any;
+    expect(solPracticeState).toBeDefined();
+    expect(solPracticeState.tableau.length).toBe(7);
+
+    // Guide actions for solitaire (hints)
+    for (const step of solitaire.guide) {
+      if (step.action) {
+        const nextState = solitaire.reducer(solPracticeState, step.action, { variant: "klondike" });
+        expect(nextState).toBeDefined();
+      }
+    }
+
+    expect(typeof letters.practice).toBe("function");
+    const letPracticeState = (await letters.practice!({ language: "es", players: 2 })) as any;
+    expect(letPracticeState).toBeDefined();
+    expect(letPracticeState.status).toBe("playing");
+
+    // Guide actions for letters
+    for (const step of letters.guide) {
+      if (step.action) {
+        const nextState = letters.reducer(letPracticeState, step.action, { language: "es", players: 2 });
+        expect(nextState).toBeDefined();
+      }
+    }
+  });
 });
+
