@@ -1,0 +1,188 @@
+/*
+ * Conversación: mensajes, bocadillos (de chat y de estado), contenedor de
+ * mensajes con anclaje al final y cuestionario por pasos.
+ */
+
+/* --------------------------------------------------------------- Mensaje -- */
+
+.sd-message-group { display: flex; flex-direction: column; gap: var(--sd-space-2); min-inline-size: 0; }
+
+/* data-align="end" coloca el mensaje (y su avatar) al final de la línea: los propios. */
+.sd-message {
+  display: flex;
+  gap: var(--sd-space-2);
+  inline-size: 100%;
+  min-inline-size: 0;
+  font-size: var(--sd-text-sm);
+}
+
+.sd-message[data-align="end"] { flex-direction: row-reverse; }
+.sd-message__avatar { flex: none; align-self: flex-end; }
+
+.sd-message__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sd-space-1);
+  min-inline-size: 0;
+}
+
+.sd-message[data-align="end"] > .sd-message__content { align-items: flex-end; }
+
+.sd-message__header,
+.sd-message__footer {
+  padding-inline: var(--sd-space-3);
+  color: var(--sd-text-muted);
+  font-size: var(--sd-text-xs);
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------- Bocadillo -- */
+
+/*
+ * Bocadillo de chat. Variantes: --accent (los mensajes propios), --muted,
+ * --tinted, --outline, --ghost y --danger. --status es el bocadillo pequeño
+ * con cola que flota sobre un avatar («jugando a…»).
+ */
+.sd-bubble-group { display: flex; flex-direction: column; align-items: inherit; gap: 2px; }
+
+.sd-bubble {
+  position: relative;
+  inline-size: fit-content;
+  max-inline-size: min(80%, 36rem);
+  padding: var(--sd-space-2) var(--sd-space-3);
+  border: 1px solid transparent;
+  border-radius: var(--sd-radius-lg);
+  background: var(--sd-surface-hover);
+  color: var(--sd-text);
+  font-size: var(--sd-text-sm);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.sd-bubble--accent { background: var(--sd-gradient-accent); color: var(--sd-on-accent); }
+.sd-bubble--muted { background: var(--sd-surface-sunken); }
+.sd-bubble--tinted { background: var(--sd-accent-soft); }
+.sd-bubble--outline { border-color: var(--sd-line-strong); background: transparent; }
+.sd-bubble--ghost { max-inline-size: 100%; padding: 0; border-radius: 0; background: none; }
+.sd-bubble--danger { border-color: oklch(65% 0.2 25 / 0.3); background: var(--sd-danger-soft); color: var(--sd-danger); }
+
+/* Las esquinas del lado del autor se estrechan en una ráfaga de mensajes. */
+.sd-message:not([data-align="end"]) .sd-bubble-group > .sd-bubble:not(:first-child) { border-start-start-radius: var(--sd-radius-xs); }
+.sd-message:not([data-align="end"]) .sd-bubble-group > .sd-bubble:not(:last-child) { border-end-start-radius: var(--sd-radius-xs); }
+.sd-message[data-align="end"] .sd-bubble-group > .sd-bubble:not(:first-child) { border-start-end-radius: var(--sd-radius-xs); }
+.sd-message[data-align="end"] .sd-bubble-group > .sd-bubble:not(:last-child) { border-end-end-radius: var(--sd-radius-xs); }
+
+.sd-bubble__reactions {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-end: var(--sd-space-3);
+  display: flex;
+  gap: 2px;
+  padding: 1px var(--sd-space-2);
+  translate: 0 70%;
+  border-radius: var(--sd-radius-full);
+  background: var(--sd-surface-raised);
+  box-shadow: 0 0 0 2px var(--sd-bg), var(--sd-shadow-1);
+  color: var(--sd-text);
+  font-size: var(--sd-text-xs);
+}
+
+.sd-bubble:has(> .sd-bubble__reactions) { margin-block-end: var(--sd-space-3); }
+
+.sd-bubble--status {
+  max-inline-size: 14em;
+  padding: var(--sd-space-1) var(--sd-space-3);
+  border-radius: var(--sd-radius-md);
+  font-size: var(--sd-text-xs);
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.sd-bubble--status::after {
+  content: "";
+  position: absolute;
+  inset-block-end: -5px;
+  left: 50%;
+  inline-size: 10px;
+  block-size: 10px;
+  translate: -50% 0;
+  rotate: 45deg;
+  border-inline-end: inherit;
+  border-block-end: inherit;
+  background: var(--sd-glass-fill);
+}
+
+/* ------------------------------------------- Contenedor de mensajes -- */
+
+/*
+ * Hilo desplazable que se queda anclado al final mientras llegan mensajes.
+ * soda.js marca data-at-end y muestra el botón de volver al final cuando se
+ * lee el historial.
+ */
+.sd-message-scroller {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+  overflow: hidden;
+}
+
+.sd-message-scroller__viewport {
+  flex: 1;
+  min-block-size: 0;
+  padding: var(--sd-space-4);
+  overflow-y: auto;
+  overflow-anchor: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.sd-message-scroller__content { display: flex; flex-direction: column; gap: var(--sd-space-4); }
+
+.sd-message-scroller__button {
+  position: absolute;
+  inset-block-end: var(--sd-space-3);
+  left: 50%;
+  translate: -50% 0;
+  transition: opacity var(--sd-duration-base), translate var(--sd-duration-base) var(--sd-ease-spring);
+}
+
+.sd-message-scroller[data-at-end] > .sd-message-scroller__button {
+  opacity: 0;
+  translate: -50% 8px;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------- Cuestionario -- */
+
+.sd-questionnaire { display: flex; flex-direction: column; gap: var(--sd-space-5); min-inline-size: 0; }
+
+.sd-questionnaire__progress {
+  display: flex;
+  align-items: center;
+  gap: var(--sd-space-3);
+  color: var(--sd-text-muted);
+  font-size: var(--sd-text-xs);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.sd-questionnaire__progress > .sd-progress { flex: 1; }
+/* El legend no es un elemento de la rejilla: su separación es margen propio. */
+.sd-questionnaire__title { float: none; margin: 0 0 var(--sd-space-1); padding: 0; font: 400 var(--sd-text-lg) / 1.25 var(--sd-font-display); text-wrap: pretty; }
+.sd-questionnaire__description { margin: 0 0 var(--sd-space-2); color: var(--sd-text-muted); font-size: var(--sd-text-sm); }
+.sd-questionnaire__choices { display: grid; gap: var(--sd-space-3); min-inline-size: 0; margin: 0; padding: 0; border: 0; }
+.sd-questionnaire__error { margin: 0; color: var(--sd-danger); font-size: var(--sd-text-sm); font-weight: 600; }
+
+/* Anterior al principio; omitir y siguiente (o enviar) al final. */
+.sd-questionnaire__actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--sd-space-2);
+}
+
+.sd-questionnaire__actions > :first-child { justify-self: start; }

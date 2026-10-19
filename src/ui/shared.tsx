@@ -162,7 +162,7 @@ export function TouchControls({
   return (
     <div className="touch-controls">
       {controls.map(([type, label]) => (
-        <button
+        <button className="sd-button"
           key={type}
           onPointerDown={(e) => {
             e.preventDefault();

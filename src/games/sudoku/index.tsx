@@ -92,19 +92,19 @@ function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
         ))}
       </div>
       <div className="controls">
-        <button
+        <button className="sd-button"
           aria-pressed={s.noteMode}
           onClick={() => dispatch({ type: "NOTES" })}
         >
           {tr(locale, "Notas", "Notes")} {s.noteMode ? "✓" : ""}
         </button>
-        <button
+        <button className="sd-button"
           disabled={!s.undo.length}
           onClick={() => dispatch({ type: "UNDO" })}
         >
           {tr(locale, "Deshacer", "Undo")}
         </button>
-        <button onClick={() => dispatch({ type: "HINT" })}>
+        <button className="sd-button" onClick={() => dispatch({ type: "HINT" })}>
           {tr(locale, "Ayuda", "Hint")}
         </button>
       </div>

@@ -1,0 +1,37 @@
+/*
+ * Soda UI — sistema de diseño de cristal y caramelo.
+ *
+ * Inspirado en el lenguaje visual de los frontends de consola (iiSU): paneles de
+ * cristal con brillo interior, teselas pastel por categoría, foco con halo y pistas
+ * de botones de mando. Sirve para webs, apps, juegos, interfaces de sistema y
+ * experiencias multimedia.
+ *
+ * Este archivo es el punto de entrada: importa cada parte en su capa de cascada,
+ * de modo que el CSS del producto puede sobrescribir cualquier estilo de Soda sin
+ * pelear por especificidad. Un empaquetador (Vite, Tailwind, PostCSS) puede
+ * incrustar los @import en un solo archivo.
+ *
+ * Tres ejes configurables con atributos, anidables en cualquier elemento:
+ *   data-theme="light | dark"            (por defecto sigue al sistema)
+ *   data-accent="grape | indigo | sky | mint | lemon | peach | coral | berry"
+ *   data-surface="web | app | game | system | tv"   (escala y densidad)
+ */
+
+@layer soda.tokens, soda.base, soda.components, soda.utilities;
+
+@import "./css/tokens.css" layer(soda.tokens);
+@import "./css/base.css" layer(soda.base);
+
+@import "./css/components/surfaces.css" layer(soda.components);
+@import "./css/components/actions.css" layer(soda.components);
+@import "./css/components/forms.css" layer(soda.components);
+@import "./css/components/navigation.css" layer(soda.components);
+@import "./css/components/overlays.css" layer(soda.components);
+@import "./css/components/feedback.css" layer(soda.components);
+@import "./css/components/data.css" layer(soda.components);
+@import "./css/components/conversation.css" layer(soda.components);
+@import "./css/components/console.css" layer(soda.components);
+@import "./css/components/focus.css" layer(soda.components);
+
+@import "./css/utilities.css" layer(soda.utilities);
+@import "./css/adaptations.css";

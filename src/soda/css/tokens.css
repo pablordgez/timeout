@@ -1,0 +1,215 @@
+/*
+ * Tokens de Soda UI (capa soda.tokens).
+ *
+ * Los colores usan light-dark(): se resuelven donde se usan, según el
+ * color-scheme de ese elemento. Por eso basta con cambiar color-scheme en
+ * cualquier subárbol para tener una sección clara dentro de una página oscura.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* Marca: degradado uva → índigo → cielo. */
+  --sd-brand-1: oklch(55% 0.257 299);
+  --sd-brand-2: oklch(55.5% 0.238 273);
+  --sd-brand-3: oklch(75.8% 0.136 235);
+  --sd-gradient-brand: linear-gradient(135deg, var(--sd-brand-1), var(--sd-brand-2), var(--sd-brand-3));
+
+  /*
+   * Tonos caramelo. Son solo matices (hue de OKLCH): los componentes que
+   * aceptan --hue derivan de él su tinte, su tinta y su brillo, de modo que una
+   * categoría, plataforma o app se identifica con un único número.
+   */
+  --sd-hue-berry: 350;
+  --sd-hue-coral: 25;
+  --sd-hue-peach: 60;
+  --sd-hue-lemon: 95;
+  --sd-hue-mint: 165;
+  --sd-hue-sky: 235;
+  --sd-hue-indigo: 273;
+  --sd-hue-grape: 300;
+
+  /* Estados. Los matices permiten tintar avisos y alertas con el mismo --hue. */
+  --sd-hue-success: 150;
+  --sd-hue-warning: 75;
+  --sd-hue-danger: 25;
+  --sd-hue-info: 235;
+  --sd-success: light-dark(oklch(56% 0.15 150), oklch(78% 0.17 150));
+  --sd-warning: light-dark(oklch(62% 0.15 65), oklch(84% 0.15 85));
+  --sd-danger: light-dark(oklch(55% 0.21 25), oklch(70% 0.19 25));
+  --sd-danger-soft: oklch(65% 0.2 25 / 0.14);
+  --sd-notify: oklch(62% 0.23 25);
+
+  /* Neutros con un ligero matiz violeta, nunca grises puros. */
+  --sd-bg: light-dark(oklch(94.5% 0.006 270), oklch(17.2% 0.014 285));
+  --sd-bg-dot: light-dark(rgb(255 255 255 / 0.95), rgb(255 255 255 / 0.05));
+  --sd-text: light-dark(oklch(25% 0.012 275), oklch(96.5% 0.006 300));
+  --sd-text-muted: light-dark(oklch(42% 0.012 280), oklch(82% 0.012 300));
+  --sd-text-subtle: light-dark(oklch(54% 0.014 270), oklch(67% 0.012 290));
+  --sd-line: light-dark(rgb(20 24 40 / 0.1), rgb(255 255 255 / 0.09));
+  --sd-line-strong: light-dark(rgb(20 24 40 / 0.2), rgb(255 255 255 / 0.18));
+
+  --sd-surface: light-dark(oklch(99% 0.002 270), oklch(21% 0.012 282));
+  --sd-surface-raised: light-dark(oklch(100% 0 0), oklch(25% 0.014 282));
+  --sd-surface-sunken: light-dark(rgb(20 24 40 / 0.045), rgb(255 255 255 / 0.04));
+  --sd-surface-hover: light-dark(rgb(20 24 40 / 0.07), rgb(255 255 255 / 0.07));
+  --sd-scrim: light-dark(rgb(20 24 40 / 0.32), rgb(6 6 10 / 0.6));
+
+  /*
+   * Cristal. El brillo combina dos reflejos de color muy tenues (violeta arriba,
+   * menta abajo) con un resplandor interior blanco: es la seña de identidad del
+   * sistema y lo que distingue un panel Soda de un simple rectángulo translúcido.
+   */
+  --sd-glass-fill: light-dark(rgb(248 249 252 / 0.62), rgb(21 22 27 / 0.7));
+  --sd-glass-sheen:
+    radial-gradient(105% 110% at 30% 34%, rgb(130 100 245 / 0.05), transparent 100%),
+    radial-gradient(125% 125% at 118% 118%, rgb(80 220 180 / 0.045), transparent 100%);
+  --sd-glass-border: light-dark(rgb(255 255 255 / 0.8), rgb(120 124 138 / 0.33));
+  --sd-glass-inset:
+    inset 0 1px 0 light-dark(rgb(255 255 255), rgb(255 255 255 / 0.08)),
+    inset 0 0 16px 4px light-dark(rgb(255 255 255 / 0.85), rgb(255 255 255 / 0.045)),
+    inset 0 0 4px 1px light-dark(rgb(255 255 255 / 0.6), rgb(255 255 255 / 0.09));
+  --sd-glass-shadow: var(--sd-glass-inset), 0 3px 10px light-dark(rgb(20 24 40 / 0.09), rgb(0 0 0 / 0.22));
+  --sd-glass-blur: 16px;
+
+  /* Superficies flotantes (menús, popovers): cristal más opaco para leer sobre cualquier contenido. */
+  --sd-overlay-fill: light-dark(rgb(250 250 253 / 0.86), rgb(27 28 35 / 0.88));
+
+  --sd-ambient:
+    radial-gradient(circle at 1px 1px, var(--sd-bg-dot) 1px, transparent 1.5px) 0 0 / 22px 22px,
+    radial-gradient(50% 45% at 15% 20%, oklch(55% 0.25 299 / 0.22), transparent 70%),
+    radial-gradient(45% 40% at 85% 65%, oklch(70% 0.15 235 / 0.2), transparent 70%);
+
+  /* Controles: cristal más denso para que se lean como pulsables. */
+  --sd-control-fill: light-dark(rgb(255 255 255 / 0.6), rgb(38 39 47 / 0.72));
+  --sd-control-fill-hover: light-dark(rgb(255 255 255 / 0.92), rgb(50 51 61 / 0.85));
+  --sd-control-shadow:
+    inset 0 1px 0 light-dark(rgb(255 255 255), rgb(255 255 255 / 0.1)),
+    inset 0 0 8px 1px light-dark(rgb(255 255 255 / 0.8), rgb(255 255 255 / 0.05)),
+    0 2px 5px light-dark(rgb(20 24 40 / 0.12), rgb(0 0 0 / 0.3));
+
+  /* Campos de formulario: hundidos, para distinguirlos de los botones. */
+  --sd-input-fill: light-dark(rgb(255 255 255 / 0.72), rgb(255 255 255 / 0.045));
+  --sd-input-shadow: inset 0 1px 2px light-dark(rgb(20 24 40 / 0.08), rgb(0 0 0 / 0.35));
+
+  /* Elevación para elementos sólidos. */
+  --sd-shadow-1:
+    0 1px 2px light-dark(rgb(20 24 40 / 0.06), rgb(0 0 0 / 0.3)),
+    0 2px 6px light-dark(rgb(20 24 40 / 0.06), rgb(0 0 0 / 0.2));
+  --sd-shadow-2:
+    0 4px 12px light-dark(rgb(20 24 40 / 0.08), rgb(0 0 0 / 0.3)),
+    0 12px 32px light-dark(rgb(20 24 40 / 0.08), rgb(0 0 0 / 0.3));
+  --sd-shadow-3: 0 24px 64px light-dark(rgb(20 24 40 / 0.18), rgb(0 0 0 / 0.5));
+
+  /* Gráficos: cinco tonos caramelo con suficiente separación entre sí. */
+  --sd-chart-1: light-dark(oklch(58% 0.22 300), oklch(70% 0.19 300));
+  --sd-chart-2: light-dark(oklch(60% 0.15 235), oklch(74% 0.13 235));
+  --sd-chart-3: light-dark(oklch(62% 0.14 165), oklch(78% 0.14 165));
+  --sd-chart-4: light-dark(oklch(68% 0.15 60), oklch(80% 0.14 70));
+  --sd-chart-5: light-dark(oklch(60% 0.2 350), oklch(72% 0.17 350));
+
+  /* Tipografía: Cal Sans para titulares y botones, DM Sans para lectura. */
+  --sd-font-display: "Cal Sans", "DM Sans", system-ui, sans-serif;
+  --sd-font-body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --sd-font-mono: "DM Mono", ui-monospace, "Cascadia Code", monospace;
+
+  /* Movimiento. El muelle se reserva para el foco y las apariciones. */
+  --sd-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --sd-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --sd-duration-fast: 120ms;
+  --sd-duration-base: 200ms;
+  --sd-duration-slow: 360ms;
+
+  /* Apilamiento: los elementos de la capa superior (popover, dialog) no lo necesitan. */
+  --sd-z-sticky: 10;
+  --sd-z-dropdown: 50;
+  --sd-z-toast: 200;
+
+  --sd-accent-h: var(--sd-hue-grape);
+  --sd-scale: 1;
+  --sd-focus-scale: 1.04;
+}
+
+[data-theme="light"] { color-scheme: light; }
+[data-theme="dark"] { color-scheme: dark; }
+
+[data-accent="grape"] { --sd-accent-h: var(--sd-hue-grape); }
+[data-accent="indigo"] { --sd-accent-h: var(--sd-hue-indigo); }
+[data-accent="sky"] { --sd-accent-h: var(--sd-hue-sky); }
+[data-accent="mint"] { --sd-accent-h: var(--sd-hue-mint); }
+[data-accent="lemon"] { --sd-accent-h: var(--sd-hue-lemon); }
+[data-accent="peach"] { --sd-accent-h: var(--sd-hue-peach); }
+[data-accent="coral"] { --sd-accent-h: var(--sd-hue-coral); }
+[data-accent="berry"] { --sd-accent-h: var(--sd-hue-berry); }
+
+/*
+ * Los tokens derivados de --sd-accent-h se declaran de nuevo en cada elemento
+ * con data-accent: una propiedad personalizada se calcula donde se declara, así
+ * que sin esta redeclaración un acento local no llegaría a sus descendientes.
+ */
+:root,
+[data-accent] {
+  --sd-accent: light-dark(oklch(54% 0.22 var(--sd-accent-h)), oklch(66% 0.2 var(--sd-accent-h)));
+  --sd-accent-strong: light-dark(oklch(45% 0.2 var(--sd-accent-h)), oklch(80% 0.14 var(--sd-accent-h)));
+  --sd-accent-soft: oklch(65% 0.2 var(--sd-accent-h) / 0.14);
+  --sd-accent-glow: oklch(68% 0.22 var(--sd-accent-h) / 0.5);
+  --sd-on-accent: oklch(100% 0 0);
+  --sd-gradient-accent: linear-gradient(
+    135deg,
+    oklch(56% 0.24 calc(var(--sd-accent-h) + 5)),
+    oklch(57% 0.22 calc(var(--sd-accent-h) - 25)),
+    oklch(72% 0.15 calc(var(--sd-accent-h) - 60))
+  );
+  --sd-focus-color: light-dark(var(--sd-accent), oklch(100% 0 0));
+}
+
+/*
+ * Superficies: cada contexto ajusta la escala y la ampliación del foco.
+ * web    — lectura y ratón, foco discreto.
+ * app    — táctil, objetivos de 44 px.
+ * game   — HUD y menús sobre la escena, algo más grande.
+ * system — lanzadores y pantallas de consola portátil, compacto.
+ * tv     — interfaz a 3 m, todo más grande y foco muy visible.
+ */
+[data-surface="web"] { --sd-scale: 1; --sd-focus-scale: 1.02; }
+[data-surface="app"] { --sd-scale: 1; --sd-focus-scale: 1.03; }
+[data-surface="game"] { --sd-scale: 1.1; --sd-focus-scale: 1.06; }
+[data-surface="system"] { --sd-scale: 0.875; --sd-focus-scale: 1.06; }
+[data-surface="tv"] { --sd-scale: 1.5; --sd-focus-scale: 1.08; }
+
+/* Igual que el acento: las medidas escaladas se recalculan en cada superficie. */
+:root,
+[data-surface] {
+  --sd-space-1: calc(4px * var(--sd-scale));
+  --sd-space-2: calc(8px * var(--sd-scale));
+  --sd-space-3: calc(12px * var(--sd-scale));
+  --sd-space-4: calc(16px * var(--sd-scale));
+  --sd-space-5: calc(20px * var(--sd-scale));
+  --sd-space-6: calc(24px * var(--sd-scale));
+  --sd-space-8: calc(32px * var(--sd-scale));
+  --sd-space-10: calc(40px * var(--sd-scale));
+  --sd-space-12: calc(48px * var(--sd-scale));
+  --sd-space-16: calc(64px * var(--sd-scale));
+
+  --sd-radius-xs: calc(6px * var(--sd-scale));
+  --sd-radius-sm: calc(10px * var(--sd-scale));
+  --sd-radius-md: calc(14px * var(--sd-scale));
+  --sd-radius-lg: calc(20px * var(--sd-scale));
+  --sd-radius-xl: calc(28px * var(--sd-scale));
+  --sd-radius-full: 999px;
+
+  --sd-text-xs: calc(0.75rem * var(--sd-scale));
+  --sd-text-sm: calc(0.875rem * var(--sd-scale));
+  --sd-text-md: calc(1rem * var(--sd-scale));
+  --sd-text-lg: calc(1.25rem * var(--sd-scale));
+  --sd-text-xl: calc(1.5rem * var(--sd-scale));
+  --sd-text-2xl: calc(2rem * var(--sd-scale));
+  --sd-text-3xl: calc(3rem * var(--sd-scale));
+  --sd-text-display: calc(clamp(3rem, 9vw, 5.5rem) * var(--sd-scale));
+
+  --sd-target: calc(44px * var(--sd-scale));
+  --sd-control: calc(40px * var(--sd-scale));
+  --sd-icon: calc(22px * var(--sd-scale));
+  --sd-tile: calc(96px * var(--sd-scale));
+  --sd-ring: calc(3px * var(--sd-scale));
+}

@@ -103,7 +103,7 @@ class GameBoundary extends Component<
             "Your save is preserved. Export your data in Settings and start a new game.",
           )}
         </p>
-        <button onClick={this.props.onExit}>
+        <button className="sd-button" onClick={this.props.onExit}>
           {tr(this.props.locale, "Volver al catálogo", "Back to games")}
         </button>
       </div>
@@ -124,6 +124,7 @@ export function App() {
     [setup, setSetup] = useState<GameDefinition | null>(null),
     [active, setActive] = useState<string | null>(null),
     [licenses, setLicenses] = useState(false),
+    [deleting, setDeleting] = useState<string | null>(null),
     [offlineReady, setOfflineReady] = useState(false),
     [update, setUpdate] = useState<(() => void) | null>(null);
   const latest = useRef(data);
@@ -377,7 +378,7 @@ export function App() {
     );
   return (
     <>
-      <aside className="sidebar">
+      <aside className="sidebar sd-sidebar">
         <a
           className="brand"
           href="#"
@@ -392,44 +393,59 @@ export function App() {
             timeout<span className="brand-dot">.</span>
           </span>
         </a>
-        <nav>
-          {[
-            ["games", "▦", tr(locale, "Colección", "Collection")],
-            ["saved", "◷", tr(locale, "Continuar", "Continue")],
-            ["stats", "↗", tr(locale, "Estadísticas", "Statistics")],
-            ["settings", "⊙", tr(locale, "Ajustes", "Settings")],
-          ].map(([id, icon, label]) => (
-            <button
-              key={id}
-              className={tab === id && !active ? "active" : ""}
-              onClick={() => {
-                setActive(null);
-                setTab(id);
-              }}
-            >
-              <span>{icon}</span>
-              {label}
-              {id === "saved" && data.sessions.length ? (
-                <small>{data.sessions.length}</small>
-              ) : null}
-            </button>
-          ))}
+        <nav className="sd-sidebar__content" aria-label="Timeout">
+          <ul className="sd-sidebar__menu">
+            {[
+              ["games", "▦", tr(locale, "Colección", "Collection")],
+              ["saved", "◷", tr(locale, "Continuar", "Continue")],
+              ["stats", "↗", tr(locale, "Estadísticas", "Statistics")],
+              ["settings", "⊙", tr(locale, "Ajustes", "Settings")],
+            ].map(([id, icon, label]) => (
+              <li key={id}>
+                <button
+                  className="sd-sidebar__button"
+                  aria-current={tab === id && !active ? "page" : undefined}
+                  onClick={() => {
+                    setActive(null);
+                    setTab(id);
+                  }}
+                >
+                  <span aria-hidden="true">{icon}</span>
+                  <span className="sd-sidebar__text">{label}</span>
+                  {id === "saved" && data.sessions.length ? (
+                    <span className="sd-sidebar__badge">
+                      {data.sessions.length}
+                    </span>
+                  ) : null}
+                </button>
+              </li>
+            ))}
+          </ul>
         </nav>
-        <div className="sidebar-bottom">
-          <span
-            className={
-              "connection-dot " +
-              (offlineReady || import.meta.env.MODE === "portable"
-                ? "ready"
-                : "")
-            }
-          />
-          {import.meta.env.MODE === "portable"
-            ? tr(locale, "Edición portable", "Portable edition")
-            : offlineReady
-              ? tr(locale, "Disponible sin conexión", "Available offline")
-              : tr(locale, "Preparando modo offline", "Preparing offline mode")}
-          <button className="text-button" onClick={() => setLicenses(true)}>
+        <div className="sidebar-bottom sd-sidebar__footer">
+          <span className="connection-status">
+            <span
+              className={
+                "connection-dot " +
+                (offlineReady || import.meta.env.MODE === "portable"
+                  ? "ready"
+                  : "")
+              }
+            />
+            {import.meta.env.MODE === "portable"
+              ? tr(locale, "Edición portable", "Portable edition")
+              : offlineReady
+                ? tr(locale, "Disponible sin conexión", "Available offline")
+                : tr(
+                    locale,
+                    "Preparando modo offline",
+                    "Preparing offline mode",
+                  )}
+          </span>
+          <button
+            className="sd-button sd-button--ghost sd-button--sm"
+            onClick={() => setLicenses(true)}
+          >
             {tr(locale, "Créditos y licencias", "Credits & licenses")}
           </button>
         </div>
@@ -439,7 +455,7 @@ export function App() {
           <span className="eyebrow">{tr(locale, "Juegos", "Games")}</span>
           <div>
             <button
-              className="sound-toggle text-button"
+              className="sd-button sd-button--ghost sd-button--icon sd-button--sm"
               aria-label={tr(
                 locale,
                 data.preferences.sound
@@ -455,7 +471,7 @@ export function App() {
               {data.preferences.sound ? "♪" : "♩"}
             </button>
             <button
-              className="text-button"
+              className="sd-button sd-button--ghost sd-button--sm"
               aria-label="Change language / Cambiar idioma"
               onClick={() =>
                 changePreferences({ locale: locale === "es" ? "en" : "es" })
@@ -464,7 +480,7 @@ export function App() {
               {locale === "es" ? "ES / en" : "es / EN"}
             </button>
             <button
-              className="theme-toggle"
+              className="sd-button sd-button--ghost sd-button--icon sd-button--sm"
               aria-label={tr(
                 locale,
                 "Cambiar modo de color",
@@ -484,7 +500,7 @@ export function App() {
           </div>
         </header>
         {warning ? (
-          <div className="notice" role="status">
+          <div className="notice sd-alert sd-alert--info" role="status">
             {warning === "corrupt" ? (
               <>
                 {tr(
@@ -492,7 +508,10 @@ export function App() {
                   "El guardado existente no se puede leer. Se conserva una copia del original para recuperarlo.",
                   "The existing save could not be read. An original copy has been preserved for recovery.",
                 )}{" "}
-                <button onClick={exportOriginalData}>
+                <button
+                  className="sd-button sd-alert__action"
+                  onClick={exportOriginalData}
+                >
                   {tr(locale, "Exportar original", "Export original")}
                 </button>
               </>
@@ -520,13 +539,17 @@ export function App() {
           </div>
         ) : null}
         {update ? (
-          <div className="notice">
+          <div className="notice sd-alert sd-alert--info">
             {tr(
               locale,
               "Hay una actualización disponible. Guarda y vuelve al catálogo para aplicarla.",
               "An update is available. Save and return to the catalog to apply it.",
             )}
-            <button disabled={!!active} onClick={update}>
+            <button
+              className="sd-button sd-alert__action"
+              disabled={!!active}
+              onClick={update}
+            >
               {tr(locale, "Actualizar", "Update")}
             </button>
           </div>
@@ -556,6 +579,7 @@ export function App() {
                 </span>
               </div>
               <input
+                className="sd-input"
                 aria-label={tr(locale, "Buscar juegos", "Search games")}
                 placeholder={tr(locale, "Buscar un juego…", "Find a game…")}
                 value={search}
@@ -565,6 +589,7 @@ export function App() {
             <div className="filters">
               {Object.entries(categories).map(([id, name]) => (
                 <button
+                  className="sd-chip"
                   key={id}
                   aria-pressed={category === id}
                   onClick={() => setCategory(id)}
@@ -573,6 +598,7 @@ export function App() {
                 </button>
               ))}
               <button
+                className="sd-chip"
                 aria-pressed={favoriteOnly}
                 onClick={() => setFavoriteOnly(!favoriteOnly)}
               >
@@ -586,7 +612,7 @@ export function App() {
                 ).length;
                 return (
                   <article
-                    className="game-card"
+                    className="game-card sd-glass sd-card sd-card--interactive"
                     key={g.id}
                     style={{ animationDelay: Math.min(i, 10) * 25 + "ms" }}
                   >
@@ -595,7 +621,7 @@ export function App() {
                         <GameIcon id={g.id} fallback={g.icon} />
                       </span>
                       <button
-                        className="favorite-button"
+                        className="sd-button sd-button--ghost sd-button--icon sd-button--sm"
                         aria-label={
                           tr(locale, "Favorito", "Favorite") +
                           " " +
@@ -618,12 +644,15 @@ export function App() {
                     <h3>{g.name[locale]}</h3>
                     <p>{g.description[locale]}</p>
                     <footer>
-                      <button className="play-link" onClick={() => setSetup(g)}>
+                      <button
+                        className="sd-button sd-button--ghost sd-button--sm"
+                        onClick={() => setSetup(g)}
+                      >
                         {tr(locale, "Jugar", "Play")} <span>→</span>
                       </button>
                       {saved ? (
                         <button
-                          className="text-button"
+                          className="sd-button sd-button--ghost sd-button--sm"
                           onClick={() => {
                             setActive(
                               data.sessions.find((s) => s.gameId === g.id)!.id,
@@ -668,28 +697,12 @@ export function App() {
                       {configDescription(gameById(s.gameId), s.config, locale)}
                     </p>
                   </div>
-                  <button onClick={() => setActive(s.id)}>
+                  <button className="sd-button" onClick={() => setActive(s.id)}>
                     {tr(locale, "Continuar", "Continue")}
                   </button>
                   <button
-                    className="text-button"
-                    onClick={() => {
-                      if (
-                        confirm(
-                          tr(
-                            locale,
-                            "¿Eliminar esta partida pendiente?",
-                            "Delete this unfinished game?",
-                          ),
-                        )
-                      )
-                        persist({
-                          ...latest.current,
-                          sessions: latest.current.sessions.filter(
-                            (v) => v.id !== s.id,
-                          ),
-                        });
-                    }}
+                    className="sd-button sd-button--destructive"
+                    onClick={() => setDeleting(s.id)}
                   >
                     {tr(locale, "Eliminar", "Delete")}
                   </button>
@@ -729,16 +742,67 @@ export function App() {
           onStart={start}
         />
       ) : null}
+      {deleting ? (
+        <div className="modal-backdrop">
+          <section
+            className="modal sd-dialog sd-dialog--alert"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="delete-title"
+            aria-describedby="delete-description"
+          >
+            <div className="sd-dialog__header">
+              <h2 className="sd-dialog__title" id="delete-title">
+                {tr(
+                  locale,
+                  "¿Eliminar esta partida?",
+                  "Delete this unfinished game?",
+                )}
+              </h2>
+              <p className="sd-dialog__description" id="delete-description">
+                {tr(
+                  locale,
+                  "La partida pendiente se borrará de este dispositivo y no se puede recuperar.",
+                  "The unfinished game will be removed from this device and cannot be recovered.",
+                )}
+              </p>
+            </div>
+            <div className="sd-dialog__footer">
+              <button
+                className="sd-button"
+                autoFocus
+                onClick={() => setDeleting(null)}
+              >
+                {tr(locale, "Cancelar", "Cancel")}
+              </button>
+              <button
+                className="sd-button sd-button--destructive"
+                onClick={() => {
+                  persist({
+                    ...latest.current,
+                    sessions: latest.current.sessions.filter(
+                      (v) => v.id !== deleting,
+                    ),
+                  });
+                  setDeleting(null);
+                }}
+              >
+                {tr(locale, "Eliminar", "Delete")}
+              </button>
+            </div>
+          </section>
+        </div>
+      ) : null}
       {licenses ? (
         <div className="modal-backdrop">
           <section
-            className="modal licenses"
+            className="modal licenses sd-dialog sd-dialog--lg"
             role="dialog"
             aria-modal="true"
             aria-labelledby="licenses-title"
           >
             <button
-              className="modal-close"
+              className="sd-dialog__close sd-button sd-button--ghost sd-button--icon sd-button--sm"
               onClick={() => setLicenses(false)}
               aria-label={tr(locale, "Cerrar", "Close")}
             >
@@ -764,8 +828,8 @@ export function App() {
             <p>
               {tr(
                 locale,
-                "Preguntas: Open Trivia DB y Timeout, CC BY-SA 4.0; selección adaptada de Spanish general knowledge database (2020), de Buades-Sitjar, Boada, Guasch, Ferré, Hinojosa, Brysbaert y Duñabeitia, CC BY 4.0. Tipografías: IBM Plex, SIL OFL.",
-                "Questions: Open Trivia DB and Timeout, CC BY-SA 4.0; adapted selection from Spanish general knowledge database (2020), by Buades-Sitjar, Boada, Guasch, Ferré, Hinojosa, Brysbaert and Duñabeitia, CC BY 4.0. Typefaces: IBM Plex, SIL OFL.",
+                "Preguntas: Open Trivia DB y Timeout, CC BY-SA 4.0; selección adaptada de Spanish general knowledge database (2020), de Buades-Sitjar, Boada, Guasch, Ferré, Hinojosa, Brysbaert y Duñabeitia, CC BY 4.0. Tipografías: Cal Sans, DM Sans y DM Mono, SIL OFL; diseño visual basado en Soda UI.",
+                "Questions: Open Trivia DB and Timeout, CC BY-SA 4.0; adapted selection from Spanish general knowledge database (2020), by Buades-Sitjar, Boada, Guasch, Ferré, Hinojosa, Brysbaert and Duñabeitia, CC BY 4.0. Typefaces: Cal Sans, DM Sans and DM Mono, SIL OFL; visual design based on Soda UI.",
               )}
             </p>
             <div className="controls">
@@ -922,13 +986,13 @@ function Setup({
   return (
     <div className="modal-backdrop">
       <section
-        className="modal"
+        className="modal sd-dialog"
         role="dialog"
         aria-modal="true"
         aria-labelledby="setup-title"
       >
         <button
-          className="modal-close"
+          className="sd-dialog__close sd-button sd-button--ghost sd-button--icon sd-button--sm"
           onClick={onClose}
           aria-label={tr(locale, "Cerrar", "Close")}
         >
@@ -943,6 +1007,7 @@ function Setup({
             <label className="setting" key={o.key}>
               <span>{o.label[locale]}</span>
               <select
+                className="sd-select"
                 value={String(config[o.key] ?? o.default)}
                 onChange={(e) => {
                   const value = o.values.find(
@@ -978,7 +1043,7 @@ function Setup({
         config.players &&
         Number(config.humans) >
           (game.playerCount?.(config) ?? Number(config.players || 2)) ? (
-          <p className="notice">
+          <p className="notice sd-alert sd-alert--info">
             {tr(
               locale,
               "Las personas no pueden superar los participantes.",
@@ -987,7 +1052,7 @@ function Setup({
           </p>
         ) : null}
         {game.languages && !game.languages.includes(locale) ? (
-          <p className="notice">
+          <p className="notice sd-alert sd-alert--info">
             {tr(
               locale,
               "Este juego está disponible en otro idioma. Puedes jugar igualmente.",
@@ -1004,7 +1069,7 @@ function Setup({
         </p>
         <div className="controls">
           <button
-            className="primary"
+            className="sd-button sd-button--primary"
             disabled={busy || Number(config.humans) > Number(config.players)}
             onClick={async () => {
               setBusy(true);
@@ -1023,12 +1088,15 @@ function Setup({
               : tr(locale, "Empezar partida", "Start game")}{" "}
             →
           </button>
-          <button onClick={() => setShowGuide(!showGuide)}>
+          <button
+            className="sd-button"
+            onClick={() => setShowGuide(!showGuide)}
+          >
             {tr(locale, "Cómo se juega", "How to play")}
           </button>
         </div>
         {error ? (
-          <p role="alert" className="notice">
+          <p role="alert" className="notice sd-alert sd-alert--info">
             {error}
           </p>
         ) : null}
@@ -1319,7 +1387,7 @@ function Play({
     <section className="play-page">
       <div className="play-heading">
         <button
-          className="text-button"
+          className="sd-button sd-button--ghost sd-button--sm"
           onClick={() => {
             endPractice();
             save();
@@ -1338,6 +1406,7 @@ function Play({
         <h1>{game.name[locale]}</h1>
         <div className="controls">
           <button
+            className="sd-button"
             onClick={() => {
               setPaused(true);
               setGuide(!guide);
@@ -1346,6 +1415,7 @@ function Play({
             {tr(locale, "Guía", "Guide")} ?
           </button>
           <button
+            className="sd-button"
             onClick={() => {
               setPaused((v) => !v);
               if (!paused) save();
@@ -1358,6 +1428,7 @@ function Play({
             Ⅱ
           </button>
           <button
+            className="sd-button"
             onClick={() => {
               setPaused(true);
               save();
@@ -1387,6 +1458,7 @@ function Play({
           <label className="bot-speed">
             {tr(locale, "Ritmo del bot", "Bot pace")}
             <select
+              className="sd-select"
               value={String(config.botSpeed || "normal")}
               onChange={(e) => {
                 const next = { ...config, botSpeed: e.target.value };
@@ -1406,6 +1478,7 @@ function Play({
         )}
         {turn?.bot && config.botSpeed === "step" && (
           <button
+            className="sd-button"
             disabled={paused || thinking}
             onClick={() => setBotStep(true)}
           >
@@ -1463,24 +1536,27 @@ function Play({
             dispatch={practice ? dispatch : undefined}
           />
           <div className="controls">
-            <button onClick={practice ? endPractice : startPractice}>
+            <button
+              className="sd-button"
+              onClick={practice ? endPractice : startPractice}
+            >
               {practice
                 ? tr(locale, "Terminar práctica", "End practice")
                 : tr(locale, "Abrir práctica guiada", "Start guided practice")}
             </button>
-            <button onClick={() => setGuide(false)}>
+            <button className="sd-button" onClick={() => setGuide(false)}>
               {tr(locale, "Cerrar guía", "Close guide")}
             </button>
           </div>
         </div>
       ) : null}
       {error ? (
-        <p role="alert" className="notice">
+        <p role="alert" className="notice sd-alert sd-alert--info">
           {error}
         </p>
       ) : null}
       {session.config.language && session.config.language !== locale ? (
-        <p className="notice">
+        <p className="notice sd-alert sd-alert--info">
           {tr(
             locale,
             "Contenido de esta partida en inglés; la interfaz sigue en español.",
@@ -1502,6 +1578,7 @@ function Play({
               )}
             </p>
             <button
+              className="sd-button"
               onClick={() => {
                 setRevealed(turnKey);
                 setPaused(false);
@@ -1560,7 +1637,10 @@ function Play({
               <div className="pause-overlay">
                 <span>Ⅱ</span>
                 <h2>{tr(locale, "En pausa", "Paused")}</h2>
-                <button className="primary" onClick={() => setPaused(false)}>
+                <button
+                  className="sd-button sd-button--primary"
+                  onClick={() => setPaused(false)}
+                >
                   {tr(locale, "Continuar", "Continue")} →
                 </button>
               </div>
@@ -1589,7 +1669,7 @@ function Play({
               "Result recorded in your history.",
             )}
           </p>
-          <button onClick={onNew}>
+          <button className="sd-button" onClick={onNew}>
             {tr(locale, "Otra partida", "Play again")}
           </button>
         </div>
@@ -1612,7 +1692,12 @@ function Guide({
     <section className="guide">
       <div className="guide-tabs">
         {game.guide.map((g, i) => (
-          <button key={i} aria-pressed={i === step} onClick={() => setStep(i)}>
+          <button
+            className="sd-button"
+            key={i}
+            aria-pressed={i === step}
+            onClick={() => setStep(i)}
+          >
             {i + 1}. {g.title[locale]}
           </button>
         ))}
@@ -1623,7 +1708,7 @@ function Guide({
         <pre className="guide-diagram">{current.diagram}</pre>
       ) : null}
       {current.action && dispatch ? (
-        <button onClick={() => dispatch(current.action!)}>
+        <button className="sd-button" onClick={() => dispatch(current.action!)}>
           {tr(locale, "Probar este paso", "Try this step")} →
         </button>
       ) : null}
@@ -1639,17 +1724,17 @@ function Stats({ data, locale }: { data: SaveData; locale: Locale }) {
     <>
       <PageTitle title={tr(locale, "Estadísticas", "Statistics")} />
       <div className="stat-grid">
-        <div>
+        <div className="sd-glass sd-card">
           <span>{tr(locale, "Partidas terminadas", "Finished games")}</span>
           <strong>{history.length}</strong>
         </div>
-        <div>
+        <div className="sd-glass sd-card">
           <span>{tr(locale, "Tiempo jugado", "Time played")}</span>
           <strong>
             {timeText(history.reduce((sum, s) => sum + s.elapsed, 0))}
           </strong>
         </div>
-        <div>
+        <div className="sd-glass sd-card">
           <span>{tr(locale, "Completadas / ganadas", "Completed / won")}</span>
           <strong>
             {history.filter((s) => s.state.status === "won").length}
@@ -1658,7 +1743,11 @@ function Stats({ data, locale }: { data: SaveData; locale: Locale }) {
       </div>
       <label className="setting">
         <span>{tr(locale, "Juego", "Game")}</span>
-        <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+        <select
+          className="sd-select"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+        >
           <option value="all">{tr(locale, "Todos", "All")}</option>
           {games.map((g) => (
             <option key={g.id} value={g.id}>
@@ -1764,11 +1853,12 @@ function Settings({
   return (
     <>
       <PageTitle title={tr(locale, "Ajustes", "Settings")} />
-      <section className="settings-card">
+      <section className="settings-card sd-glass sd-card">
         <h2>{tr(locale, "Aspecto", "Appearance")}</h2>
         <label className="setting">
           <span>{tr(locale, "Tema", "Theme")}</span>
           <select
+            className="sd-select"
             value={data.preferences.theme}
             onChange={(e) => onPreferences({ theme: e.target.value })}
           >
@@ -1782,6 +1872,7 @@ function Settings({
         <label className="setting">
           <span>{tr(locale, "Modo", "Mode")}</span>
           <select
+            className="sd-select"
             value={data.preferences.mode}
             onChange={(e) => onPreferences({ mode: e.target.value as any })}
           >
@@ -1793,6 +1884,7 @@ function Settings({
         <label className="setting">
           <span>{tr(locale, "Idioma", "Language")}</span>
           <select
+            className="sd-select"
             value={locale}
             onChange={(e) =>
               onPreferences({ locale: e.target.value as Locale })
@@ -1803,18 +1895,19 @@ function Settings({
           </select>
         </label>
       </section>
-      <section className="settings-card">
+      <section className="settings-card sd-glass sd-card">
         <h2>{tr(locale, "Sonido", "Sound")}</h2>
         <label className="setting">
           <span>{tr(locale, "Efectos de sonido", "Sound effects")}</span>
           <input
+            className="sd-checkbox"
             type="checkbox"
             checked={data.preferences.sound}
             onChange={(e) => onPreferences({ sound: e.target.checked })}
           />
         </label>
       </section>
-      <section className="settings-card">
+      <section className="settings-card sd-glass sd-card">
         <h2>{tr(locale, "Partidas y copias", "Games & backups")}</h2>
         <p>
           {tr(
@@ -1824,13 +1917,14 @@ function Settings({
           )}
         </p>
         <div className="controls">
-          <button onClick={() => downloadJson(data)}>
+          <button className="sd-button" onClick={() => downloadJson(data)}>
             {tr(locale, "Exportar todos los datos", "Export all data")} ↗
           </button>
-          <button onClick={() => input.current?.click()}>
+          <button className="sd-button" onClick={() => input.current?.click()}>
             {tr(locale, "Importar copia", "Import backup")} ↙
           </button>
           <button
+            className="sd-button"
             onClick={async () => {
               try {
                 const backup = await lastBackup();
@@ -1854,6 +1948,7 @@ function Settings({
           </button>
         </div>
         <input
+          className="sd-input"
           ref={input}
           type="file"
           accept="application/json,.json"
@@ -1890,7 +1985,11 @@ function Settings({
             </p>
             <label className="setting">
               <span>{tr(locale, "Modo de importación", "Import mode")}</span>
-              <select value={mode} onChange={(e) => setMode(e.target.value)}>
+              <select
+                className="sd-select"
+                value={mode}
+                onChange={(e) => setMode(e.target.value)}
+              >
                 <option value="merge">
                   {tr(
                     locale,
@@ -1907,6 +2006,7 @@ function Settings({
               <label className="setting">
                 <span>{tr(locale, "En conflictos", "On conflicts")}</span>
                 <select
+                  className="sd-select"
                   value={prefer ? "incoming" : "local"}
                   onChange={(e) => setPrefer(e.target.value === "incoming")}
                 >
@@ -1925,7 +2025,7 @@ function Settings({
             ) : null}
             <div className="controls">
               <button
-                className="primary"
+                className="sd-button sd-button--primary"
                 onClick={async () => {
                   try {
                     await backupData(data);
@@ -1948,14 +2048,14 @@ function Settings({
               >
                 {tr(locale, "Confirmar importación", "Confirm import")}
               </button>
-              <button onClick={() => setIncoming(null)}>
+              <button className="sd-button" onClick={() => setIncoming(null)}>
                 {tr(locale, "Cancelar", "Cancel")}
               </button>
             </div>
           </div>
         ) : null}
         {error ? (
-          <p role="alert" className="notice">
+          <p role="alert" className="notice sd-alert sd-alert--info">
             {error}
           </p>
         ) : null}

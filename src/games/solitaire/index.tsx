@@ -655,17 +655,17 @@ function Board({ state, dispatch, locale, paused, compact }: BoardProps) {
         )}
       </div>
       <div className="sol-tools">
-        <button
+        <button className="sd-button"
           disabled={paused || !state.history.length}
           onClick={() => dispatch({ type: "undo" })}
         >
           {tr(locale, "↶ Deshacer", "↶ Undo")}
         </button>
-        <button disabled={disabled} onClick={() => dispatch({ type: "hint" })}>
+        <button className="sd-button" disabled={disabled} onClick={() => dispatch({ type: "hint" })}>
           {tr(locale, "◇ Pista", "◇ Hint")}
         </button>
         {selection && (
-          <button onClick={() => setSelection(null)}>
+          <button className="sd-button" onClick={() => setSelection(null)}>
             {tr(locale, "Cancelar selección", "Clear selection")}
           </button>
         )}
@@ -946,7 +946,7 @@ function SolitaireView(props: GameViewProps<SolitaireState>) {
             "Try the controls on a practice board. Your saved game and statistics are unaffected.",
           )}
         </p>
-        <button onClick={() => setDemo(practice(state.variant))}>
+        <button className="sd-button" onClick={() => setDemo(practice(state.variant))}>
           {demo
             ? tr(locale, "Reiniciar práctica", "Reset practice")
             : tr(
@@ -987,7 +987,7 @@ function SolitaireView(props: GameViewProps<SolitaireState>) {
               paused={false}
               compact
             />
-            <button onClick={() => setDemo(null)}>
+            <button className="sd-button" onClick={() => setDemo(null)}>
               {tr(locale, "Cerrar práctica", "Close practice")}
             </button>
           </div>

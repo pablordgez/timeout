@@ -1,0 +1,495 @@
+/*
+ * Presentación de datos: avatares, tablas, listas de ajustes, items,
+ * acordeón y desplegable, gráficos, marcadores y adjuntos.
+ */
+
+/* ------------------------------------------------- Avatares y presencia -- */
+
+.sd-avatar {
+  --hue: var(--sd-accent-h);
+  --size: calc(48px * var(--sd-scale));
+  position: relative;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  inline-size: var(--size);
+  block-size: var(--size);
+  border-radius: var(--sd-radius-full);
+  background: linear-gradient(145deg, oklch(78% 0.13 var(--hue)), oklch(56% 0.2 calc(var(--hue) - 30)));
+  box-shadow: inset 0 0 0 2px rgb(255 255 255 / 0.5), var(--sd-shadow-1);
+  color: oklch(100% 0 0);
+  font: 400 calc(var(--size) * 0.4) / 1 var(--sd-font-display);
+}
+
+.sd-avatar > img { inline-size: 100%; block-size: 100%; border-radius: inherit; object-fit: cover; }
+
+.sd-avatar[data-presence]::after {
+  content: "";
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-end: 0;
+  inline-size: 28%;
+  aspect-ratio: 1;
+  border-radius: var(--sd-radius-full);
+  background: var(--sd-text-subtle);
+  box-shadow: 0 0 0 calc(2.5px * var(--sd-scale)) var(--sd-bg);
+}
+
+.sd-avatar[data-presence="online"]::after { background: var(--sd-success); }
+.sd-avatar[data-presence="away"]::after { background: var(--sd-warning); }
+.sd-avatar[data-presence="busy"]::after { background: var(--sd-danger); }
+
+.sd-avatar > .sd-badge { position: absolute; inset-block-start: -4%; inset-inline-end: -8%; }
+
+.sd-avatar--xs { --size: calc(24px * var(--sd-scale)); }
+.sd-avatar--sm { --size: calc(32px * var(--sd-scale)); }
+.sd-avatar--lg { --size: calc(72px * var(--sd-scale)); }
+
+/* Grupo solapado con contador del resto. */
+.sd-avatar-group { display: inline-flex; align-items: center; }
+.sd-avatar-group > * { box-shadow: 0 0 0 2px var(--sd-bg); }
+.sd-avatar-group > * + * { margin-inline-start: calc(var(--sd-space-3) * -1); }
+
+.sd-avatar-group__count {
+  --size: calc(48px * var(--sd-scale));
+  display: inline-grid;
+  place-items: center;
+  inline-size: var(--size);
+  block-size: var(--size);
+  border-radius: var(--sd-radius-full);
+  background: var(--sd-surface-raised);
+  color: var(--sd-text-muted);
+  font-size: var(--sd-text-xs);
+  font-weight: 700;
+}
+
+.sd-avatar-group:has(.sd-avatar--sm) > .sd-avatar-group__count { --size: calc(32px * var(--sd-scale)); }
+
+/* ---------------------------------------------------------------- Tabla -- */
+
+.sd-table-container {
+  overflow: auto;
+  border: 1px solid var(--sd-line);
+  border-radius: var(--sd-radius-lg);
+  background: var(--sd-surface-sunken);
+}
+
+.sd-table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--sd-text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.sd-table caption {
+  padding: var(--sd-space-3);
+  caption-side: bottom;
+  color: var(--sd-text-muted);
+  font-size: var(--sd-text-sm);
+}
+
+.sd-table :is(th, td) {
+  padding: var(--sd-space-3) var(--sd-space-4);
+  border-block-end: 1px solid var(--sd-line);
+  text-align: start;
+  white-space: nowrap;
+}
+
+.sd-table thead th {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 1;
+  background: var(--sd-glass-sheen), var(--sd-overlay-fill);
+  color: var(--sd-text-muted);
+  font-size: var(--sd-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sd-table tbody tr { transition: background-color var(--sd-duration-fast); }
+.sd-table tbody tr:hover { background: var(--sd-surface-hover); }
+.sd-table tbody tr[aria-selected="true"] { background: var(--sd-accent-soft); }
+.sd-table tbody tr:last-child > * { border-block-end: 0; }
+.sd-table tfoot { background: var(--sd-surface-sunken); font-weight: 700; }
+.sd-table tfoot :is(th, td) { border-block-start: 1px solid var(--sd-line); border-block-end: 0; }
+.sd-table .sd-table__numeric { text-align: end; }
+
+/* Cabecera ordenable: el botón ocupa la celda y aria-sort del <th> dibuja la flecha. */
+.sd-table__sort {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sd-space-1);
+  margin: calc(var(--sd-space-1) * -1) calc(var(--sd-space-2) * -1);
+  padding: var(--sd-space-1) var(--sd-space-2);
+  border: 0;
+  border-radius: var(--sd-radius-xs);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+
+.sd-table__sort:hover { background: var(--sd-surface-hover); color: var(--sd-text); }
+.sd-table__sort::after { content: "↕"; opacity: 0.45; }
+[aria-sort="ascending"] > .sd-table__sort::after { content: "↑"; opacity: 1; }
+[aria-sort="descending"] > .sd-table__sort::after { content: "↓"; opacity: 1; }
+
+.sd-table-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sd-space-2);
+  margin-block-end: var(--sd-space-3);
+}
+
+/* -------------------------------------------------------- Listas de ajustes -- */
+
+.sd-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border-radius: var(--sd-radius-lg);
+  list-style: none;
+}
+
+.sd-list__row {
+  display: flex;
+  align-items: center;
+  gap: var(--sd-space-3);
+  inline-size: 100%;
+  min-block-size: calc(var(--sd-target) * 1.2);
+  padding: var(--sd-space-2) var(--sd-space-4);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  text-decoration: none;
+}
+
+.sd-list > li + li > .sd-list__row,
+.sd-list > .sd-list__row + .sd-list__row {
+  border-block-start: 1px solid var(--sd-line);
+}
+
+:is(button, a, label).sd-list__row { cursor: pointer; }
+:is(button, a, label).sd-list__row:hover { background: var(--sd-surface-hover); }
+
+.sd-list__icon {
+  --hue: var(--sd-accent-h);
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: calc(var(--sd-target) * 0.75);
+  aspect-ratio: 1;
+  border-radius: var(--sd-radius-sm);
+  background: linear-gradient(160deg, oklch(80% 0.12 var(--hue)), oklch(62% 0.18 var(--hue)));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.45);
+  color: oklch(100% 0 0);
+}
+
+.sd-list__icon svg { inline-size: 62%; block-size: 62%; }
+.sd-list__label { flex: 1; min-inline-size: 0; font-weight: 600; }
+.sd-list__detail { display: block; color: var(--sd-text-muted); font-size: var(--sd-text-sm); font-weight: 400; }
+.sd-list__value { color: var(--sd-text-muted); font-size: var(--sd-text-sm); font-variant-numeric: tabular-nums; }
+
+/* ----------------------------------------------------------------- Item -- */
+
+/*
+ * Bloque genérico de contenido: medio (icono, avatar o imagen), texto y
+ * acciones. Sirve para listados, resultados y tarjetas compactas.
+ */
+.sd-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sd-space-3) var(--sd-space-4);
+  padding: var(--sd-space-4);
+  border: 1px solid transparent;
+  border-radius: var(--sd-radius-lg);
+  color: inherit;
+  text-decoration: none;
+}
+
+.sd-item--outline { border-color: var(--sd-line-strong); }
+.sd-item--muted { background: var(--sd-surface-sunken); }
+.sd-item--sm { gap: var(--sd-space-2) var(--sd-space-3); padding: var(--sd-space-2) var(--sd-space-3); }
+:is(a, button).sd-item { cursor: pointer; }
+:is(a, button).sd-item:hover { background: var(--sd-surface-hover); }
+
+.sd-item__media {
+  --hue: var(--sd-accent-h);
+  display: grid;
+  flex: none;
+  place-items: center;
+  align-self: flex-start;
+}
+
+.sd-item__media--icon {
+  inline-size: calc(var(--sd-target) * 0.85);
+  aspect-ratio: 1;
+  border: 1px solid var(--sd-line);
+  border-radius: var(--sd-radius-md);
+  background: var(--sd-surface-sunken);
+  color: var(--sd-text-muted);
+}
+
+.sd-item__media--tint {
+  inline-size: calc(var(--sd-target) * 0.85);
+  aspect-ratio: 1;
+  border-radius: var(--sd-radius-md);
+  background: linear-gradient(160deg, oklch(80% 0.12 var(--hue)), oklch(62% 0.18 var(--hue)));
+  color: oklch(100% 0 0);
+}
+
+.sd-item__media--image { inline-size: calc(var(--sd-target) * 1.4); aspect-ratio: 1; overflow: hidden; border-radius: var(--sd-radius-md); }
+.sd-item__media--image > img { inline-size: 100%; block-size: 100%; object-fit: cover; }
+.sd-item__media svg { inline-size: 55%; block-size: 55%; }
+
+.sd-item__content { display: grid; flex: 1; gap: 2px; min-inline-size: 0; }
+.sd-item__title { margin: 0; font-weight: 600; line-height: 1.35; }
+.sd-item__description { margin: 0; color: var(--sd-text-muted); font-size: var(--sd-text-sm); line-height: 1.45; }
+.sd-item__actions { display: flex; flex: none; align-items: center; gap: var(--sd-space-2); }
+.sd-item__header,
+.sd-item__footer { display: flex; flex-basis: 100%; align-items: center; justify-content: space-between; gap: var(--sd-space-2); }
+
+.sd-item-group { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+.sd-item-group > * + * { border-block-start: 1px solid var(--sd-line); border-radius: 0; }
+
+/* -------------------------------------------------- Acordeón y desplegable -- */
+
+/*
+ * Sobre <details>/<summary>: abrir y cerrar no necesita JavaScript, y el
+ * atributo name hace exclusivo un grupo (solo una sección abierta).
+ */
+.sd-accordion { display: flex; flex-direction: column; }
+.sd-accordion__item { border-block-end: 1px solid var(--sd-line); }
+.sd-accordion--card { padding-inline: var(--sd-space-4); border: 1px solid var(--sd-line); border-radius: var(--sd-radius-lg); }
+.sd-accordion--card > .sd-accordion__item:last-child { border-block-end: 0; }
+
+.sd-accordion__trigger,
+.sd-collapsible__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sd-space-3);
+  padding-block: var(--sd-space-4);
+  border-radius: var(--sd-radius-xs);
+  font-weight: 600;
+  list-style: none;
+  cursor: pointer;
+}
+
+:is(.sd-accordion__trigger, .sd-collapsible__trigger)::-webkit-details-marker { display: none; }
+
+.sd-accordion__trigger::after {
+  content: "";
+  flex: none;
+  inline-size: 0.45em;
+  block-size: 0.45em;
+  border-block-end: 2px solid var(--sd-text-muted);
+  border-inline-end: 2px solid var(--sd-text-muted);
+  rotate: 45deg;
+  translate: 0 -0.15em;
+  transition: rotate var(--sd-duration-base) var(--sd-ease-out);
+}
+
+[open] > .sd-accordion__trigger::after { rotate: 225deg; translate: 0 0.15em; }
+.sd-accordion__trigger:hover { color: var(--sd-accent-strong); }
+.sd-accordion__item:has(> :disabled, [aria-disabled="true"]) { opacity: 0.5; pointer-events: none; }
+.sd-accordion__content { padding-block-end: var(--sd-space-4); color: var(--sd-text-muted); font-size: var(--sd-text-sm); line-height: 1.6; }
+
+.sd-collapsible__trigger { padding-block: var(--sd-space-2); }
+.sd-collapsible__content { padding-block: var(--sd-space-1) var(--sd-space-3); }
+
+/* Donde se puede animar hasta height: auto, el contenido se despliega suavemente. */
+@supports (interpolate-size: allow-keywords) {
+  :is(.sd-accordion__item, .sd-collapsible) { interpolate-size: allow-keywords; }
+
+  :is(.sd-accordion__item, .sd-collapsible)::details-content {
+    block-size: 0;
+    overflow: hidden;
+    transition:
+      block-size var(--sd-duration-slow) var(--sd-ease-out),
+      content-visibility var(--sd-duration-slow) allow-discrete;
+  }
+
+  :is(.sd-accordion__item, .sd-collapsible)[open]::details-content { block-size: auto; }
+}
+
+/* -------------------------------------------------------------- Gráficos -- */
+
+/*
+ * Contenedor para gráficos de cualquier biblioteca o SVG propio. Las series
+ * usan --sd-chart-1…5 y los textos, rejillas y ejes heredan los neutros.
+ */
+.sd-chart {
+  position: relative;
+  display: grid;
+  gap: var(--sd-space-3);
+  color: var(--sd-text-muted);
+  font-size: var(--sd-text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.sd-chart svg { overflow: visible; }
+.sd-chart svg text { fill: currentColor; font-family: var(--sd-font-body); }
+.sd-chart :is(.sd-chart__grid line, .sd-chart__grid path) { stroke: var(--sd-line); stroke-dasharray: 3 4; }
+.sd-chart .sd-chart__axis { stroke: var(--sd-line-strong); }
+
+.sd-chart__legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sd-space-2) var(--sd-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sd-chart__legend > * { display: inline-flex; align-items: center; gap: var(--sd-space-2); }
+
+.sd-chart__swatch {
+  inline-size: 0.8em;
+  block-size: 0.8em;
+  border-radius: 0.25em;
+  background: var(--color, var(--sd-chart-1));
+}
+
+.sd-chart__tooltip {
+  display: grid;
+  gap: var(--sd-space-1);
+  min-inline-size: 9rem;
+  padding: var(--sd-space-2) var(--sd-space-3);
+  border: 1px solid var(--sd-glass-border);
+  border-radius: var(--sd-radius-md);
+  background: var(--sd-glass-sheen), var(--sd-overlay-fill);
+  box-shadow: var(--sd-shadow-2);
+  color: var(--sd-text);
+  font-size: var(--sd-text-xs);
+}
+
+.sd-chart__tooltip > * { display: flex; align-items: center; gap: var(--sd-space-2); }
+.sd-chart__tooltip b { margin-inline-start: auto; font-weight: 700; }
+
+/* ------------------------------------------------------------ Marcador -- */
+
+/* Línea de contexto en un hilo: «hoy», «nuevos mensajes», cambios de estado. */
+.sd-marker {
+  display: flex;
+  align-items: center;
+  gap: var(--sd-space-2);
+  color: var(--sd-text-muted);
+  font-size: var(--sd-text-sm);
+}
+
+.sd-marker svg { flex: none; inline-size: 1.1em; block-size: 1.1em; }
+.sd-marker a { color: inherit; text-decoration: underline; text-underline-offset: 0.2em; }
+.sd-marker a:hover { color: var(--sd-text); }
+
+.sd-marker--separator::before,
+.sd-marker--separator::after {
+  content: "";
+  flex: 1;
+  block-size: 1px;
+  background: var(--sd-line);
+}
+
+.sd-marker--border { padding-block-end: var(--sd-space-2); border-block-end: 1px solid var(--sd-line); }
+
+/* -------------------------------------------------------------- Adjuntos -- */
+
+/*
+ * Archivo adjunto con estado en data-state: idle, uploading, processing,
+ * error o done. Mientras sube o se procesa, el título brilla.
+ */
+.sd-attachment {
+  --hue: var(--sd-accent-h);
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sd-space-2);
+  inline-size: fit-content;
+  min-inline-size: 10rem;
+  max-inline-size: 100%;
+  padding: var(--sd-space-2);
+  padding-inline-end: var(--sd-space-3);
+  border: 1px solid var(--sd-line-strong);
+  border-radius: var(--sd-radius-lg);
+  background: var(--sd-surface-sunken);
+  font-size: var(--sd-text-sm);
+}
+
+.sd-attachment[data-state="error"] { border-color: oklch(65% 0.2 25 / 0.5); }
+
+.sd-attachment__media {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: calc(var(--sd-target) * 0.9);
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--sd-radius-md);
+  background: linear-gradient(160deg, oklch(80% 0.12 var(--hue)), oklch(62% 0.18 var(--hue)));
+  color: oklch(100% 0 0);
+}
+
+.sd-attachment__media > img { inline-size: 100%; block-size: 100%; object-fit: cover; }
+.sd-attachment__media svg { inline-size: 50%; block-size: 50%; }
+:is([data-state="uploading"], [data-state="processing"]) > .sd-attachment__media { opacity: 0.6; }
+
+.sd-attachment__content { flex: 1; min-inline-size: 0; line-height: 1.25; }
+
+.sd-attachment__title {
+  display: block;
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sd-attachment__description {
+  display: block;
+  overflow: hidden;
+  margin-block-start: 2px;
+  color: var(--sd-text-muted);
+  font-size: var(--sd-text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-state="error"] .sd-attachment__description { color: var(--sd-danger); }
+
+:is([data-state="uploading"], [data-state="processing"]) .sd-attachment__title {
+  background: linear-gradient(100deg, var(--sd-text) 40%, var(--sd-accent) 50%, var(--sd-text) 60%) 0 0 / 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: sd-shimmer 1.6s linear infinite;
+}
+
+.sd-attachment__actions { display: flex; flex: none; align-items: center; gap: var(--sd-space-1); }
+
+.sd-attachment--vertical {
+  flex-direction: column;
+  align-items: stretch;
+  inline-size: calc(var(--sd-tile) * 1.25);
+  min-inline-size: 0;
+  padding: var(--sd-space-2);
+}
+
+.sd-attachment--vertical > .sd-attachment__media { inline-size: 100%; }
+.sd-attachment--vertical > .sd-attachment__actions { position: absolute; inset-block-start: var(--sd-space-3); inset-inline-end: var(--sd-space-3); }
+
+.sd-attachment-group {
+  display: flex;
+  gap: var(--sd-space-2);
+  overflow-x: auto;
+  padding-block-end: var(--sd-space-1);
+  scrollbar-width: thin;
+}

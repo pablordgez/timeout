@@ -1,0 +1,258 @@
+/*
+ * Superficies: cristal, tarjeta, separador, proporción, área de desplazamiento,
+ * esqueleto de carga, paneles redimensionables y estado vacío.
+ */
+
+/* -------------------------------------------------------------- Cristal -- */
+
+.sd-glass {
+  background: var(--sd-glass-sheen), var(--sd-glass-fill);
+  border: 1.5px solid var(--sd-glass-border);
+  border-radius: var(--sd-radius-xl);
+  box-shadow: var(--sd-glass-shadow);
+  backdrop-filter: blur(var(--sd-glass-blur)) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--sd-glass-blur)) saturate(1.4);
+}
+
+.sd-glass--pill { border-radius: var(--sd-radius-full); }
+
+/* Panel plano: para agrupar dentro de otro cristal sin apilar desenfoques. */
+.sd-glass--flat {
+  background: var(--sd-surface-sunken);
+  border: 1px solid var(--sd-line);
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/*
+ * El cristal es un material: sobre un componente con fondo propio (un chip
+ * flotando sobre la escena de un juego, por ejemplo) gana el material, pero la
+ * forma sigue siendo la del componente.
+ */
+.sd-glass:is(.sd-chip, .sd-button, .sd-segmented, .sd-tabs__list, .sd-bubble) {
+  border-color: var(--sd-glass-border);
+  background: var(--sd-glass-sheen), var(--sd-glass-fill);
+}
+
+/* -------------------------------------------------------------- Tarjeta -- */
+
+.sd-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sd-space-4);
+  padding: var(--sd-space-6);
+  color: inherit;
+  text-decoration: none;
+}
+
+.sd-card--sm { gap: var(--sd-space-3); padding: var(--sd-space-4); }
+
+.sd-card--interactive {
+  transition:
+    transform var(--sd-duration-base) var(--sd-ease-spring),
+    box-shadow var(--sd-duration-base) var(--sd-ease-out);
+}
+
+.sd-card--interactive:hover { transform: translateY(-3px); }
+
+/* Cabecera con acción opcional alineada al final, como en las tarjetas de ajustes. */
+.sd-card__header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: var(--sd-space-1) var(--sd-space-3);
+}
+
+.sd-card__header > :not(.sd-card__action) { grid-column: 1; }
+.sd-card__action { grid-column: 2; grid-row: 1 / span 2; }
+
+.sd-card__title { margin: 0; font: 400 var(--sd-text-lg) / 1.2 var(--sd-font-display); }
+.sd-card__description { margin: 0; color: var(--sd-text-muted); font-size: var(--sd-text-sm); }
+.sd-card__content { display: flex; flex-direction: column; gap: var(--sd-space-3); }
+
+.sd-card__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sd-space-2);
+}
+
+.sd-card__footer--bordered {
+  margin-inline: calc(var(--sd-space-6) * -1);
+  margin-block-end: calc(var(--sd-space-6) * -1);
+  padding: var(--sd-space-4) var(--sd-space-6);
+  border-block-start: 1px solid var(--sd-line);
+}
+
+/* ------------------------------------------------------------ Separador -- */
+
+.sd-separator {
+  flex: none;
+  align-self: stretch;
+  margin: 0;
+  border: 0;
+  background: var(--sd-line);
+  block-size: 1px;
+}
+
+.sd-separator[aria-orientation="vertical"] { inline-size: 1px; block-size: auto; }
+
+/* ----------------------------------------------------------- Proporción -- */
+
+.sd-aspect {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: var(--ratio, 16 / 9);
+  border-radius: var(--sd-radius-lg);
+}
+
+.sd-aspect > :is(img, video, iframe) {
+  inline-size: 100%;
+  block-size: 100%;
+  border: 0;
+  object-fit: cover;
+}
+
+/* -------------------------------------------------- Área de desplazamiento -- */
+
+.sd-scroll-area {
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: var(--sd-line-strong) transparent;
+  scrollbar-width: thin;
+}
+
+.sd-scroll-area::-webkit-scrollbar { inline-size: 10px; block-size: 10px; }
+.sd-scroll-area::-webkit-scrollbar-track { background: transparent; }
+
+.sd-scroll-area::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: var(--sd-radius-full);
+  background: var(--sd-line-strong) padding-box;
+}
+
+/* Desvanece el borde inferior para insinuar que hay más contenido. */
+.sd-scroll-area--fade {
+  mask-image: linear-gradient(to bottom, #000 calc(100% - var(--sd-space-8)), transparent);
+}
+
+/* ------------------------------------------------------------ Esqueleto -- */
+
+.sd-skeleton {
+  display: block;
+  min-block-size: 1em;
+  border-radius: var(--sd-radius-sm);
+  background:
+    linear-gradient(100deg, transparent 30%, light-dark(rgb(255 255 255 / 0.7), rgb(255 255 255 / 0.08)) 50%, transparent 70%) 0 0 / 250% 100%,
+    var(--sd-surface-hover);
+  animation: sd-shimmer 1.6s linear infinite;
+}
+
+.sd-skeleton--circle { border-radius: var(--sd-radius-full); aspect-ratio: 1; }
+.sd-skeleton--text { block-size: 0.8em; border-radius: var(--sd-radius-xs); }
+
+/* ------------------------------------------------- Paneles redimensionables -- */
+
+/*
+ * Paneles separados por asas (role="separator"). soda.js mueve el asa con
+ * puntero o teclado y fija el tamaño del panel anterior en --size.
+ */
+.sd-resizable {
+  display: flex;
+  overflow: hidden;
+  min-block-size: 0;
+}
+
+.sd-resizable[aria-orientation="vertical"] { flex-direction: column; }
+
+.sd-resizable__panel {
+  flex: 1 1 0;
+  overflow: auto;
+  min-inline-size: 0;
+  min-block-size: 0;
+}
+
+.sd-resizable__panel[data-sized] { flex: 0 0 var(--size); }
+
+.sd-resizable__handle {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 1px;
+  background: var(--sd-line-strong);
+  cursor: col-resize;
+  touch-action: none;
+}
+
+/* Zona de agarre más ancha que la línea visible. */
+.sd-resizable__handle::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline: -6px;
+}
+
+/* Pastilla de agarre opcional, visible al pasar por encima o al enfocar. */
+.sd-resizable__handle::after {
+  content: "";
+  z-index: 1;
+  inline-size: 6px;
+  block-size: 28px;
+  border-radius: var(--sd-radius-full);
+  background: var(--sd-glass-sheen), var(--sd-control-fill);
+  box-shadow: var(--sd-control-shadow);
+  opacity: 0;
+  transition: opacity var(--sd-duration-base);
+}
+
+.sd-resizable__handle:is(:hover, :focus-visible, [data-dragging])::after,
+.sd-resizable__handle--grip::after { opacity: 1; }
+
+.sd-resizable[aria-orientation="vertical"] > .sd-resizable__handle {
+  inline-size: auto;
+  block-size: 1px;
+  cursor: row-resize;
+}
+
+.sd-resizable[aria-orientation="vertical"] > .sd-resizable__handle::before { inset-block: -6px; inset-inline: 0; }
+.sd-resizable[aria-orientation="vertical"] > .sd-resizable__handle::after { inline-size: 28px; block-size: 6px; }
+
+/* --------------------------------------------------------- Estado vacío -- */
+
+.sd-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sd-space-3);
+  padding: var(--sd-space-10) var(--sd-space-6);
+  text-align: center;
+  text-wrap: balance;
+}
+
+.sd-empty--outline {
+  border: 1.5px dashed var(--sd-line-strong);
+  border-radius: var(--sd-radius-xl);
+}
+
+.sd-empty__icon {
+  --hue: var(--sd-accent-h);
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: calc(var(--sd-target) * 1.3);
+  block-size: calc(var(--sd-target) * 1.3);
+  margin-block-end: var(--sd-space-2);
+  border-radius: var(--sd-radius-lg);
+  background:
+    radial-gradient(90% 70% at 30% 20%, rgb(255 255 255 / 0.9), transparent 60%),
+    linear-gradient(160deg, oklch(95% 0.04 var(--hue)), oklch(85% 0.09 var(--hue)));
+  box-shadow: inset 0 0 0 2px rgb(255 255 255 / 0.85), var(--sd-shadow-1);
+  color: oklch(60% 0.17 var(--hue));
+}
+
+.sd-empty__icon svg { inline-size: 50%; block-size: 50%; }
+.sd-empty__title { margin: 0; font: 400 var(--sd-text-xl) / 1.2 var(--sd-font-display); }
+.sd-empty__description { max-inline-size: 36ch; margin: 0; color: var(--sd-text-muted); font-size: var(--sd-text-sm); }
+.sd-empty__content { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--sd-space-2); margin-block-start: var(--sd-space-2); }

@@ -1,0 +1,491 @@
+/*
+ * Capas flotantes: popover, menú (desplegable, contextual y de barra),
+ * paleta de comandos, información sobre herramientas, tarjeta al pasar,
+ * diálogo, diálogo de alerta, hoja lateral y cajón inferior.
+ *
+ * Se apoyan en la plataforma: atributo popover para lo que se abre junto a un
+ * disparador y <dialog> para lo modal. Donde existe posicionamiento por ancla
+ * (position-area), el popover se coloca junto a su disparador; si no, soda.js
+ * lo coloca.
+ */
+
+/* -------------------------------------------------- Material flotante -- */
+
+.sd-popover,
+.sd-menu,
+.sd-command,
+.sd-hover-card,
+.sd-dialog,
+.sd-sheet,
+.sd-drawer {
+  border: 1px solid var(--sd-glass-border);
+  background: var(--sd-glass-sheen), var(--sd-overlay-fill);
+  box-shadow: var(--sd-glass-shadow), var(--sd-shadow-3);
+  color: var(--sd-text);
+  font-family: var(--sd-font-body);
+  backdrop-filter: blur(var(--sd-glass-blur)) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--sd-glass-blur)) saturate(1.4);
+}
+
+/* ------------------------------------------------------------- Popover -- */
+
+.sd-popover {
+  inline-size: min(calc(100vw - 2 * var(--sd-space-4)), 20rem);
+  padding: var(--sd-space-4);
+  border-radius: var(--sd-radius-lg);
+}
+
+.sd-popover__header { display: grid; gap: var(--sd-space-1); margin-block-end: var(--sd-space-3); }
+.sd-popover__title { margin: 0; font: 400 var(--sd-text-md) / 1.2 var(--sd-font-display); }
+.sd-popover__description { margin: 0; color: var(--sd-text-muted); font-size: var(--sd-text-sm); }
+
+/* Aparición con muelle; @starting-style anima también el primer fotograma. */
+:is(.sd-popover, .sd-menu)[popover] {
+  opacity: 1;
+  scale: 1;
+  transition:
+    opacity var(--sd-duration-base) var(--sd-ease-out),
+    scale var(--sd-duration-base) var(--sd-ease-spring),
+    overlay var(--sd-duration-base) allow-discrete,
+    display var(--sd-duration-base) allow-discrete;
+}
+
+/*
+ * .sd-menu fija display: flex, que gana al display: none que el navegador da a
+ * un popover cerrado: sin esta regla los menús cerrados siguen ocupando sitio
+ * (invisibles) y se tragan los clics y el hover de lo que tienen debajo.
+ * display entra en la transición, así que la salida sigue animándose.
+ */
+:is(.sd-popover, .sd-menu)[popover]:not(:popover-open) { display: none; opacity: 0; scale: 0.96; }
+
+@starting-style {
+  :is(.sd-popover, .sd-menu)[popover]:popover-open { opacity: 0; scale: 0.96; }
+}
+
+@supports (position-area: block-end) {
+  :is(.sd-popover, .sd-menu)[popover]:not([data-sd-at-pointer]) {
+    inset: auto;
+    margin: var(--sd-space-1) 0;
+    position-area: block-end span-inline-end;
+    position-try-fallbacks: flip-block, flip-inline;
+  }
+
+  /* Una lista anclada a un campo (combobox) es al menos tan ancha como el campo. */
+  .sd-menu[data-sd-anchor] { min-inline-size: anchor-size(inline); }
+}
+
+/* ---------------------------------------------------------------- Menú -- */
+
+.sd-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-inline-size: 13rem;
+  max-block-size: min(70vh, 28rem);
+  margin: 0;
+  padding: var(--sd-space-1);
+  overflow-y: auto;
+  border-radius: var(--sd-radius-md);
+  font-size: var(--sd-text-sm);
+  list-style: none;
+}
+
+.sd-menu__item,
+.sd-command__item {
+  display: flex;
+  align-items: center;
+  gap: var(--sd-space-2);
+  inline-size: 100%;
+  min-block-size: calc(var(--sd-control) * 0.85);
+  padding: 0 var(--sd-space-2);
+  border: 0;
+  border-radius: var(--sd-radius-sm);
+  background: transparent;
+  color: var(--sd-text);
+  font: 500 var(--sd-text-sm) / 1.2 var(--sd-font-body);
+  text-align: start;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+:is(.sd-menu__item, .sd-command__item):hover,
+.sd-command__item[aria-selected="true"] {
+  background: var(--sd-accent-soft);
+  color: var(--sd-accent-strong);
+}
+
+:is(.sd-menu__item, .sd-command__item) svg {
+  flex: none;
+  inline-size: calc(var(--sd-icon) * 0.75);
+  block-size: calc(var(--sd-icon) * 0.75);
+  color: var(--sd-text-muted);
+}
+
+:is(.sd-menu__item, .sd-command__item):is(:disabled, [aria-disabled="true"]) { opacity: 0.45; pointer-events: none; }
+
+.sd-menu__item--danger { color: var(--sd-danger); }
+.sd-menu__item--danger:hover { background: var(--sd-danger-soft); color: var(--sd-danger); }
+.sd-menu__item--danger svg { color: currentColor; }
+
+.sd-menu__shortcut {
+  margin-inline-start: auto;
+  padding-inline-start: var(--sd-space-4);
+  color: var(--sd-text-subtle);
+  font: 500 var(--sd-text-xs) / 1 var(--sd-font-mono);
+  letter-spacing: 0.05em;
+}
+
+.sd-menu__label,
+.sd-command__heading {
+  padding: var(--sd-space-2) var(--sd-space-2) var(--sd-space-1);
+  color: var(--sd-text-subtle);
+  font-size: var(--sd-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sd-menu__separator,
+.sd-command__separator {
+  flex: none;
+  block-size: 1px;
+  margin: var(--sd-space-1) calc(var(--sd-space-1) * -1);
+  border: 0;
+  background: var(--sd-line);
+}
+
+/* Elementos marcables: el indicador ocupa la columna inicial. */
+.sd-menu__item:is([role="menuitemcheckbox"], [role="menuitemradio"])::before {
+  content: "";
+  flex: none;
+  inline-size: 1em;
+  block-size: 1em;
+}
+
+.sd-menu__item[role="menuitemcheckbox"][aria-checked="true"]::before {
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.sd-menu__item[role="menuitemradio"][aria-checked="true"]::before {
+  background: radial-gradient(circle, currentColor 0 30%, transparent 33%);
+}
+
+/* Submenú: se abre hacia el final de la línea al pasar o enfocar. */
+.sd-menu__sub { position: relative; }
+
+.sd-menu__sub > .sd-menu__item::after {
+  content: "›";
+  margin-inline-start: auto;
+  padding-inline-start: var(--sd-space-4);
+  color: var(--sd-text-subtle);
+}
+
+.sd-menu__sub > .sd-menu__item:dir(rtl)::after { content: "‹"; }
+
+.sd-menu__sub > .sd-menu {
+  position: absolute;
+  inset-block-start: calc(var(--sd-space-1) * -1);
+  inset-inline-start: calc(100% + var(--sd-space-1));
+  z-index: 1;
+  display: none;
+}
+
+.sd-menu__sub:is(:hover, :focus-within) > .sd-menu { display: flex; }
+
+/* --------------------------------------------------- Paleta de comandos -- */
+
+.sd-command {
+  display: flex;
+  flex-direction: column;
+  inline-size: min(100%, 36rem);
+  overflow: hidden;
+  border-radius: var(--sd-radius-lg);
+}
+
+.sd-command__input {
+  display: flex;
+  align-items: center;
+  gap: var(--sd-space-2);
+  padding: 0 var(--sd-space-4);
+  border-block-end: 1px solid var(--sd-line);
+}
+
+.sd-command__input svg { flex: none; inline-size: calc(var(--sd-icon) * 0.85); block-size: calc(var(--sd-icon) * 0.85); color: var(--sd-text-muted); }
+
+.sd-command__input input {
+  flex: 1;
+  min-inline-size: 0;
+  min-block-size: var(--sd-target);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: 400 var(--sd-text-md) / 1.4 var(--sd-font-body);
+  outline: none;
+}
+
+.sd-command__input input::placeholder { color: var(--sd-text-subtle); }
+
+.sd-command__list {
+  max-block-size: 20rem;
+  margin: 0;
+  padding: var(--sd-space-1);
+  overflow-y: auto;
+  list-style: none;
+  scrollbar-width: thin;
+}
+
+.sd-command__group { display: flex; flex-direction: column; gap: 1px; padding-block: var(--sd-space-1); }
+.sd-command__group[hidden] { display: none; }
+
+.sd-command__empty {
+  margin: 0;
+  padding: var(--sd-space-6) var(--sd-space-4);
+  color: var(--sd-text-muted);
+  font-size: var(--sd-text-sm);
+  text-align: center;
+}
+
+.sd-command__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--sd-space-4);
+  padding: var(--sd-space-2) var(--sd-space-4);
+  border-block-start: 1px solid var(--sd-line);
+  color: var(--sd-text-muted);
+  font-size: var(--sd-text-xs);
+}
+
+/* ------------------------------------------- Información y tarjeta al pasar -- */
+
+/*
+ * Solo con CSS: el contenido aparece al pasar por encima o al enfocar el
+ * anfitrión. Asocia el texto con aria-describedby para que también se anuncie.
+ */
+.sd-tooltip-host {
+  position: relative;
+  display: inline-flex;
+}
+
+/*
+ * Ocultos con display: none (y no solo invisibles) para que no ensanchen la
+ * página cuando el anfitrión está cerca del borde; allow-discrete conserva la
+ * transición de entrada y salida.
+ */
+.sd-tooltip,
+.sd-hover-card {
+  position: absolute;
+  inset-block-end: calc(100% + var(--sd-space-2));
+  left: 50%;
+  z-index: var(--sd-z-dropdown);
+  display: none;
+  opacity: 0;
+  translate: -50% 4px;
+  transition:
+    opacity var(--sd-duration-base) var(--sd-ease-out),
+    translate var(--sd-duration-base) var(--sd-ease-out),
+    display var(--sd-duration-base) allow-discrete;
+}
+
+.sd-tooltip {
+  padding: var(--sd-space-1) var(--sd-space-2);
+  border-radius: var(--sd-radius-sm);
+  background: var(--sd-text);
+  box-shadow: var(--sd-shadow-2);
+  color: var(--sd-bg);
+  font: 600 var(--sd-text-xs) / 1.3 var(--sd-font-body);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.sd-tooltip .sd-kbd { margin-inline-start: var(--sd-space-1); border-color: currentColor; background: none; color: inherit; opacity: 0.8; }
+
+.sd-hover-card {
+  inline-size: min(calc(100vw - 2 * var(--sd-space-4)), 18rem);
+  padding: var(--sd-space-4);
+  border-radius: var(--sd-radius-lg);
+  font-size: var(--sd-text-sm);
+}
+
+/* Puente invisible para poder llevar el puntero a la tarjeta. */
+.sd-hover-card::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: calc(var(--sd-space-2) * -1);
+  block-size: var(--sd-space-2);
+}
+
+.sd-tooltip-host:is(:hover, :focus-within) > :is(.sd-tooltip, .sd-hover-card) {
+  display: block;
+  opacity: 1;
+  translate: -50% 0;
+  transition-delay: 300ms;
+}
+
+@starting-style {
+  .sd-tooltip-host:is(:hover, :focus-within) > :is(.sd-tooltip, .sd-hover-card) { opacity: 0; }
+}
+
+.sd-tooltip-host:is(:hover, :focus-within) > .sd-hover-card { transition-delay: 500ms; }
+
+:is(.sd-tooltip, .sd-hover-card)[data-side="bottom"] {
+  inset-block: calc(100% + var(--sd-space-2)) auto;
+  translate: -50% -4px;
+}
+
+:is(.sd-tooltip, .sd-hover-card)[data-side="bottom"]::before { inset-block: calc(var(--sd-space-2) * -1) auto; }
+
+:is(.sd-tooltip, .sd-hover-card):is([data-side="inline-start"], [data-side="inline-end"]) {
+  inset-block: 50% auto;
+  left: auto;
+  translate: 0 -50%;
+}
+
+:is(.sd-tooltip, .sd-hover-card)[data-side="inline-start"] { inset-inline-end: calc(100% + var(--sd-space-2)); }
+:is(.sd-tooltip, .sd-hover-card)[data-side="inline-end"] { inset-inline-start: calc(100% + var(--sd-space-2)); }
+
+.sd-tooltip-host:is(:hover, :focus-within) > :is(.sd-tooltip, .sd-hover-card):is([data-side="inline-start"], [data-side="inline-end"]) { translate: 0 -50%; }
+
+/* --------------------------------------------------------------- Diálogo -- */
+
+.sd-dialog {
+  position: fixed;
+  inline-size: min(92vw, 28rem);
+  max-block-size: min(90dvh, 48rem);
+  padding: var(--sd-space-6);
+  overflow-y: auto;
+  border-radius: var(--sd-radius-xl);
+}
+
+.sd-dialog--lg { inline-size: min(94vw, 42rem); }
+.sd-dialog[open] { animation: sd-pop-in var(--sd-duration-slow) var(--sd-ease-spring); }
+
+:is(.sd-dialog, .sd-sheet, .sd-drawer)::backdrop {
+  background: var(--sd-scrim);
+  backdrop-filter: blur(6px);
+}
+
+.sd-dialog__header { display: grid; gap: var(--sd-space-2); margin-block-end: var(--sd-space-5); }
+.sd-dialog__title { margin: 0; font: 400 var(--sd-text-xl) / 1.15 var(--sd-font-display); text-wrap: balance; }
+.sd-dialog__description { margin: 0; color: var(--sd-text-muted); font-size: var(--sd-text-sm); line-height: 1.5; }
+
+.sd-dialog__footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--sd-space-2);
+  margin-block-start: var(--sd-space-6);
+}
+
+.sd-dialog__close {
+  position: absolute;
+  inset-block-start: var(--sd-space-3);
+  inset-inline-end: var(--sd-space-3);
+}
+
+/* Diálogo de alerta: confirmaciones con icono tintado y acciones a partes iguales. */
+.sd-dialog--alert { inline-size: min(92vw, 24rem); text-align: center; }
+.sd-dialog--alert .sd-dialog__header { justify-items: center; }
+.sd-dialog--alert .sd-dialog__footer > * { flex: 1; }
+
+.sd-dialog__media {
+  --hue: var(--sd-accent-h);
+  display: grid;
+  place-items: center;
+  inline-size: var(--sd-target);
+  aspect-ratio: 1;
+  margin-block-end: var(--sd-space-2);
+  border-radius: var(--sd-radius-md);
+  background: linear-gradient(160deg, oklch(95% 0.06 var(--hue)), oklch(84% 0.12 var(--hue)));
+  box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / 0.85);
+  color: oklch(58% 0.18 var(--hue));
+}
+
+.sd-dialog__media svg { inline-size: 55%; block-size: 55%; }
+
+/* ---------------------------------------------------- Hoja lateral y cajón -- */
+
+/*
+ * Hoja: un <dialog> pegado a un borde. data-side="end" (por defecto),
+ * "start", "top" o "bottom"; los lados lógicos se invierten solos en RTL.
+ */
+.sd-sheet {
+  --from: 100% 0;
+  position: fixed;
+  display: none;
+  flex-direction: column;
+  gap: var(--sd-space-4);
+  inline-size: min(90vw, 24rem);
+  max-inline-size: none;
+  block-size: 100dvh;
+  max-block-size: none;
+  margin: 0;
+  padding: var(--sd-space-6);
+  overflow-y: auto;
+  inset-block: 0;
+  inset-inline: auto 0;
+  border-width: 0 0 0 1.5px;
+  border-radius: var(--sd-radius-xl) 0 0 var(--sd-radius-xl);
+}
+
+.sd-sheet:dir(rtl) { --from: -100% 0; border-radius: 0 var(--sd-radius-xl) var(--sd-radius-xl) 0; }
+.sd-sheet[open] { display: flex; animation: sd-slide-in var(--sd-duration-slow) var(--sd-ease-out); }
+
+.sd-sheet[data-side="start"] {
+  --from: -100% 0;
+  inset-inline: 0 auto;
+  border-width: 0 1.5px 0 0;
+  border-radius: 0 var(--sd-radius-xl) var(--sd-radius-xl) 0;
+}
+
+.sd-sheet[data-side="start"]:dir(rtl) { --from: 100% 0; border-radius: var(--sd-radius-xl) 0 0 var(--sd-radius-xl); }
+
+.sd-sheet:is([data-side="top"], [data-side="bottom"]) {
+  inline-size: 100%;
+  block-size: auto;
+  max-block-size: 80dvh;
+  inset-inline: 0;
+}
+
+.sd-sheet[data-side="top"] {
+  --from: 0 -100%;
+  inset-block: 0 auto;
+  border-width: 0 0 1.5px;
+  border-radius: 0 0 var(--sd-radius-xl) var(--sd-radius-xl);
+}
+
+.sd-sheet[data-side="bottom"],
+.sd-drawer {
+  --from: 0 100%;
+  inset-block: auto 0;
+  border-width: 1.5px 0 0;
+  border-radius: var(--sd-radius-xl) var(--sd-radius-xl) 0 0;
+}
+
+/* Cajón: hoja inferior centrada con asa, pensada para móvil. */
+.sd-drawer {
+  position: fixed;
+  inline-size: min(100%, 40rem);
+  max-inline-size: none;
+  max-block-size: 85dvh;
+  margin: 0 auto;
+  padding: var(--sd-space-8) var(--sd-space-6) var(--sd-space-6);
+  overflow-y: auto;
+}
+
+.sd-drawer[open] { animation: sd-slide-in var(--sd-duration-slow) var(--sd-ease-out); }
+
+.sd-drawer::before {
+  content: "";
+  position: absolute;
+  inset-block-start: var(--sd-space-3);
+  left: 50%;
+  inline-size: calc(var(--sd-target) * 1.1);
+  block-size: 5px;
+  translate: -50% 0;
+  border-radius: var(--sd-radius-full);
+  background: var(--sd-line-strong);
+}

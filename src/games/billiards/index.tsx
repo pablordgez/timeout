@@ -146,7 +146,7 @@ function PoolView({
       {!missingCall && !oldPracticeWarning && <p role="status">{s.event[l]}</p>}
       {s.phase === "break-choice" ? (
         <div className="pool-controls">
-          <button
+          <button className="sd-button"
             disabled={paused}
             onClick={() => dispatch({ type: "BREAK_CHOICE", choice: "accept" })}
           >
@@ -156,14 +156,14 @@ function PoolView({
               "Accept table and spot the 8",
             )}
           </button>
-          <button
+          <button className="sd-button"
             disabled={paused}
             onClick={() => dispatch({ type: "BREAK_CHOICE", choice: "rerack" })}
           >
             {tr(l, "Montar y sacar yo", "Re-rack and break myself")}
           </button>
           {s.breakChoice?.illegal && (
-            <button
+            <button className="sd-button"
               disabled={paused}
               onClick={() =>
                 dispatch({ type: "BREAK_CHOICE", choice: "other" })
@@ -182,7 +182,7 @@ function PoolView({
         <div className="pool-controls">
           <label>
             {tr(l, "Bola anunciada", "Called ball")}
-            <select
+            <select className="sd-select"
               disabled={!ready}
               value={targets.includes(s.calledBall) ? s.calledBall : ""}
               onChange={(e) =>
@@ -206,7 +206,7 @@ function PoolView({
           </label>
           <label>
             {tr(l, "Tronera anunciada", "Called pocket")}
-            <select
+            <select className="sd-select"
               value={s.calledPocket}
               disabled={!ready}
               onChange={(e) =>
@@ -273,7 +273,7 @@ function PoolView({
                 }
               />
             </label>
-            <button
+            <button className="sd-button"
               disabled={!ready || s.inHand}
               onClick={() => act({ type: "SHOOT" })}
             >
@@ -296,7 +296,7 @@ function PoolView({
               <>
                 <label>
                   {tr(l, "Posición horizontal (%)", "Horizontal position (%)")}
-                  <input
+                  <input className="sd-input"
                     type="number"
                     min="0"
                     max={s.behindHead ? 24 : 100}
@@ -307,7 +307,7 @@ function PoolView({
                 </label>
                 <label>
                   {tr(l, "Posición vertical (%)", "Vertical position (%)")}
-                  <input
+                  <input className="sd-input"
                     type="number"
                     min="0"
                     max="100"
@@ -316,7 +316,7 @@ function PoolView({
                     onChange={(e) => setPlaceY(Number(e.target.value))}
                   />
                 </label>
-                <button
+                <button className="sd-button"
                   disabled={!ready}
                   onClick={() =>
                     dispatch({
@@ -332,7 +332,7 @@ function PoolView({
             )}
             <label>
               {tr(l, "Ángulo", "Angle")}
-              <input
+              <input className="sd-slider"
                 aria-label={tr(l, "Ángulo de tiro", "Shot angle")}
                 type="range"
                 min="-180"
@@ -350,7 +350,7 @@ function PoolView({
             </label>
           </div>
           <label className="pool-aim-lock">
-            <input
+            <input className="sd-checkbox"
               type="checkbox"
               checked={locked}
               disabled={!ready}

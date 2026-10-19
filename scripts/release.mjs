@@ -99,8 +99,9 @@ for (const name of [
   "workbox-precaching",
   "workbox-strategies",
   "workbox-window",
-  "@fontsource/ibm-plex-sans",
-  "@fontsource/ibm-plex-mono",
+  "@fontsource/cal-sans",
+  "@fontsource/dm-sans",
+  "@fontsource/dm-mono",
 ])
   Object.assign(
     sourceFiles,

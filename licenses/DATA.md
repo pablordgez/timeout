@@ -10,4 +10,4 @@ Se conserva la atribución a las fuentes y se incluyen `CC-BY-SA-4.0.txt` y `CC-
 
 Stockfish 19 Lite Single WASM se conserva sin modificar bajo GPLv3; versión, archivos y hashes en `stockfish-manifest.json`. La integración de Timeout añade un adaptador de Web Worker para cargar el WASM incluido sin solicitudes de red. Cada archivo de entrega incluye las atribuciones y acompaña una entrega de fuente correspondiente, incluido el árbol de Stockfish y su red neuronal.
 
-Las bibliotecas de ejecución y fuentes IBM Plex conservan sus licencias MIT, BSD-2-Clause, ISC o SIL OFL 1.1. Sus textos completos están en `THIRD-PARTY-NOTICES.txt`, con versiones en `dependencies.json`. Ningún recurso de juego se ha copiado de ROM, gráficos, música ni nombres comerciales originales.
+Las bibliotecas de ejecución y fuentes Cal Sans, DM Sans y DM Mono conservan sus licencias MIT, BSD-2-Clause, ISC o SIL OFL 1.1. Sus textos completos están en `THIRD-PARTY-NOTICES.txt`, con versiones en `dependencies.json`. Ningún recurso de juego se ha copiado de ROM, gráficos, música ni nombres comerciales originales.

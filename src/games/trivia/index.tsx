@@ -348,7 +348,7 @@ function View({
         {s.phase === "roll" ? (
           <>
             <h2>{tr(locale, "El siguiente paso", "Your next step")}</h2>
-            <button
+            <button className="sd-button"
               disabled={paused || bot}
               onClick={() => dispatch({ type: "ROLL" })}
             >
@@ -379,13 +379,13 @@ function View({
                   dispatch({ type: "ANSWER", answer });
                 }}
               >
-                <input
+                <input className="sd-input"
                   value={answer}
                   aria-label={tr(locale, "Tu respuesta", "Your answer")}
                   onChange={(e) => setAnswer(e.target.value)}
                   disabled={paused || bot}
                 />
-                <button disabled={paused || bot}>
+                <button className="sd-button" disabled={paused || bot}>
                   {tr(locale, "Comprobar respuesta", "Check answer")}
                 </button>
               </form>
@@ -413,13 +413,13 @@ function View({
                 </p>
                 {!bot && (
                   <div className="controls">
-                    <button
+                    <button className="sd-button"
                       disabled={bot || paused}
                       onClick={() => dispatch({ type: "GRADE", correct: true })}
                     >
                       {tr(locale, "He acertado", "Correct")}
                     </button>
-                    <button
+                    <button className="sd-button"
                       disabled={bot || paused}
                       onClick={() =>
                         dispatch({ type: "GRADE", correct: false })

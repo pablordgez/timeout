@@ -1,0 +1,76 @@
+/*
+ * Foco y animaciones compartidas.
+ *
+ * El foco es el estado más importante del sistema: con mando o mando a
+ * distancia es el único cursor. Se muestra con teclado (:focus-visible) y
+ * también cuando soda.js marca la modalidad direccional, porque el foco movido
+ * por un mando es programático y los navegadores no siempre lo consideran
+ * visible.
+ */
+
+:is(
+  .sd-button, .sd-tile, .sd-dock__item, .sd-chip, .sd-chip__remove, .sd-navbar__link,
+  .sd-segmented > *, .sd-tabs__list > *, .sd-tabs__panel, .sd-card--interactive,
+  .sd-switch, .sd-slider, .sd-checkbox, .sd-radio, .sd-toggle, .sd-pagination__link,
+  .sd-breadcrumb a, .sd-nav-menu__trigger, .sd-nav-menu__link, .sd-nav-menu__panel-link,
+  .sd-menubar__trigger, .sd-sidebar__button, .sd-accordion__trigger, .sd-collapsible__trigger,
+  .sd-calendar__day, a.sd-item, button.sd-item, .sd-table__sort, .sd-dots > button,
+  .sd-resizable__handle, .sd-carousel__viewport, .sd-scroll-area, .sd-message-scroller__viewport
+):is(:focus-visible, [data-sd-modality="directional"] :focus) {
+  outline: var(--sd-ring) solid var(--sd-focus-color);
+  outline-offset: calc(var(--sd-ring) * 0.8);
+}
+
+/* Los objetos que se «cogen» con el foco además crecen y brillan. */
+:is(.sd-tile, .sd-dock__item, .sd-card--interactive):is(:focus-visible, [data-sd-modality="directional"] :focus) {
+  z-index: 1;
+  transform: scale(var(--sd-focus-scale));
+  filter: drop-shadow(0 0 calc(12px * var(--sd-scale)) var(--sd-accent-glow));
+}
+
+/* Campos: un halo suave alrededor del borde de acento, sin desplazar el contenido. */
+:is(.sd-input, .sd-textarea, .sd-select, .sd-otp__slot):focus-visible,
+:is(.sd-input-group, .sd-choice--card):has(:focus-visible) {
+  outline: var(--sd-ring) solid oklch(65% 0.2 var(--sd-accent-h) / 0.35);
+  outline-offset: 0;
+}
+
+/* En filas de lista y menús el foco rellena la fila, como un cursor de consola. */
+:is(.sd-list__row, .sd-menu__item, .sd-command__item):is(:focus-visible, [data-sd-modality="directional"] :focus) {
+  outline: var(--sd-ring) solid var(--sd-focus-color);
+  outline-offset: calc(var(--sd-ring) * -1.5);
+  background: var(--sd-accent-soft);
+}
+
+:is(.sd-menu__item, .sd-command__item):is(:focus-visible, [data-sd-modality="directional"] :focus) {
+  outline-width: calc(var(--sd-ring) * 0.6);
+  outline-offset: calc(var(--sd-ring) * -0.6);
+}
+
+/* ----------------------------------------------------------- Animaciones -- */
+
+@keyframes sd-pop-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.96); }
+}
+
+@keyframes sd-fade-out {
+  to { opacity: 0; transform: translateY(4px) scale(0.98); }
+}
+
+@keyframes sd-slide-in {
+  from { translate: var(--from); }
+}
+
+@keyframes sd-shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: 0 0; }
+}
+
+@keyframes sd-spin {
+  to { rotate: 1turn; }
+}
+
+@keyframes sd-indeterminate {
+  from { background-position: -60% 0; }
+  to { background-position: 160% 0; }
+}

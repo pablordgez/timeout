@@ -102,7 +102,7 @@ function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
           <label className="sr-only" htmlFor="word-guess">
             {tr(locale, "Palabra", "Word")}
           </label>
-          <input
+          <input className="sd-input"
             id="word-guess"
             disabled={paused}
             maxLength={5}
@@ -117,7 +117,7 @@ function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
               )
             }
           />
-          <button type="submit" disabled={paused || input.length !== 5}>
+          <button className="sd-button" type="submit" disabled={paused || input.length !== 5}>
             {tr(locale, "Comprobar", "Check")}
           </button>
         </form>

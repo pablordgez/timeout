@@ -95,7 +95,7 @@ function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
               {tr(locale, "Respuesta correcta", "Correct answer")}:{" "}
               <strong>{q.w}</strong>
             </p>
-            <button onClick={() => setReviewIndex(null)}>
+            <button className="sd-button" onClick={() => setReviewIndex(null)}>
               {s.status === "playing"
                 ? tr(locale, "Seguir jugando", "Keep playing")
                 : tr(locale, "Ver todas las respuestas", "See all answers")}
@@ -119,19 +119,19 @@ function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
                 setAnswer("");
               }}
             >
-              <input
+              <input className="sd-input"
                 aria-label={tr(locale, "Tu respuesta", "Your answer")}
                 value={answer}
                 onChange={(e) => setAnswer(e.target.value)}
                 disabled={paused}
                 autoComplete="off"
               />
-              <button disabled={paused || !answer.trim()}>
+              <button className="sd-button" disabled={paused || !answer.trim()}>
                 {tr(locale, "Responder", "Answer")}
               </button>
             </form>
             <div className="controls">
-              <button
+              <button className="sd-button"
                 disabled={paused}
                 onClick={() => {
                   dispatch({ type: "PASS" });
@@ -140,7 +140,7 @@ function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
               >
                 {tr(locale, "Pasar palabra", "Pass")}
               </button>
-              <button
+              <button className="sd-button"
                 disabled={paused}
                 onClick={() => dispatch({ type: "REVEAL" })}
               >

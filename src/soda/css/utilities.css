@@ -1,0 +1,25 @@
+/*
+ * Utilidades de Soda UI (capa soda.utilities).
+ */
+
+/*
+ * Los componentes fijan display (grid, flex) y eso gana al display: none que el
+ * navegador da a [hidden]. Esta capa va después de los componentes para que
+ * hidden oculte siempre, también en pasos del cuestionario, avisos y paneles.
+ */
+[hidden]:not([hidden="until-found"]) { display: none; }
+
+.sd-stack { display: flex; flex-direction: column; gap: var(--gap, var(--sd-space-4)); }
+.sd-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gap, var(--sd-space-3)); }
+
+/* Iconos direccionales (flechas, chevrones) que deben invertirse en RTL. */
+.sd-flip-rtl:dir(rtl) { scale: -1 1; }
+
+.sd-visually-hidden {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

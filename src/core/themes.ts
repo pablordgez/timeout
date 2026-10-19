@@ -1,13 +1,16 @@
 export interface ThemeDefinition {
   id: string;
   name: string;
+  /** Soda accent name, applied as data-accent on the root element. */
+  accent: string;
   light: Record<string, string>;
   dark: Record<string, string>;
 }
 const shared = {
-  "font-body": "'IBM Plex Sans', sans-serif",
-  "font-mono": "'IBM Plex Mono', monospace",
-  radius: "14px",
+  "font-body": "'DM Sans', system-ui, sans-serif",
+  "font-display": "'Cal Sans', 'DM Sans', system-ui, sans-serif",
+  "font-mono": "'DM Mono', ui-monospace, monospace",
+  radius: "20px",
   space: "8px",
   motion: "180ms",
   "card-face": "#faf7ef",
@@ -42,56 +45,110 @@ const shared = {
 export const themes: ThemeDefinition[] = [
   {
     id: "signal",
-    name: "Signal",
+    name: "Soda · Uva",
+    accent: "grape",
     light: {
       ...shared,
-      bg: "#f5f3ef",
-      surface: "#ffffff",
-      raised: "#ebe9e4",
-      text: "#232427",
-      muted: "#65656c",
-      border: "#d8d7d2",
-      accent: "#d82330",
+      bg: "#ebedf1",
+      surface: "#fbfcfd",
+      raised: "#f0f1f6",
+      text: "#202128",
+      muted: "#4c4c54",
+      border: "#d6d7dd",
+      accent: "#853fd8",
       "on-accent": "#fff",
     },
     dark: {
       ...shared,
-      bg: "#111315",
-      surface: "#1b1d20",
-      raised: "#272a2e",
-      text: "#f0eee9",
-      muted: "#aaaab0",
-      border: "#35383c",
-      accent: "#f45760",
-      "on-accent": "#121314",
+      bg: "#0f0f16",
+      surface: "#17181e",
+      raised: "#202128",
+      text: "#f4f3f7",
+      muted: "#c5c2cb",
+      border: "#34353d",
+      accent: "#a76ef8",
+      "on-accent": "#fff",
     },
   },
   {
     id: "phosphor",
-    name: "Phosphor",
+    name: "Soda · Menta",
+    accent: "mint",
     light: {
       ...shared,
-      bg: "#edf3e8",
-      surface: "#f8fff2",
-      raised: "#dfe9d7",
-      text: "#163720",
-      muted: "#46654d",
-      border: "#b9cfb5",
-      accent: "#28663b",
+      bg: "#ebedf1",
+      surface: "#fbfcfd",
+      raised: "#f0f1f6",
+      text: "#202128",
+      muted: "#4c4c54",
+      border: "#d6d7dd",
+      accent: "#00924c",
       "on-accent": "#fff",
-      radius: "3px",
     },
     dark: {
       ...shared,
-      bg: "#0b150e",
-      surface: "#102019",
-      raised: "#1b3324",
-      text: "#b8edbf",
-      muted: "#89b393",
-      border: "#315b3d",
-      accent: "#86db92",
-      "on-accent": "#102019",
-      radius: "3px",
+      bg: "#0f0f16",
+      surface: "#17181e",
+      raised: "#202128",
+      text: "#f4f3f7",
+      muted: "#c5c2cb",
+      border: "#34353d",
+      accent: "#00b672",
+      "on-accent": "#fff",
+    },
+  },
+  {
+    id: "sky",
+    name: "Soda · Cielo",
+    accent: "sky",
+    light: {
+      ...shared,
+      bg: "#ebedf1",
+      surface: "#fbfcfd",
+      raised: "#f0f1f6",
+      text: "#202128",
+      muted: "#4c4c54",
+      border: "#d6d7dd",
+      accent: "#0078d9",
+      "on-accent": "#fff",
+    },
+    dark: {
+      ...shared,
+      bg: "#0f0f16",
+      surface: "#17181e",
+      raised: "#202128",
+      text: "#f4f3f7",
+      muted: "#c5c2cb",
+      border: "#34353d",
+      accent: "#00a0f9",
+      "on-accent": "#fff",
+    },
+  },
+  {
+    id: "coral",
+    name: "Soda · Coral",
+    accent: "coral",
+    light: {
+      ...shared,
+      bg: "#ebedf1",
+      surface: "#fbfcfd",
+      raised: "#f0f1f6",
+      text: "#202128",
+      muted: "#4c4c54",
+      border: "#d6d7dd",
+      accent: "#d00021",
+      "on-accent": "#fff",
+    },
+    dark: {
+      ...shared,
+      bg: "#0f0f16",
+      surface: "#17181e",
+      raised: "#202128",
+      text: "#f4f3f7",
+      muted: "#c5c2cb",
+      border: "#34353d",
+      accent: "#f4514f",
+      "on-accent": "#fff",
     },
   },
 ];
@@ -107,5 +164,9 @@ export function applyTheme(id: string, mode: string) {
   appliedKeys = Object.keys(tokens);
   for (const [key, value] of Object.entries(tokens))
     document.documentElement.style.setProperty(`--${key}`, value);
-  document.documentElement.style.colorScheme = dark ? "dark" : "light";
+  const root = document.documentElement;
+  root.style.colorScheme = dark ? "dark" : "light";
+  root.dataset.theme = dark ? "dark" : "light";
+  root.dataset.accent = theme.accent;
+  root.dataset.surface = "web";
 }

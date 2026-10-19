@@ -1,0 +1,50 @@
+/*
+ * Adaptaciones a capacidades y preferencias del sistema. Se importa sin capa
+ * porque cada bloque declara la capa de Soda que modifica.
+ */
+
+/* Sin desenfoque, el cristal pasa a ser una superficie sólida legible. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  @layer soda.components {
+    .sd-glass { background: var(--sd-glass-sheen), var(--sd-surface); }
+    :is(.sd-popover, .sd-menu, .sd-command, .sd-hover-card, .sd-dialog, .sd-sheet, .sd-drawer) { background: var(--sd-surface-raised); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @layer soda.tokens {
+    :root,
+    [data-surface] { --sd-focus-scale: 1; }
+  }
+
+  @layer soda.components {
+    [class*="sd-"],
+    [class*="sd-"]::before,
+    [class*="sd-"]::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* Alto contraste: bordes y estados pasan a colores del sistema. */
+@media (forced-colors: active) {
+  @layer soda.components {
+    .sd-glass,
+    .sd-button,
+    .sd-tile,
+    .sd-chip,
+    .sd-toggle,
+    .sd-pagination__link,
+    .sd-menu,
+    .sd-popover,
+    .sd-command { border: 1px solid CanvasText; }
+
+    .sd-gradient-text { background: none; color: CanvasText; }
+
+    :is(.sd-segmented, .sd-tabs__list) > [aria-selected="true"],
+    .sd-toggle[aria-pressed="true"],
+    .sd-calendar__day[aria-selected="true"] { background: Highlight; color: HighlightText; }
+  }
+}

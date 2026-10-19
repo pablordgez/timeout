@@ -10,8 +10,9 @@ const names = [
   "workbox-precaching",
   "workbox-strategies",
   "workbox-window",
-  "@fontsource/ibm-plex-sans",
-  "@fontsource/ibm-plex-mono",
+  "@fontsource/cal-sans",
+  "@fontsource/dm-sans",
+  "@fontsource/dm-mono",
 ];
 let out = "Timeout — runtime dependency notices\n\n";
 const manifest = [];

@@ -118,7 +118,7 @@ function DominoView({
             ))}
           </div>
           {s.status === "playing" && (
-            <button
+            <button className="sd-button"
               disabled={paused}
               onClick={() => dispatch({ type: "NEXT_ROUND" })}
             >
@@ -173,14 +173,14 @@ function DominoView({
           </div>
           <div className="domino-actions">
             {c.mode !== "pairs" && (
-              <button
+              <button className="sd-button"
                 disabled={paused || !human || can.length > 0 || !s.stock.length}
                 onClick={() => dispatch({ type: "DRAW" })}
               >
                 {tr(l, "Robar", "Draw")} · {s.stock.length}
               </button>
             )}
-            <button
+            <button className="sd-button"
               disabled={
                 paused ||
                 !human ||

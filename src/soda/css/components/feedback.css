@@ -1,0 +1,300 @@
+/*
+ * Estado y avisos: alerta, avisos emergentes y logros, progreso, medidor de
+ * HUD, indicador de carga, chips (el Badge de shadcn), contadores y presencia.
+ */
+
+/* --------------------------------------------------------------- Alerta -- */
+
+/*
+ * Alerta en línea. Las variantes solo eligen un matiz; el tinte, el borde y
+ * el icono se derivan de --hue, así que cualquier matiz propio también vale.
+ */
+.sd-alert {
+  --hue: var(--sd-accent-h);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--sd-space-1) var(--sd-space-3);
+  padding: var(--sd-space-4);
+  border: 1px solid oklch(70% 0.14 var(--hue) / 0.35);
+  border-radius: var(--sd-radius-lg);
+  background: oklch(70% 0.14 var(--hue) / 0.1);
+  color: var(--sd-text);
+  font-size: var(--sd-text-sm);
+}
+
+.sd-alert--neutral { border-color: var(--sd-line); background: var(--sd-surface-sunken); }
+.sd-alert--info { --hue: var(--sd-hue-info); }
+.sd-alert--success { --hue: var(--sd-hue-success); }
+.sd-alert--warning { --hue: var(--sd-hue-warning); }
+.sd-alert--danger { --hue: var(--sd-hue-danger); }
+
+.sd-alert > svg,
+.sd-alert__icon {
+  grid-row: 1 / span 2;
+  inline-size: calc(var(--sd-icon) * 0.9);
+  block-size: calc(var(--sd-icon) * 0.9);
+  color: light-dark(oklch(52% 0.17 var(--hue)), oklch(80% 0.13 var(--hue)));
+}
+
+.sd-alert--neutral > svg { color: var(--sd-text-muted); }
+.sd-alert__title { grid-column: 2; margin: 0; font-weight: 700; line-height: 1.35; }
+.sd-alert__description { grid-column: 2; margin: 0; color: var(--sd-text-muted); line-height: 1.5; }
+.sd-alert--danger .sd-alert__description { color: var(--sd-danger); }
+.sd-alert__action { grid-column: 3; grid-row: 1 / span 2; align-self: center; }
+
+/* ------------------------------------------------- Avisos y logros -- */
+
+.sd-toast-region {
+  position: fixed;
+  inset-block-end: var(--sd-space-4);
+  inset-inline-end: var(--sd-space-4);
+  z-index: var(--sd-z-toast);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--sd-space-2);
+  pointer-events: none;
+}
+
+.sd-toast-region[data-position^="top"] { inset-block: var(--sd-space-4) auto; flex-direction: column-reverse; }
+.sd-toast-region[data-position$="start"] { inset-inline: var(--sd-space-4) auto; align-items: flex-start; }
+.sd-toast-region[data-position$="center"] { left: 50%; inset-inline-end: auto; align-items: center; translate: -50% 0; }
+
+.sd-toast {
+  --hue: var(--sd-hue-lemon);
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sd-space-3);
+  max-inline-size: min(24rem, calc(100vw - 2 * var(--sd-space-4)));
+  padding: var(--sd-space-3);
+  padding-inline-end: var(--sd-space-5);
+  border-radius: var(--sd-radius-lg);
+  pointer-events: auto;
+  animation: sd-pop-in var(--sd-duration-slow) var(--sd-ease-spring);
+}
+
+.sd-toast--success { --hue: var(--sd-hue-success); }
+.sd-toast--info { --hue: var(--sd-hue-info); }
+.sd-toast--warning { --hue: var(--sd-hue-warning); }
+.sd-toast--danger { --hue: var(--sd-hue-danger); }
+
+.sd-toast__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: var(--sd-target);
+  aspect-ratio: 1;
+  border-radius: var(--sd-radius-md);
+  background: linear-gradient(160deg, oklch(95% 0.06 var(--hue)), oklch(84% 0.12 var(--hue)));
+  box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / 0.85);
+  color: oklch(60% 0.16 calc(var(--hue) - 20));
+}
+
+.sd-toast__icon svg { inline-size: 60%; block-size: 60%; }
+.sd-toast__icon .sd-spinner { font-size: calc(var(--sd-target) * 0.45); }
+.sd-toast__body { display: grid; flex: 1; gap: 2px; min-inline-size: 0; }
+.sd-toast__title { margin: 0; font: 400 var(--sd-text-md) / 1.2 var(--sd-font-display); }
+.sd-toast__text { margin: 0; color: var(--sd-text-muted); font-size: var(--sd-text-sm); }
+.sd-toast__action { flex: none; }
+
+.sd-toast__close {
+  position: absolute;
+  inset-block-start: calc(var(--sd-space-2) * -1);
+  inset-inline-start: calc(var(--sd-space-2) * -1);
+  inline-size: calc(var(--sd-target) * 0.5);
+  min-block-size: calc(var(--sd-target) * 0.5);
+  opacity: 0;
+  transition: opacity var(--sd-duration-base);
+}
+
+.sd-toast:is(:hover, :focus-within) > .sd-toast__close { opacity: 1; }
+.sd-toast[data-leaving] { animation: sd-fade-out var(--sd-duration-base) var(--sd-ease-out) forwards; }
+
+/* ------------------------------------------------------------ Progreso -- */
+
+.sd-progress {
+  display: block;
+  inline-size: 100%;
+  block-size: calc(8px * var(--sd-scale));
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--sd-radius-full);
+  background: var(--sd-line);
+  appearance: none;
+}
+
+.sd-progress::-webkit-progress-bar { background: var(--sd-line); }
+.sd-progress::-webkit-progress-value { border-radius: var(--sd-radius-full); background: var(--sd-gradient-accent); }
+.sd-progress::-moz-progress-bar { border-radius: var(--sd-radius-full); background: var(--sd-gradient-accent); }
+
+/* Sin value, <progress> es indeterminado: una franja de acento recorre la pista. */
+.sd-progress:indeterminate {
+  background:
+    linear-gradient(90deg, transparent, var(--sd-accent), transparent) 0 0 / 40% 100% no-repeat,
+    var(--sd-line);
+  animation: sd-indeterminate 1.4s var(--sd-ease-out) infinite;
+}
+
+.sd-progress:indeterminate::-webkit-progress-bar { background: transparent; }
+.sd-progress:indeterminate::-moz-progress-bar { background: transparent; }
+
+/*
+ * Medidor de HUD (vida, energía, carga). Usa role="meter" con aria-valuenow y
+ * recibe el relleno en --value; --hue elige el color del recurso.
+ */
+.sd-meter {
+  --hue: var(--sd-hue-mint);
+  --value: 100%;
+  position: relative;
+  block-size: calc(12px * var(--sd-scale));
+  overflow: hidden;
+  border-radius: var(--sd-radius-full);
+  background: rgb(0 0 0 / 0.35);
+  box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.4), 0 0 0 1.5px rgb(255 255 255 / 0.55);
+}
+
+.sd-meter::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: var(--value);
+  border-radius: inherit;
+  background: linear-gradient(180deg, oklch(86% 0.13 var(--hue)), oklch(64% 0.19 var(--hue)));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6), 0 0 10px oklch(70% 0.18 var(--hue) / 0.6);
+  transition: inline-size var(--sd-duration-slow) var(--sd-ease-out);
+}
+
+.sd-meter--segmented::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(90deg, transparent 0 calc(10% - 2px), rgb(0 0 0 / 0.35) calc(10% - 2px) 10%);
+}
+
+/* ------------------------------------------------------ Indicador de carga -- */
+
+/* Anillo con degradado de acento; se mide en em para acompañar al texto. */
+.sd-spinner {
+  display: inline-block;
+  flex: none;
+  inline-size: 1.25em;
+  block-size: 1.25em;
+  border-radius: var(--sd-radius-full);
+  background: conic-gradient(from 0deg, transparent 10%, var(--sd-accent));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 0.2em), #000 calc(100% - 0.19em));
+  animation: sd-spin 0.8s linear infinite;
+}
+
+/* ------------------------------------------------- Chips y contadores -- */
+
+/*
+ * .sd-chip es la etiqueta (el Badge de shadcn); .sd-badge es el contador
+ * numérico rojo de las notificaciones.
+ */
+.sd-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sd-space-2);
+  min-block-size: calc(var(--sd-target) * 0.7);
+  padding: 0 var(--sd-space-3);
+  border: 1px solid var(--sd-line);
+  border-radius: var(--sd-radius-full);
+  background: var(--sd-surface-sunken);
+  color: var(--sd-text-muted);
+  font: 600 var(--sd-text-sm) / 1 var(--sd-font-body);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+:is(button, a).sd-chip { cursor: pointer; }
+:is(button, a).sd-chip:hover { background: var(--sd-surface-hover); color: var(--sd-text); }
+
+.sd-chip svg { inline-size: calc(var(--sd-icon) * 0.75); block-size: calc(var(--sd-icon) * 0.75); }
+
+.sd-chip--sm {
+  gap: var(--sd-space-1);
+  min-block-size: calc(var(--sd-target) * 0.5);
+  padding: 0 var(--sd-space-2);
+  font-size: var(--sd-text-xs);
+}
+
+.sd-chip--accent,
+.sd-chip[aria-pressed="true"] {
+  border-color: oklch(65% 0.2 var(--sd-accent-h) / 0.35);
+  background: var(--sd-accent-soft);
+  color: var(--sd-accent-strong);
+}
+
+.sd-chip--solid {
+  border-color: transparent;
+  background: var(--sd-gradient-accent);
+  color: var(--sd-on-accent);
+}
+
+.sd-chip--outline { background: transparent; border-color: var(--sd-line-strong); color: var(--sd-text); }
+
+.sd-chip--danger {
+  border-color: oklch(65% 0.2 25 / 0.3);
+  background: var(--sd-danger-soft);
+  color: var(--sd-danger);
+}
+
+/* Chip tintado con --hue, para etiquetas de plataforma o género. */
+.sd-chip--tint {
+  border-color: oklch(70% 0.14 var(--hue) / 0.35);
+  background: oklch(70% 0.14 var(--hue) / 0.15);
+  color: light-dark(oklch(45% 0.15 var(--hue)), oklch(85% 0.1 var(--hue)));
+}
+
+/* Botón de quitar dentro de un chip (filtros, selección múltiple). */
+.sd-chip__remove {
+  display: grid;
+  place-items: center;
+  inline-size: 1.3em;
+  block-size: 1.3em;
+  margin-inline: calc(var(--sd-space-1) * -1) calc(var(--sd-space-2) * -1);
+  padding: 0;
+  border: 0;
+  border-radius: var(--sd-radius-full);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.sd-chip__remove:hover { background: var(--sd-surface-hover); }
+.sd-chip__remove svg { inline-size: 0.9em; block-size: 0.9em; }
+
+.sd-badge {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 1.45em;
+  block-size: 1.45em;
+  padding: 0 0.35em;
+  border-radius: var(--sd-radius-full);
+  background: var(--sd-notify);
+  box-shadow: 0 0 0 2px var(--sd-bg);
+  color: oklch(100% 0 0);
+  font: 700 var(--sd-text-xs) / 1 var(--sd-font-body);
+  font-variant-numeric: tabular-nums;
+}
+
+.sd-badge--dot { min-inline-size: 0.7em; block-size: 0.7em; padding: 0; }
+
+/* ------------------------------------------------------------ Presencia -- */
+
+/* Punto de presencia suelto; .sd-avatar[data-presence] lo dibuja solo. */
+.sd-presence {
+  display: inline-block;
+  inline-size: 0.7em;
+  block-size: 0.7em;
+  border-radius: var(--sd-radius-full);
+  background: var(--sd-text-subtle);
+  box-shadow: 0 0 0 2px var(--sd-bg);
+}
+
+.sd-presence[data-presence="online"] { background: var(--sd-success); }
+.sd-presence[data-presence="away"] { background: var(--sd-warning); }
+.sd-presence[data-presence="busy"] { background: var(--sd-danger); }

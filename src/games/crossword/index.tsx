@@ -157,7 +157,7 @@ function View({
                 }
               >
                 <small>{numbering.get(i) || ""}</small>
-                <input
+                <input className="sd-input"
                   ref={(el) => {
                     refs.current[i] = el;
                   }}
@@ -213,7 +213,7 @@ function View({
           {tr(locale, "letras completadas", "letters filled")}
         </p>
         <div className="controls">
-          <button
+          <button className="sd-button"
             disabled={paused || s.status !== "playing"}
             onClick={() =>
               dispatch({ type: "CELL", index: s.selected, toggle: true })
@@ -221,13 +221,13 @@ function View({
           >
             {tr(locale, "Cambiar dirección ↔", "Change direction ↔")}
           </button>
-          <button
+          <button className="sd-button"
             disabled={paused || s.status !== "playing"}
             onClick={() => dispatch({ type: "HINT" })}
           >
             {tr(locale, "Revelar letra", "Reveal letter")}
           </button>
-          <button
+          <button className="sd-button"
             disabled={paused}
             aria-pressed={s.check}
             onClick={() => dispatch({ type: "CHECK" })}
