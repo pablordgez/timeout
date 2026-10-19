@@ -3,6 +3,9 @@ import { soundEventForTransition, soundRecipe } from "../src/core/sound-design";
 import { baseState } from "../src/core/types";
 import { directedShot } from "../src/games/billiards/preview";
 import { createPool, poolReducer } from "../src/games/billiards/engine";
+import { domino } from "../src/games/domino";
+import { letters } from "../src/games/letters";
+import { poker } from "../src/games/poker";
 
 const state = (extra: Record<string, any> = {}) => ({
   ...baseState(11),
@@ -219,6 +222,64 @@ describe("precise pool charging", () => {
     expect(
       soundEventForTransition("billiards", s, shot, { type: "SHOOT" })?.event,
     ).toBe("reject");
+  });
+  it("determines handoff visibility only when multiple human players participate", () => {
+    const shouldHideHand = (
+      gameDef: any,
+      state: any,
+      config: any,
+      revealed: string | null,
+    ) => {
+      const turn = gameDef.getTurn?.(state, config);
+      const turnKey = turn
+        ? `${turn.player}:${state.round ?? state.handNumber ?? state.hand ?? ""}`
+        : null;
+      const hasMultipleHumans =
+        (gameDef.playerCount?.(config) ?? Number(config.players || 2)) > 1 &&
+        Number(config.humans ?? 1) > 1;
+      return (
+        hasMultipleHumans && !!turn?.hidden && !turn.bot && revealed !== turnKey
+      );
+    };
+
+    const dominoState = {
+      phase: "play",
+      turn: 0,
+      round: 1,
+      hands: [[0], [1]],
+      status: "playing",
+    };
+    expect(
+      shouldHideHand(domino, dominoState, { players: 2, humans: 1 }, null),
+    ).toBe(false);
+    expect(
+      shouldHideHand(domino, dominoState, { players: 2, humans: 2 }, null),
+    ).toBe(true);
+
+    const lettersState = {
+      status: "playing",
+      turn: 0,
+      players: [{ rack: [] }, { rack: [] }],
+    };
+    expect(
+      shouldHideHand(letters, lettersState, { players: 2, humans: 1 }, null),
+    ).toBe(false);
+    expect(
+      shouldHideHand(letters, lettersState, { players: 2, humans: 2 }, null),
+    ).toBe(true);
+
+    const pokerState = {
+      street: "flop",
+      turn: 0,
+      handNumber: 1,
+      players: [{ stack: 100 }, { stack: 100 }],
+    };
+    expect(
+      shouldHideHand(poker, pokerState, { players: 2, humans: 1 }, null),
+    ).toBe(false);
+    expect(
+      shouldHideHand(poker, pokerState, { players: 2, humans: 2 }, null),
+    ).toBe(true);
   });
 });
 

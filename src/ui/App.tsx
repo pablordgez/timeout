@@ -1163,7 +1163,11 @@ function Play({
     turnKey = turn
       ? `${turn.player}:${state.round ?? state.handNumber ?? state.hand ?? ""}`
       : null;
-  const hidden = !!turn?.hidden && !turn.bot && revealed !== turnKey;
+  const hasMultipleHumans =
+    (game.playerCount?.(config) ?? Number(config.players || 2)) > 1 &&
+    Number(config.humans ?? 1) > 1;
+  const hidden =
+    hasMultipleHumans && !!turn?.hidden && !turn.bot && revealed !== turnKey;
   const hasBots =
     !!game.bot &&
     config.mode !== "practice" &&
