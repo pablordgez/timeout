@@ -405,7 +405,19 @@ function Board({ state, dispatch, locale, paused, compact }: BoardProps) {
                 />
               </small>
             </span>
+            <span className="sol-top-suit" aria-hidden="true">
+              <PixelSprite
+                sprite={suits[card.suit]}
+                palette={{ k: "currentColor" }}
+              />
+            </span>
             <span className="sol-center">
+              <PixelSprite
+                sprite={suits[card.suit]}
+                palette={{ k: "currentColor" }}
+              />
+            </span>
+            <span className="sol-bottom-suit" aria-hidden="true">
               <PixelSprite
                 sprite={suits[card.suit]}
                 palette={{ k: "currentColor" }}
@@ -726,7 +738,19 @@ function Board({ state, dispatch, locale, paused, compact }: BoardProps) {
                     />
                   </small>
                 </span>
+                <span className="sol-top-suit" aria-hidden="true">
+                  <PixelSprite
+                    sprite={suits[card.suit]}
+                    palette={{ k: "currentColor" }}
+                  />
+                </span>
                 <span className="sol-center">
+                  <PixelSprite
+                    sprite={suits[card.suit]}
+                    palette={{ k: "currentColor" }}
+                  />
+                </span>
+                <span className="sol-bottom-suit" aria-hidden="true">
                   <PixelSprite
                     sprite={suits[card.suit]}
                     palette={{ k: "currentColor" }}

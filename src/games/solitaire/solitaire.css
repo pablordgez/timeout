@@ -163,6 +163,32 @@
   right: 5px;
   transform: rotate(180deg);
 }
+.sol-top-suit {
+  position: absolute;
+  top: 4px;
+  right: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.sol-top-suit .pixel-sprite {
+  width: 12px;
+  height: 12px;
+}
+.sol-bottom-suit {
+  position: absolute;
+  bottom: 4px;
+  left: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.sol-bottom-suit .pixel-sprite {
+  width: 12px;
+  height: 12px;
+}
 .sol-center {
   position: absolute;
   top: 32%;
