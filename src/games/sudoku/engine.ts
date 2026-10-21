@@ -1,4 +1,21 @@
 import { random, shuffle } from "../../core/random";
+export function hasConflict(board: number[], index: number): boolean {
+  const val = board[index];
+  if (!val) return false;
+  const r = Math.floor(index / 9);
+  const c = index % 9;
+  const br = Math.floor(r / 3) * 3;
+  const bc = Math.floor(c / 3) * 3;
+  for (let i = 0; i < 9; i++) {
+    const rowIdx = r * 9 + i;
+    if (rowIdx !== index && board[rowIdx] === val) return true;
+    const colIdx = i * 9 + c;
+    if (colIdx !== index && board[colIdx] === val) return true;
+    const boxIdx = (br + Math.floor(i / 3)) * 9 + bc + (i % 3);
+    if (boxIdx !== index && board[boxIdx] === val) return true;
+  }
+  return false;
+}
 export function candidates(board: number[], index: number): number[] {
   if (board[index]) return [];
   const r = Math.floor(index / 9),

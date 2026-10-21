@@ -8,6 +8,19 @@ export function crosswordReducer(s:CrosswordState,a:Action,_config?:Config):Cros
  if(a.type==='SLOT'){const slot=s.puzzle.slots.find(v=>v.id===a.id);return slot?{...s,selected:slot.cells.find(i=>!s.board[i])??slot.cells[0],direction:slot.direction}:s;}
  if(a.type==='ARROW'){const size=s.puzzle.size;let x=s.selected%size,y=Math.floor(s.selected/size);const d:Record<string,[number,number]>={left:[-1,0],right:[1,0],up:[0,-1],down:[0,1]};const [dx,dy]=d[a.direction]||[0,0];if(!dx&&!dy)return s;for(let n=0;n<size;n++){x+=dx;y+=dy;if(x<0||x>=size||y<0||y>=size)break;const i=y*size+x;if(s.puzzle.mask[i])return {...s,selected:i,direction:dy?'down':'across'};}return s;}
  if(s.status!=='playing')return s;
+ if(a.type==='DEMO_CHECK'||(a.type==='CHECK'&&a.demo)){
+  const board=[...s.board];let selected=s.selected;
+  if(!board.some((v,i)=>s.puzzle.mask[i]&&v&&v!==s.puzzle.solution[i])){
+    const slot=currentSlot(s);
+    const target=slot.cells.find(i=>!board[i])??s.puzzle.mask.findIndex((v,i)=>v&&!board[i]);
+    if(target>=0){
+      const correct=s.puzzle.solution[target]||'a';
+      board[target]=correct==='x'?'z':'x';
+      selected=target;
+    }
+  }
+  return {...s,board,selected,check:true,checks:s.checks+1};
+ }
  if(a.type==='CHECK')return {...s,check:!s.check,checks:s.check?s.checks:s.checks+1};
  if(a.type!=='INPUT'&&a.type!=='HINT'&&a.type!=='BACKSPACE'&&a.type!=='PASTE')return s;
  const board=[...s.board];let selected=s.selected;const slot=currentSlot(s);const at=slot.cells.indexOf(selected);let hints=s.hints;

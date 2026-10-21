@@ -174,7 +174,7 @@ export function botProfile(seed: number, index: number) {
 }
 export function triviaReducer(s: State, a: Action, cfg: Config): State {
   if (s.status !== "playing") return s;
-  if (a.type === "ROLL" && s.phase === "roll") {
+  if (a.type === "ROLL") {
     const [r, rng] = random(s.rng),
       dice = Math.floor(r * 6) + 1;
     return {
@@ -183,6 +183,9 @@ export function triviaReducer(s: State, a: Action, cfg: Config): State {
       dice,
       destinations: destinations(s.players[s.turn].position, dice),
       phase: "move",
+      answer: "",
+      gradeOverride: undefined,
+      question: null,
     };
   }
   if (

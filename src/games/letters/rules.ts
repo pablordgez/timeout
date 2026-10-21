@@ -149,8 +149,13 @@ export function lettersReducer(state: LettersState, action: Action, _config: Con
   }
   if (action.type === 'RECALL') return { ...state, pending: action.tileId === undefined ? [] : state.pending.filter(p => p.tileId !== action.tileId), message: undefined };
   if (action.type === 'PLAY') return commitLetters(state, action.placements || state.pending, dictionary);
-  if (action.type === 'PASS') {
-    if (state.pending.length) return { ...state, message: 'recall-first' };
+  if (action.type === 'PASS' || action.type === 'DEMO_PASS') {
+    if (state.pending.length) {
+      if (action.demo || action.type === 'DEMO_PASS') {
+        return advance({ ...state, pending: [] }, 'pass', 0, []);
+      }
+      return { ...state, message: 'recall-first' };
+    }
     return advance(state,'pass',0,[]);
   }
   if (action.type === 'EXCHANGE') {

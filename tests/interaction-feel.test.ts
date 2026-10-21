@@ -401,5 +401,100 @@ describe("Foley synthesis availability", () => {
       }
     }
   });
+
+  it("verifies all 'Probar este paso' actions make visible changes to the board", async () => {
+    const { sudoku } = await import("../src/games/sudoku");
+    const { crossword } = await import("../src/games/crossword");
+    const { trivia } = await import("../src/games/trivia");
+    const { letters } = await import("../src/games/letters");
+    const { hasConflict } = await import("../src/games/sudoku/engine");
+
+    // 1. Sudoku: DEMO_NOTES selects an empty cell and populates notes
+    const emptyBoard = Array(81).fill(0);
+    emptyBoard[0] = 5;
+    const sudokuState: any = {
+      ...baseState(1),
+      board: emptyBoard,
+      puzzle: emptyBoard,
+      solution: Array(81).fill(5),
+      notes: Array.from({ length: 81 }, () => []),
+      selected: 1,
+      mistakes: 0,
+      hints: 0,
+      noteMode: false,
+      undo: [],
+      errorCheck: "conflicts",
+      rating: { level: 1, technique: "single" },
+      status: "playing",
+    };
+    const demoNotesState = sudoku.reducer(sudokuState, { type: "DEMO_NOTES" }, { difficulty: 1 });
+    expect(demoNotesState.noteMode).toBe(true);
+    expect(demoNotesState.selected).toBeGreaterThan(0);
+    expect(demoNotesState.notes[demoNotesState.selected].length).toBeGreaterThan(0);
+
+    // 2. Sudoku: conflict checking vs spoiler solution check
+    // Row conflict: cell 1 and cell 2 both have 5 (same row)
+    const conflictBoard = [...emptyBoard];
+    conflictBoard[1] = 5;
+    conflictBoard[2] = 5;
+    expect(hasConflict(conflictBoard, 1)).toBe(true);
+    expect(hasConflict(conflictBoard, 2)).toBe(true);
+
+    // Placing a legal digit (no row/col/box duplicate) that doesn't match the hidden solution
+    // does NOT trigger mistakes when errorCheck is "conflicts" (default)
+    const placedState = sudoku.reducer(sudokuState, { type: "NUMBER", value: 3 }, { difficulty: 1 });
+    expect(placedState.mistakes).toBe(0);
+
+    // But if errorCheck is explicitly set to "solution", it DOES flag the difference
+    const solutionCheckState = { ...sudokuState, errorCheck: "solution" };
+    const flaggedState = sudoku.reducer(solutionCheckState, { type: "NUMBER", value: 3 }, { difficulty: 1 });
+    expect(flaggedState.mistakes).toBe(1);
+
+    // 3. Crossword: DEMO_CHECK visibly activates check mode and marks error
+    const dummyPuzzle: any = {
+      size: 3,
+      mask: [true, true, true, false, false, false, false, false, false],
+      slots: [{ id: 0, direction: "across", number: 1, clue: "Test", cells: [0, 1, 2] }],
+      solution: ["c", "a", "t"],
+    };
+    const cwState: any = {
+      ...baseState(1),
+      puzzle: dummyPuzzle,
+      board: ["", "", ""],
+      selected: 0,
+      direction: "across",
+      hints: 0,
+      checks: 0,
+      check: false,
+      status: "playing",
+    };
+    const checkedState = crossword.reducer(cwState, { type: "DEMO_CHECK" }, {});
+    expect(checkedState.check).toBe(true);
+    expect(checkedState.board.some((v, i) => v && v !== dummyPuzzle.solution[i])).toBe(true);
+
+    // 4. Letters: DEMO_PASS recalls pending tiles and advances
+    const letInit: any = (letters as any).practice();
+    const placedLetters = letters.reducer(letInit, { type: "PLACE", row: 7, col: 7, tileId: 1000 }, { language: "es", players: 2 });
+    expect(placedLetters.pending.length).toBe(1);
+    const passedLetters = letters.reducer(placedLetters, { type: "PASS", demo: true }, { language: "es", players: 2 });
+    expect(passedLetters.pending.length).toBe(0);
+    expect(passedLetters.turn).toBe(1);
+
+    // 5. Trivia: ROLL works and sets destinations even if phase is not 'roll'
+    const triviaState: any = {
+      ...baseState(1),
+      rng: 42,
+      phase: "move",
+      turn: 0,
+      players: [{ position: 0, tokens: [false, false, false, false, false, false] }],
+      destinations: [],
+      status: "playing",
+    };
+    const rolledTrivia = trivia.reducer(triviaState, { type: "ROLL" }, {});
+    expect(rolledTrivia.phase).toBe("move");
+    expect(rolledTrivia.destinations.length).toBeGreaterThan(0);
+    expect(rolledTrivia.dice).toBeGreaterThanOrEqual(1);
+    expect(rolledTrivia.dice).toBeLessThanOrEqual(6);
+  });
 });
 

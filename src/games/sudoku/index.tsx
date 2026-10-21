@@ -9,7 +9,7 @@ import {
   type GameViewProps,
 } from "../../core/types";
 import SudokuWorker from "./generator.worker?worker&inline";
-import { candidates } from "./engine";
+import { candidates, hasConflict } from "./engine";
 interface State extends GameState {
   puzzle: number[];
   solution: number[];
@@ -21,8 +21,10 @@ interface State extends GameState {
   hints: number;
   noteMode: boolean;
   undo: { board: number[]; notes: number[][] }[];
+  errorCheck?: "conflicts" | "solution" | "off";
 }
 function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
+  const checkMode = s.errorCheck || "conflicts";
   useEffect(() => {
     const fn = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement) return;
@@ -56,7 +58,7 @@ function View({ state: s, dispatch, locale, paused }: GameViewProps<State>) {
                 "sudoku-cell" +
                 (s.puzzle[i] ? " given" : "") +
                 (s.selected === i ? " selected" : peers ? " peer" : "") +
-                (v && v !== s.solution[i] ? " invalid" : "") +
+                ((checkMode === "off" ? false : checkMode === "solution" ? Boolean(v && v !== s.solution[i]) : Boolean(v && hasConflict(s.board, i))) ? " invalid" : "") +
                 (v && v === s.board[s.selected] ? ' matching' : '') +
                 (i % 9 === 2 || i % 9 === 5 ? " box-right" : "") +
                 (Math.floor(i / 9) === 2 || Math.floor(i / 9) === 5
@@ -138,8 +140,19 @@ export const sudoku: GameDefinition<State> = {
       ],
       1,
     ),
+    select(
+      "errorCheck",
+      "Aviso de errores",
+      "Error check",
+      [
+        ["conflicts", "Solo conflictos directos", "Direct conflicts only"],
+        ["solution", "Comprobar con solución", "Check against solution"],
+        ["off", "Desactivado", "Off"],
+      ],
+      "conflicts",
+    ),
   ],
-  defaults: { difficulty: 1 },
+  defaults: { difficulty: 1, errorCheck: "conflicts" },
   create: async (cfg, seed, signal) => {
     const generated = await new Promise<any>((resolve, reject) => {
       const w = new SudokuWorker();
@@ -177,11 +190,25 @@ export const sudoku: GameDefinition<State> = {
       hints: 0,
       noteMode: false,
       undo: [],
+      errorCheck: (cfg.errorCheck as any) || "conflicts",
     };
   },
   reducer: (s, a) => {
     if (a.type === "SELECT") return { ...s, selected: a.index };
     if (a.type === "NOTES") return { ...s, noteMode: !s.noteMode };
+    if (a.type === "DEMO_NOTES" || (a.type === "NOTES" && a.demo)) {
+      let idx = s.board.findIndex((v, i) => !v && s.notes[i].length === 0);
+      if (idx < 0) idx = s.board.findIndex((v) => !v);
+      if (idx < 0) return { ...s, noteMode: true };
+      const cs = candidates(s.board, idx);
+      const notes = s.notes.map((n, i) => (i === idx ? (cs.length ? cs : [1, 2]) : [...n]));
+      return {
+        ...s,
+        selected: idx,
+        noteMode: true,
+        notes,
+      };
+    }
     if (a.type === "UNDO") {
       const prev = s.undo.at(-1);
       return prev
@@ -211,7 +238,14 @@ export const sudoku: GameDefinition<State> = {
       board[i] = value;
       notes[i] = [];
       const won = board.every((v, i) => v === s.solution[i]);
-      const wrong = value !== 0 && value !== s.solution[i];
+      const checkMode = s.errorCheck || "conflicts";
+      const wrong = value !== 0 && (
+        checkMode === "off"
+          ? false
+          : checkMode === "solution"
+            ? value !== s.solution[i]
+            : hasConflict(board, i)
+      );
       const hints = s.hints + (a.type === "HINT" ? 1 : 0);
       return {
         ...s,
@@ -225,7 +259,9 @@ export const sudoku: GameDefinition<State> = {
         status: won ? "won" : "playing",
         score: won ? Math.max(0, 1000 - hints * 100 - s.mistakes * 10) : 0,
         message: wrong
-          ? "Ese número entra en conflicto con la solución / That number conflicts with the solution"
+          ? (checkMode === "solution"
+              ? "Ese número entra en conflicto con la solución / That number conflicts with the solution"
+              : "Ese número entra en conflicto con otra casilla / That number conflicts with another cell")
           : a.type === "HINT"
             ? `Candidatos legales / Legal candidates: ${candidates(s.board, i).join(", ")}`
             : undefined,
@@ -250,7 +286,7 @@ export const sudoku: GameDefinition<State> = {
         "Selecciona una casilla y activa Notas. Pulsa cifras para añadirlas o quitarlas. Busca casillas con un solo candidato.",
         "Select a cell and enable Notes. Tap digits to add or remove candidates. Look for a cell with only one candidate.",
       ),
-      action: { type: "NOTES" },
+      action: { type: "DEMO_NOTES" },
     },
     {
       title: labels("Una ayuda explicada", "An explained hint"),

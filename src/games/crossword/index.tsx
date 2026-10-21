@@ -355,7 +355,7 @@ export const crossword: GameDefinition<CrosswordState> = {
         "Check marks incorrect letters with ! without erasing them. Reveal fills a letter and records a hint. Complete every word correctly to win. Each white cell is worth 10 points; each hint deducts 20.",
       ),
       diagram: "□ → A\n! → corregir / correct",
-      action: { type: "CHECK" },
+      action: { type: "DEMO_CHECK" },
     },
     {
       title: labels("Vocabulario abierto", "Open vocabulary"),
